@@ -1838,17 +1838,3 @@ const t4_accordionBtnsHandler = () => {
     });
   });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
