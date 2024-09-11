@@ -1,0 +1,247 @@
+/* PSRR-18949 */
+.active-filters {
+    flex-wrap: wrap;
+}
+.search-count {
+    width: 100%;
+}
+
+/* PSRR-18465 stop long words in heading causing horizontal scroll */
+@media (max-width: 479px) {
+	h1,
+  	.section-heading--amplified .amplified--title {
+		overflow-wrap: break-word;
+        word-wrap: break-word;
+        -ms-word-break: break-all;
+        word-break: break-all;
+        word-break: break-word;
+        -ms-hyphens: none;
+        -moz-hyphens: none;
+        -webkit-hyphens: none;
+        hyphens: none;
+	    text-wrap: wrap;
+	}
+}
+
+/* Required as H1 on News Hero has suffix */
+.section-heading--amplified h2 {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+/* PSRR-18470 prevent overflow */
+@media print, screen and (max-width: 48.06125em) {
+	.tuition-fees-section .tabs > .accordion--mobile.accordion--open > .accordion__content .accordion__content {
+	    padding: 0;
+	    overflow: hidden;
+	}
+}
+
+@media print, screen and (max-width: 48.06125em) {
+	.tuition-fees-section .tabs > .accordion--mobile.accordion--open > .accordion__button {
+	    z-index: 3;
+	}
+}
+
+/* PSRR-18463 */
+.cards--section + span + .cards--section.cards--section-heading-hidden {
+    margin-top: -3.75rem;
+}
+
+@media print, screen and (min-width: 64.0625em) {
+	.cards--section + span + .cards--section.cards--section-heading-hidden {
+	    margin-top: -7.75rem;
+	}
+}
+
+
+/* PSRR-18861 */
+.wysiwyg [href*="mailto:"] {
+    display: inline;
+}
+
+/* PSRR-18947 */
+.gsc-above-wrapper-area{ 
+  border-bottom: none !important; 
+}
+.gsc-webResult.gsc-result.gsc-promotion{ 
+  border-color: #FDB913 !important; 
+  background-color: #F7F7F7 !important; 
+}
+
+/* PSRR-19181 Avoid reloading on mobile pagination */
+nav.pagination span {
+    pointer-events: none;
+}
+
+/* PSRR-19050 Style pagination added via JS */
+.paginationjs-pages ul {
+	list-style: none;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.paginationjs-pages a {
+  	cursor: pointer;
+}
+
+@media print, screen and (max-width: 48.06125em) {
+	.paginationjs-pages li.currentpage a {
+      	font-size: 1rem;
+    	padding: 0.5rem 0.8125rem;
+	}
+}
+
+/* Search filter deselect */
+.active-filters--list li.primary {
+  	cursor: pointer;
+}
+
+/* PSRR-20601 Fellowship Search */
+.fellowship--item .global-spacing--4x {
+  	width: 100%;
+}
+
+.fellowship--item .description img {
+  	padding: 2rem;
+}
+
+/* PSRR-20599 CEJS */
+.cejs--item ul.list-group {
+  	list-style: none;
+    display: flex;
+  	flex-wrap: wrap;
+}
+
+.cejs--item ul.list-group figure {
+	margin: 0;
+}
+
+.cejs--item ul.list-group figure img {
+	display: block;
+}
+
+.cejs--item ul.iconDashboard {
+    margin: 0 0 2rem 0;
+}
+
+.su-listing--form-wrapper-cejs fieldset {
+	padding-right: 0;
+	padding-left: 0;
+}
+
+.su-listing--form-wrapper-cejs .fieldset-wrapper {
+	flex-wrap: wrap;
+}
+
+.su-listing--form-wrapper-cejs input[type=checkbox] + label {
+	margin: 0;
+    border: 4px solid transparent;
+}
+
+.su-listing--form-wrapper-cejs input[type=checkbox] + label img {
+	display: block;
+}
+
+.su-listing--form-wrapper-cejs .sdg input[type=checkbox] + label img {
+	padding: 2px;
+}
+
+.su-listing--form-wrapper-cejs input[type=checkbox]:checked + label {
+	border-color: #ffffff;
+}
+
+.su-listing--form-wrapper-cejs input[name*="lsap"] + label {
+	border-radius: 100%;
+}
+
+.su-listing--form-wrapper-cejs input[type=checkbox] + label::after,
+.su-listing--form-wrapper-cejs input[type=checkbox] + label::before {
+	display: none !important;
+}
+
+.su-listing--form-wrapper-cejs input[type=checkbox] + label img {
+    max-width: 100px;
+}
+
+/* PSRR-20600 Albers Mentor Search */
+.mentor-listing--item {
+    box-shadow: 3px 3px 8px 0 rgba(104, 104, 104, 0.2);
+	height: 100%;
+	background-color: #f7f7f7;
+	padding: 0;
+}
+
+@media print, screen and (min-width: 48.0625em) {
+    .mentor-listing--item {
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		gap: 1.25rem;
+        flex-direction: column;
+		padding: 0;
+    }
+}
+
+@media print, screen and (min-width: 64.0625em) {
+	.mentor-listing--item {
+		padding: 0;
+	}
+}
+
+@media print, screen and (max-width: 48.06125em) {
+	.mentor-listing--item {
+		padding-bottom: 1rem;
+	}
+}
+
+.mentor-listing--item .program-listing--body {
+	padding-bottom: 1.25rem;
+}
+
+.mentor-listing .program-listing--img {
+	position: relative;
+}
+
+.mentor-listing .program-listing--img::after {
+	content: "";
+	display: block;
+	padding-bottom: 100%;
+}
+
+.mentor-listing .program-listing--img img {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: 50% 50%;
+}
+
+.mentor-listing .program-listing--img img {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	max-width: 360px;
+	max-height: 360px;
+}
+
+.mentor-grid-margin-x {
+	margin-left: 1.25rem;
+	margin-right: 1.25rem;
+}
+
+.mentor-program {
+	padding-bottom: 1.25rem;
+}
+
+
