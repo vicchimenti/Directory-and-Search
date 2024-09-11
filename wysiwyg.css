@@ -84,59 +84,6 @@ blockquote {
   [data-embed-button=ohou_media_embed] .responsive-video-iframe {
     width: 100%;
   }
-  /*
-  figure.align-right,
-  figure.alignright,
-  figure.obj-right,
-  figure.align-left,
-  figure.alignleft,
-  figure.obj-left,
-  figure.align-center,
-  figure.obj-center,
-  .align-center,
-  .obj-center {
-    display: table;
-  }
-  figure.align-right figcaption,
-  figure.alignright figcaption,
-  figure.obj-right figcaption,
-  figure.align-left figcaption,
-  figure.alignleft figcaption,
-  figure.obj-left figcaption,
-  figure.align-center figcaption,
-  figure.obj-center figcaption,
-  .align-center figcaption,
-  .obj-center figcaption {
-    display: table-caption;
-  }
-  figure.align-right.responsive-video-iframe,
-  figure.alignright.responsive-video-iframe,
-  figure.obj-right.responsive-video-iframe,
-  figure.align-left.responsive-video-iframe,
-  figure.alignleft.responsive-video-iframe,
-  figure.obj-left.responsive-video-iframe,
-  figure.align-center.responsive-video-iframe,
-  figure.obj-center.responsive-video-iframe,
-  .align-center.responsive-video-iframe,
-  .obj-center.responsive-video-iframe {
-    min-width: 40%;
-  }
-  
-  figcaption {
-    font-family: Montserrat, Gill Sans, sans-serif;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    line-height: 1.75;
-    margin-top: 0.5rem;
-    caption-side: bottom;
-    color: #262626;
-  }
-  @media print, screen and (min-width: 64.0625em) {
-    figcaption {
-      font-size: 0.8125rem;
-    }
-  }
-  */
   
   
   span.btn, 
