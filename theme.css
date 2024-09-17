@@ -2,7 +2,7 @@
 /**
  * OHO Interactive main theme stylesheet.
  * Version 2022-05-25
- * Updated 2024-06-16 by Aubrey
+ * Updated 2024-09-17 by Aubrey
  * https://www.oho.com
  */
 .global-spacing--15x {
@@ -9449,7 +9449,7 @@ body.mobile-menu-open:not(.has-alert) {
 @media print, screen and (min-width: 64.0625em) {
   .main-menu.accessible-menu .menu-item__button,
 .utility-menu.accessible-menu .menu-item__button {
-    pointer-events: none;
+    /*pointer-events: none;*/
   }
   .utility-menu button.menu-item__button {
     width: 100%;
@@ -17672,124 +17672,4 @@ h3 {
     display: inherit !important;
   }
 }
-
 /*# sourceMappingURL=../maps/theme.css.map */
-
-
-/* wysiwyg.css */
-
-blockquote {
-  position: relative;
-  margin: 0 auto;
-  padding: 2.5rem;
-  background-color: #f7f7f7;
-}
-
-blockquote p {
-  font-family: Roboto Slab, Didot, serif;
-  font-size: 1.875rem;
-  font-weight: 400;
-  line-height: 1.55;
-}
-
-blockquote .quotee {
-  font-family: Montserrat, Gill Sans, sans-serif;
-  font-size: 1.0625rem;
-  font-weight: 500;
-  line-height: 1.7;
-  font-family: "Montserrat", "Gill Sans", sans-serif;
-  margin-top: 1.5rem;
-}
-
-.media--right {
-  float: right;
-  margin-left: 2rem;
-  margin-top: 2.5rem;
-  margin-right: 0;
-  margin-bottom: 1rem;
-  display: table;
-  max-width: 50%;
-}
-
-.media--right .media__main {
-  display: table-caption;
-  caption-side: bottom;
-}
-
-.media--right img {
-  display: block;
-}
-
-.media--right.responsive-video-iframe {
-  width: 33%;
-}
-
-.media--left {
-  float: left;
-  margin-top: 2.5rem;
-  margin-right: 2rem;
-  margin-bottom: 1rem;
-  margin-left: 0;
-  display: table;
-  max-width: 50%;
-}
-
-.media--left .media__main {
-  display: table-caption;
-  caption-side: bottom;
-}
-
-.media--left img {
-  display: block;
-}
-
-
-.media--fullwidth {
-  display: table;
-  margin-top: 2.5rem;
-  margin-right: auto;
-  margin-bottom: 1rem;
-  margin-left: auto;
-}
-
-.media--fullwidth img{
-  display: block;
-}
-
-.media--fullwidth.responsive-video-iframe {
-  width: 100%;
-}
-
-[data-embed-button=ohou_media_embed] .video-embed-field-responsive-video,
-[data-embed-button=ohou_media_embed] .responsive-video-iframe {
-  width: 100%;
-}
-
-
-span.btn, 
-a.btn, 
-ss-link.btn,
-media-item.btn{
-  font-family: "Montserrat", "Gill Sans", sans-serif;
-  border-width: 0.125rem;
-  border-radius: 0.25rem;
-  border-style: solid;
-  display: inline-block;
-  position: relative;
-  z-index: 2;
-  line-height: 1.1;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1.0625rem;
-  line-height: 1.25;
-  padding: 1rem 2rem;
-  border-color: #aa0000;
-  color: #ffffff;
-  background: #aa0000;
-}
-
-span.btn a {
-  color: #ffffff;
-  text-decoration: none;
-}
-
