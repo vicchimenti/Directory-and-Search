@@ -86,10 +86,8 @@
             return true;
          }
      },
-     runAjax: function (link, groupSel, loadArea, reloadLoadArea, async, disableCache) {
+     runAjax: function (link, groupSel, loadArea, reloadLoadArea, async, disableCache, pushHistory) {
 
-      
-        
          if (typeof reloadLoadArea === 'undefined') {
              reloadLoadArea = false;
          }
@@ -97,9 +95,12 @@
              async = true;
          }
          
- 
          if (typeof disableCache === 'undefined') {
              disableCache = false;
+         }
+
+         if (typeof pushHistory === 'undefined') {
+            pushHistory = false;
          }
  
          if (loadArea !== null) {
@@ -237,7 +238,7 @@
                          }
                      }
                  }
-                 if (!disableCache) {
+                 if (!disableCache && pushHistory) {
                     window.history.pushState( {}, '', link);
                  }
                  var checkScroll = loadArea.hasAttribute('data-t4-scroll');
@@ -1055,6 +1056,9 @@
          if (!event.target.hasAttribute('data-t4-filter')) {
              var clicked = this.getParent(event.target,'[data-t4-filter]');
          }
+         /*
+            NOTE - As the ajax doesn't trigger on change or keydown need to trigger a click event on the submit button in the form for the ajax to run
+         */
          if (clicked.hasAttribute('data-t4-filter')) {
              var name = clicked.getAttribute('data-t4-filter');
              if (clicked.hasAttribute('data-t4-value')) {
@@ -1067,7 +1071,14 @@
                      
                              selectsArray[i].options[x].selected = false;
                              selectsArray[i].value = '';
-                             selectsArray[i].dispatchEvent(this.getEvent('change'));
+                             //selectsArray[i].dispatchEvent(this.getEvent('change'));
+                             var form = selectsArray[i].closest('form');
+                            if (form) {
+                                var submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+                                if (submitButton) {
+                                    submitButton.dispatchEvent(this.getEvent('click'));
+                                }
+                            }
                          }
                      }
                  }
@@ -1075,21 +1086,42 @@
                  var checksArray = document.querySelectorAll(this.ajaxGroupSel + ' form input[type=radio][name="' + name + '"][data-t4-value="' + category + '"],' + this.ajaxGroupSel + ' form input[type=checkbox][name="' + name + '"][data-t4-value="' + category + '"]');
                	for (var i = 0; i < checksArray.length; i++) {
                      checksArray[i].checked = false;
-                     checksArray[i].dispatchEvent(this.getEvent('change'));
+                     //checksArray[i].dispatchEvent(this.getEvent('change'));
+                     var form = checksArray[i].closest('form');
+                     if (form) {
+                         var submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+                         if (submitButton) {
+                             submitButton.dispatchEvent(this.getEvent('click'));
+                         }
+                     }
                  }
              } else {
                  var dateArray = document.querySelectorAll(this.ajaxGroupSel + ' form input[type=date][name="' + name + '"]');
                  
                  for (var i = 0; i < dateArray.length; i++) {
                      dateArray[i].value = '';
-                     dateArray[i].dispatchEvent(this.getEvent('change'));
+                     //dateArray[i].dispatchEvent(this.getEvent('change'));
+                     var form = dateArray[i].closest('form');
+                    if (form) {
+                        var submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+                        if (submitButton) {
+                            submitButton.dispatchEvent(this.getEvent('click'));
+                        }
+                    }
                  }
  
                  var rangeArray = document.querySelectorAll(this.ajaxGroupSel + ' form input[type=range][name="' + name + '"]');
                  
                  for (var i = 0; i < rangeArray.length; i++) {
                      rangeArray[i].value = rangeArray[i].getAttribute('max');
-                     rangeArray[i].dispatchEvent(this.getEvent('change'));
+                     //rangeArray[i].dispatchEvent(this.getEvent('change'));
+                     var form = rangeArray[i].closest('form');
+                    if (form) {
+                        var submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+                        if (submitButton) {
+                            submitButton.dispatchEvent(this.getEvent('click'));
+                        }
+                    }
                  }
  
                  var inputArray = document.querySelectorAll(this.ajaxGroupSel + ' form input[type=text][name="' + name + '"]');
@@ -1097,7 +1129,14 @@
                  for (var i = 0; i < inputArray.length; i++) {
     
                      inputArray[i].value = '';
-                     inputArray[i].dispatchEvent(this.getEvent('keydown'));
+                     //inputArray[i].dispatchEvent(this.getEvent('keydown'));
+                     var form = inputArray[i].closest('form');
+                     if (form) {
+                         var submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+                         if (submitButton) {
+                             submitButton.dispatchEvent(this.getEvent('click'));
+                         }
+                     }
                  }
              }
          } else {
@@ -1232,10 +1271,11 @@
          //If it is not possible to find the main container it will not trigger the JS
          //this.loadBeforeAndAfterAjax();
          document.addEventListener("click", this.eventList.bind(this), false);
-         document.addEventListener("change", this.eventList.bind(this), false);
+         //document.addEventListener("change", this.eventList.bind(this), false);
          document.addEventListener("input", this.eventList.bind(this), false);
-         document.addEventListener("keyup", this.eventList.bind(this), false);
-         document.addEventListener("keydown", this.eventList.bind(this), false);
+         //document.addEventListener("keyup", this.eventList.bind(this), false);
+         //document.addEventListener("keydown", this.eventList.bind(this), false);
+         addEventListener("popstate", this.eventList.bind(this), false);
      };
      this.eventList = function (event) {
          console.log('2 - ');
@@ -1334,7 +1374,16 @@
  
              }
          }
- 
+
+         if (event.type === 'popstate') {
+            var containers = document.querySelectorAll(this.ajaxGroupSel + '[role="main"]');
+            if (containers.length > 0) {
+                var link = window.location.href;
+                var loadArea = containers[0];
+                var done = this.runAjax(link, this.ajaxGroupSel, loadArea, false, true, false, false);
+            }
+         }
+         
          if (done === true) {
              event.preventDefault(); // Cancel the native event
              event.stopPropagation(); // Don't bubble/capture the event
