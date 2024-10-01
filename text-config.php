@@ -95,19 +95,31 @@ try {
     $exactSearch = \T4\PHPSearchLibrary\FilterFactory::getInstance('FilterByExactMatch', $search);
     $dateSearch = \T4\PHPSearchLibrary\FilterFactory::getInstance('FilterByDate', $search);
 
+    // if ($queryHandler->isQuerySet('keywords')) {
+    //     $substringSearch->setMember('element', 'fullName');
+    //     $substringSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
+    //     $substringSearch->setMember('combinationOption', true);
+    //     $substringSearch->runFilter();
+    //     $substringSearch->setMember('element', 'positionTitles');
+    //     $substringSearch->runFilter();
+    //   	$substringSearch->setMember('element', 'schoolCollege');
+    //   	$substringSearch->runFilter();
+    //     $substringSearch->setMember('element', 'staffDepartment');
+    //   	$substringSearch->runFilter();
+    //     $substringSearch->setMember('element', 'areasOfExpertise');
+    //   	$substringSearch->runFilter();
+    //     $search->combineResults();
+    // }
+
     if ($queryHandler->isQuerySet('keywords')) {
-        $substringSearch->setMember('element', 'fullName');
-        $substringSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
-        $substringSearch->setMember('combinationOption', true);
-        $substringSearch->runFilter();
-        $substringSearch->setMember('element', 'positionTitles');
-        $substringSearch->runFilter();
-      	$substringSearch->setMember('element', 'schoolCollege');
-      	$substringSearch->runFilter();
-        $substringSearch->setMember('element', 'staffDepartment');
-      	$substringSearch->runFilter();
-        $substringSearch->setMember('element', 'areasOfExpertise');
-      	$substringSearch->runFilter();
+        $wordSearch->setMember('element', 'fullName');
+        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
+        $wordSearch->setMember('combinationOption', true);
+        $wordSearch->runFilter();
+        $wordSearch->setMember('element', 'positionTitles');
+        $wordSearch->runFilter();
+        $wordSearch->setMember('element', 'areasOfExpertise');
+      	$wordSearch->runFilter();
         $search->combineResults();
     }
 
