@@ -196,10 +196,10 @@ try {
         $frequencySearch->setMember('element', 'fullName');
         $frequencySearch->runProcessor();
         $frequencySearch->setMember('boost', 2);
-        $frequencySearch->setMember('element', 'lastName');
+        $frequencySearch->setMember('element', 'positionTitles');
         $frequencySearch->runProcessor();
       	$frequencySearch->setMember('boost', 1);
-        $frequencySearch->setMember('element', 'firstName');
+        $frequencySearch->setMember('element', 'areasOfExpertise');
         $frequencySearch->runProcessor();
       
       	// Calculates how much of the JSON element is occupied by the search term(s)
