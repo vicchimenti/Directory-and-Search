@@ -21,9 +21,9 @@ $i = 0;
                        value="<?php echo !empty($query['keywords']) ? $query['keywords']: ''  ?>">
             </div>
             <div class="cell cell medium-4">
-                <label for="keywords">Search for Areas of Expertise</label>
-                <input type="text" name="keywords" id="keywords" placeholder="Areas of Expertise &hellip;"
-                       value="<?php echo !empty($query['keywords']) ? $query['keywords']: ''  ?>">
+                <label for="keywords-expertise">Search for Areas of Expertise</label>
+                <input type="text" name="keywords-expertise" id="keywords-expertise" placeholder="Areas of Expertise &hellip;"
+                       value="<?php echo !empty($query['keywords-expertise']) ? $query['keywords-expertise']: ''  ?>">
             </div>
             <div class="cell medium-4">
                 <?php
