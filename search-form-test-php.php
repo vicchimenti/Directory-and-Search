@@ -16,13 +16,13 @@ $i = 0;
 
         <form>
         <div class="cell cell initial-12">
-                <label for="keywords">Search</label>
-                <input type="text" name="keywords" id="keywords" placeholder="Names, Titles, Areas of Expertise &hellip;"
+                <label for="keywords">Search by Name or Title</label>
+                <input type="text" name="keywords" id="keywords" placeholder="Names or Titles &hellip;"
                        value="<?php echo !empty($query['keywords']) ? $query['keywords']: ''  ?>">
             </div>
             <div class="cell cell medium-4">
-                <label for="keywords">Search</label>
-                <input type="text" name="keywords" id="keywords" placeholder="Names, Titles, Areas of Expertise &hellip;"
+                <label for="keywords">Search for Areas of Expertise</label>
+                <input type="text" name="keywords" id="keywords" placeholder="Areas of Expertise &hellip;"
                        value="<?php echo !empty($query['keywords']) ? $query['keywords']: ''  ?>">
             </div>
             <div class="cell medium-4">
