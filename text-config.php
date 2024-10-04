@@ -123,6 +123,18 @@ try {
         $search->combineResults();
     }
 
+    if ($queryHandler->isQuerySet('keywords-expertise')) {
+        $wordSearch->setMember('element', 'fullName');
+        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
+        $wordSearch->setMember('combinationOption', true);
+        $wordSearch->runFilter();
+        $wordSearch->setMember('element', 'positionTitles');
+        $wordSearch->runFilter();
+        $wordSearch->setMember('element', 'areasOfExpertise');
+      	$wordSearch->runFilter();
+        $search->combineResults();
+    }
+
     if ($queryHandler->isQuerySet('typeOfStaff')) {
         $exactSearch->setMember('element', 'typeOfStaff');
         $exactSearch->setMember('query', $queryHandler->getQueryValue('typeOfStaff'));
