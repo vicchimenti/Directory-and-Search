@@ -2,7 +2,7 @@
 /**
  * OHO Interactive main theme stylesheet.
  * Version 2022-05-25
- * Updated 2024-09-17 by Aubrey
+ * Updated 2024-10-03 by Aubrey
  * https://www.oho.com
  */
 .global-spacing--15x {
@@ -8276,14 +8276,14 @@ body.mobile-menu-open:not(.has-alert) {
   width: 100%;
 }
 .site-search td.gsc-input {
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #fff;
 }
 .site-search td.gsc-search-button {
   width: 40px;
 }
 @media print, screen and (min-width: 64.0625em) {
   .site-search td.gsc-search-button {
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #fff;
   }
 }
 .site-search td.gsc-clear-button {
@@ -17673,3 +17673,12 @@ h3 {
   }
 }
 /*# sourceMappingURL=../maps/theme.css.map */
+
+
+
+
+
+
+
+
+
