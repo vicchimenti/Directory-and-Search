@@ -118,20 +118,14 @@ try {
         $wordSearch->runFilter();
         $wordSearch->setMember('element', 'positionTitles');
         $wordSearch->runFilter();
-        $wordSearch->setMember('element', 'areasOfExpertise');
-      	$wordSearch->runFilter();
         $search->combineResults();
     }
 
     if ($queryHandler->isQuerySet('keywords-expertise')) {
-        $wordSearch->setMember('element', 'fullName');
-        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
+        $wordSearch->setMember('element', 'areasOfExpertise');
+        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords-expertise'));
         $wordSearch->setMember('combinationOption', true);
         $wordSearch->runFilter();
-        $wordSearch->setMember('element', 'positionTitles');
-        $wordSearch->runFilter();
-        $wordSearch->setMember('element', 'areasOfExpertise');
-      	$wordSearch->runFilter();
         $search->combineResults();
     }
 
