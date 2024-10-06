@@ -5189,7 +5189,7 @@ ol > li::before {
 .video-play-button::after {
   content: "\f144";
   color: #eee;
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-size: 2.5rem;
   font-weight: 600;
 }
@@ -5767,7 +5767,7 @@ h6 {
   margin-left: 0.9375rem;
   content: "\f00d";
   color: #ffffff;
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 100;
 }
 .active-filters .vaf__clear {
@@ -5916,7 +5916,7 @@ h6 {
   -webkit-animation: fa-spin 2000ms infinite cubic-bezier(0.82, 0.06, 0.14, 0.97);
           animation: fa-spin 2000ms infinite cubic-bezier(0.82, 0.06, 0.14, 0.97);
   color: #fe5000;
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-size: 100px;
 }
 .ajax-progress::before, .ajax-progress::after,
@@ -6404,7 +6404,7 @@ form[class*=webform] .fieldset-wrapper .js-form-type-radio {
   display: none;
 }
 .pager [class*=pager__item--] a::before, .pager [class*=pager__item--] a::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -6900,7 +6900,7 @@ form[class*=webform] .fieldset-wrapper .js-form-type-radio {
   position: relative;
 }
 .external a::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -6925,7 +6925,7 @@ a[data-entity-type=media]:after,
 [href$=".xls"]:after,
 [href$=".xlsx"]:after,
 [href$=".zip"]:after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -7725,7 +7725,7 @@ html.oho-js body:not(.cookie-panel-dismissed) .cookie-banner {
 }
 .footer--grouping .footer--utility a[href^="http://"]::after,
 .footer--grouping .footer--utility a[href^="https://"]::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -8244,7 +8244,7 @@ body.mobile-menu-open:not(.has-alert) {
     -webkit-transition: color 150ms cubic-bezier(0.42, 0.08, 0.06, 0.98);
     transition: color 150ms cubic-bezier(0.42, 0.08, 0.06, 0.98);
     color: #aa0000;
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     font-size: 1.5rem;
     font-weight: 400;
   }
@@ -8630,7 +8630,7 @@ body.mobile-menu-open:not(.has-alert) {
     width: 100%;
     content: "\f067";
     color: #ffffff;
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     font-size: 1.5rem;
   }
 }
@@ -8652,7 +8652,7 @@ body.mobile-menu-open:not(.has-alert) {
     width: 100%;
     content: "\f13a";
     color: #aa0000;
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     font-size: 14px;
     position: relative;
     top: -0.25em;
@@ -9246,7 +9246,7 @@ body.mobile-menu-open:not(.has-alert) {
     content: "\f078";
     -webkit-transform: translateY(-50%);
             transform: translateY(-50%);
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     font-size: 1.5em;
   }
   .sidebar-menu-open .sidebar-menu__toggle::after {
@@ -9299,7 +9299,7 @@ body.mobile-menu-open:not(.has-alert) {
   display: none;
 }
 .sidebar-menu-accordion .accordion__button::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -9333,7 +9333,7 @@ body.mobile-menu-open:not(.has-alert) {
   position: relative;
 }
 .sidebar-menu .parent-link a::before {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -9468,7 +9468,7 @@ body.mobile-menu-open:not(.has-alert) {
 }
 .utility-menu a[href^="http://"]::after,
 .utility-menu a[href^="https://"]::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -9608,7 +9608,7 @@ body.mobile-menu-open:not(.has-alert) {
     padding: 0.5rem;
   }
   .utility-menu li span::after {
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -9751,7 +9751,7 @@ body {
 .accordion__button::before {
   display: inline-block;
   float:left;
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -10035,7 +10035,7 @@ body {
     padding-left: 1.5rem;
   }
   .breadcrumbs li:nth-last-child(2)::before {
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     content: "\f060";
     color: #aa0000;
     padding: 0;
@@ -10053,7 +10053,7 @@ body {
 }
 @media print, screen and (max-width: 40.06125em) {
   .bg--dark .breadcrumbs li:nth-last-child(2)::before {
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     content: "\f060";
     color: #8ae0f2;
     padding: 0;
@@ -10065,7 +10065,7 @@ body {
 
 @media print, screen and (max-width: 40.06125em) {
   .hero--landing .breadcrumbs li:nth-last-child(2)::before {
-      font-family: "Font Awesome 6 Pro";
+      font-family: "Font Awesome 5 Pro";
       content: "\f060";
       color: #fff;
       padding: 0;
@@ -12920,7 +12920,7 @@ HERO IFRAME WITH PARALLAX
     font-size: 1.25rem;
   }
   .image-grid-item__toggle::before {
-    font-family: "Font Awesome 6 Pro";
+    font-family: "Font Awesome 5 Pro";
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -12953,7 +12953,7 @@ HERO IFRAME WITH PARALLAX
   font-weight: 700;
 }
 .jump-links.bg--dark .funderline-list ol > li::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -16671,7 +16671,7 @@ input[type=checkbox]:focus + label {
   background-image: linear-gradient(#aa0000, #aa0000);
 }
 .profile-detail .more-less__toggle::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -17279,7 +17279,7 @@ input[type=checkbox]:focus + label {
   border-color: #ffffff;
 }
 .program-comparison--sticky-panel li button::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -17490,7 +17490,7 @@ input[type=checkbox]:focus + label {
   display: none;
 }
 .program-comparison--sticky-panel.bg--dark .accordion__button::after {
-  font-family: "Font Awesome 6 Pro";
+  font-family: "Font Awesome 5 Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
