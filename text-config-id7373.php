@@ -95,37 +95,19 @@ try {
     $exactSearch = \T4\PHPSearchLibrary\FilterFactory::getInstance('FilterByExactMatch', $search);
     $dateSearch = \T4\PHPSearchLibrary\FilterFactory::getInstance('FilterByDate', $search);
 
-    // if ($queryHandler->isQuerySet('keywords')) {
-    //     $substringSearch->setMember('element', 'fullName');
-    //     $substringSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
-    //     $substringSearch->setMember('combinationOption', true);
-    //     $substringSearch->runFilter();
-    //     $substringSearch->setMember('element', 'positionTitles');
-    //     $substringSearch->runFilter();
-    //   	$substringSearch->setMember('element', 'schoolCollege');
-    //   	$substringSearch->runFilter();
-    //     $substringSearch->setMember('element', 'staffDepartment');
-    //   	$substringSearch->runFilter();
-    //     $substringSearch->setMember('element', 'areasOfExpertise');
-    //   	$substringSearch->runFilter();
-    //     $search->combineResults();
-    // }
-
     if ($queryHandler->isQuerySet('keywords')) {
-        $wordSearch->setMember('element', 'fullName');
-        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
-        $wordSearch->setMember('combinationOption', true);
-        $wordSearch->runFilter();
-        $wordSearch->setMember('element', 'positionTitles');
-        $wordSearch->runFilter();
-        $search->combineResults();
-    }
-
-    if ($queryHandler->isQuerySet('keywords-expertise')) {
-        $wordSearch->setMember('element', 'areasOfExpertise');
-        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords-expertise'));
-        $wordSearch->setMember('combinationOption', true);
-        $wordSearch->runFilter();
+        $substringSearch->setMember('element', 'fullName');
+        $substringSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
+        $substringSearch->setMember('combinationOption', true);
+        $substringSearch->runFilter();
+        $substringSearch->setMember('element', 'positionTitles');
+        $substringSearch->runFilter();
+      	$substringSearch->setMember('element', 'schoolCollege');
+      	$substringSearch->runFilter();
+        $substringSearch->setMember('element', 'staffDepartment');
+      	$substringSearch->runFilter();
+        $substringSearch->setMember('element', 'areasOfExpertise');
+      	$substringSearch->runFilter();
         $search->combineResults();
     }
 
@@ -202,10 +184,10 @@ try {
         $frequencySearch->setMember('element', 'fullName');
         $frequencySearch->runProcessor();
         $frequencySearch->setMember('boost', 2);
-        $frequencySearch->setMember('element', 'positionTitles');
+        $frequencySearch->setMember('element', 'lastName');
         $frequencySearch->runProcessor();
       	$frequencySearch->setMember('boost', 1);
-        $frequencySearch->setMember('element', 'areasOfExpertise');
+        $frequencySearch->setMember('element', 'firstName');
         $frequencySearch->runProcessor();
       
       	// Calculates how much of the JSON element is occupied by the search term(s)
