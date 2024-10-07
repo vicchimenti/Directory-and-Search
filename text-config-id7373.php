@@ -96,12 +96,12 @@ try {
     $dateSearch = \T4\PHPSearchLibrary\FilterFactory::getInstance('FilterByDate', $search);
 
     if ($queryHandler->isQuerySet('keywords')) {
-        $substringSearch->setMember('element', 'fullName');
-        $substringSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
-        $substringSearch->setMember('combinationOption', true);
-        $substringSearch->runFilter();
-        $substringSearch->setMember('element', 'areasOfExpertise');
-      	$substringSearch->runFilter();
+        $wordSearch->setMember('element', 'fullName');
+        $wordSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
+        $wordSearch->setMember('combinationOption', true);
+        $wordSearch->runFilter();
+        $wordSearch->setMember('element', 'areasOfExpertise');
+      	$wordSearch->runFilter();
         $search->combineResults();
     }
 
