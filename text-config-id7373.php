@@ -100,12 +100,12 @@ try {
         $substringSearch->setMember('query', $queryHandler->getQueryValue('keywords'));
         $substringSearch->setMember('combinationOption', true);
         $substringSearch->runFilter();
-        $substringSearch->setMember('element', 'positionTitles');
-        $substringSearch->runFilter();
-      	$substringSearch->setMember('element', 'schoolCollege');
-      	$substringSearch->runFilter();
-        $substringSearch->setMember('element', 'staffDepartment');
-      	$substringSearch->runFilter();
+        // $substringSearch->setMember('element', 'positionTitles');
+        // $substringSearch->runFilter();
+      	// $substringSearch->setMember('element', 'schoolCollege');
+      	// $substringSearch->runFilter();
+        // $substringSearch->setMember('element', 'staffDepartment');
+      	// $substringSearch->runFilter();
         $substringSearch->setMember('element', 'areasOfExpertise');
       	$substringSearch->runFilter();
         $search->combineResults();
