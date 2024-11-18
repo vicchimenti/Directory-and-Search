@@ -48,8 +48,8 @@ async function handleFunnelbackRequest(method, queryParams) {
   
   // Example usage for GET
   const queryParamsGet = {
-    profile: 'myprofile',
-    collection: 'mycollection',
+    profile: '_default',
+    collection: 'seattleu~sp-search',
     query: 'search term',
   };
   handleFunnelbackRequest('GET', queryParamsGet)
@@ -60,8 +60,8 @@ async function handleFunnelbackRequest(method, queryParams) {
   
   // Example usage for POST
   const queryParamsPost = {
-    profile: 'myprofile',
-    collection: 'mycollection',
+    profile: '_default',
+    collection: 'seattleu~sp-search',
     query: 'search term',
     // Add more parameters as needed
   };
