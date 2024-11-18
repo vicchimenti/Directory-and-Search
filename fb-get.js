@@ -1,6 +1,6 @@
 // Make a GET request to Funnelback
 function performSearch(query) {
-    const searchUrl = '/s/search.json?collection=your_collection&query=' + encodeURIComponent(query);
+    const searchUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&query=' + encodeURIComponent(query);
   
     fetch(searchUrl)
       .then(response => {
