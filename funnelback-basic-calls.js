@@ -41,6 +41,7 @@ async function handleFunnelbackRequest(method, queryParams) {
   
   // Example usage for POST
   const queryParamsPost = {
+    profile: 'myprofile',
     collection: 'mycollection',
     query: 'search term',
     // Add more parameters as needed
