@@ -19,9 +19,9 @@ async function handleFunnelbackRequest(method, queryParams) {
             })
             .catch(error => {
                 console.error("Error fetching IP address:", error);
-                document.getElementById("ip-address").textContent = 
-                      "Unable to retrieve IP address.";
-            });
+            //     document.getElementById("ip-address").textContent = 
+            //           "Unable to retrieve IP address.";
+            // });
     });
   
     try {
