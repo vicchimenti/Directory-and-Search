@@ -44,6 +44,7 @@ async function handleFunnelbackRequest(method, queryParams) {
       console.error('Error:', error);
       throw error;
     }
+  }
 }
 
 
