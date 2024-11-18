@@ -4,7 +4,7 @@ function performPostSearch(query) {
     formData.append('collection', 'seattleu~sp-search');
     formData.append('profile', '=_default');
   
-    fetch('/s/search.html', {
+    fetch('https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html', {
       method: 'POST',
       body: formData,
     })
