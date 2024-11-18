@@ -12,6 +12,7 @@ function performSearch(query) {
       .then(data => {
         // Process the search results
         console.log(data);
+        performPostSearch(query);
       })
       .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
