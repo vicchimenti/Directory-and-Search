@@ -29,6 +29,7 @@ async function handleFunnelbackRequest(method, queryParams) {
   
   // Example usage for GET
   const queryParamsGet = {
+    profile: 'myprofile',
     collection: 'mycollection',
     query: 'search term',
   };
