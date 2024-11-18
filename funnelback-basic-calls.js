@@ -1,16 +1,35 @@
 async function handleFunnelbackRequest(method, queryParams) {
-    const funnelbackEndpoint = "YOUR_FUNNELBACK_ENDPOINT"; // Replace with your Funnelback endpoint
+    const funnelbackEndpoint = "https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial"; // Replace with your Funnelback endpoint
   
     let url = funnelbackEndpoint;
     if (method === 'GET') {
       url += '?' + new URLSearchParams(queryParams).toString();
     }
+
+    let ipAddress = '';
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch the IP address from the API
+        fetch("https://ipinfo.io/json") 
+            .then(response => response.json())
+            .then(data => {
+                // log the ip
+                console.log("X-Forwarded-For: " + data.ip);
+                ipAddress = data.ip;
+
+            })
+            .catch(error => {
+                console.error("Error fetching IP address:", error);
+                document.getElementById("ip-address").textContent = 
+                      "Unable to retrieve IP address.";
+            });
+    });
   
     try {
       const response = await fetch(url, {
         method: method,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Forwarded-For:': ipAddress,
         },
         body: method === 'POST' ? new URLSearchParams(queryParams) : null,
       });
