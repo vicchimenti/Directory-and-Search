@@ -2,10 +2,11 @@ function performPostSearch(query) {
     const formData = new FormData();
     formData.append('query', query);
     formData.append('collection', 'seattleu~sp-search');
+    formData.append('profile', '=_default');
   
-    fetch('/s/search.json', {
+    fetch('/s/search.html', {
       method: 'POST',
-      body: formData
+      body: formData,
     })
       .then(response => {
         if (!response.ok) {

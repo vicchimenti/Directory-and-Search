@@ -44,29 +44,40 @@ async function handleFunnelbackRequest(method, queryParams) {
       console.error('Error:', error);
       throw error;
     }
-  }
-  
-  // Example usage for GET
-  const queryParamsGet = {
+}
+
+
+
+
+// Get the search query from the input field
+const searchInput = document.getElementById('search-input');
+const searchButton = document.getElementById('search-button');
+
+const queryParamsGet = {
     profile: '_default',
     collection: 'seattleu~sp-search',
-    query: 'search term',
-  };
-  handleFunnelbackRequest('GET', queryParamsGet)
+    query: searchInput.value,
+};
+handleFunnelbackRequest('GET', queryParamsGet)
     .then(data => {
-      // Process the returned HTML fragment
-      console.log(data);
+    // Process the returned HTML fragment
+    console.log(data);
     });
-  
-  // Example usage for POST
-  const queryParamsPost = {
+
+
+const queryParamsPost = {
     profile: '_default',
     collection: 'seattleu~sp-search',
-    query: 'search term',
-    // Add more parameters as needed
-  };
-  handleFunnelbackRequest('POST', queryParamsPost)
+    query: searchInput.value,
+};
+handleFunnelbackRequest('POST', queryParamsPost)
     .then(data => {
-      // Process the returned HTML fragment
-      console.log(data);
+    // Process the returned HTML fragment
+    console.log(data);
     });
+
+
+
+searchButton.addEventListener('click', () => {
+    handleFunnelbackRequest(queryParamsGet);
+});
