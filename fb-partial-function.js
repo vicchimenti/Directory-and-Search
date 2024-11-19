@@ -3,6 +3,7 @@
         try {
           const response = await fetch('https://api.ipify.org?format=json');
           const data = await response.json();
+          console.log("getIP: " + data.ip);
           return data.ip;
         } catch (error) {
           console.error('Error fetching IP address:', error);
@@ -12,6 +13,8 @@
   
       // Funnelback fetch function
       async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
+
+        console.log("async method: " + method);
         try {
           if (method === 'GET' && searchQuery) {
             url += `?query=${encodeURIComponent(searchQuery)}`;
@@ -47,6 +50,8 @@
   
         const searchQuery = document.getElementById('search-input').value; // Get search query
         const userIP = await getUserIP(); // Fetch user IP (optional)
+        console.log('const ip: ' + userIP);
+        console.log("Query: " + searchQuery);
   
         // Define Funnelback URLs
         const getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your GET URL
@@ -57,6 +62,10 @@
           fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery),
           fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery),
         ]);
+
+        console.log("getResponse: " + getResponse);
+        console.log("postResponse: " + postResponse);
+
   
         // Display results
         document.getElementById('results').innerHTML = `
