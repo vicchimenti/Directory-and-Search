@@ -10,7 +10,7 @@ const { query } = request
 
 const params = querystring.stringify(query)
 
-const endpoint = `https://${process.env.FUNNELBACK_SEARCH_DOMAIN}/s/search.html?${params}`
+const endpoint = `https://${process.env.https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial}/s/search.html?${params}`
 
 const funnelbackResponse = await fetch(endpoint)
 const searchResults = await funnelbackResponse.text()

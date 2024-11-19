@@ -1,15 +1,30 @@
     // Fetch user's IP address
     async function getUserIP() {
-        try {
-          let response = await fetch('https://api.ipify.org?format=json');
-          let data = await response.json();
-          console.log("getIP: " + data.ip);
-          return data.ip;
-        } catch (error) {
-          console.error('Error fetching IP address:', error);
-          return ''; // Default to empty if error occurs
-        }
+      try {
+        let response = await fetch('https://api.ipify.org?format=json');
+        let data = await response.json();
+        console.log("getIP: " + data.ip);
+        return data.ip;
+      } catch (error) {
+        console.error('Error fetching IP address:', error);
+        return ''; // Default to empty if error occurs
       }
+    }
+
+    function fetchPublicIP(callback) {
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => callback(null, data.ip))
+        .catch(error => callback(error, null));
+    }
+    
+    fetchPublicIP((error, ip) => {
+      if (error) {
+        console.error('Error retrieving IP address:', error);
+      } else {
+        console.log('Public IP address retrieved:', ip);
+      }
+    });
   
       // Funnelback fetch function
       async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
