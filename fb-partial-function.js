@@ -49,8 +49,8 @@
         const userIP = await getUserIP(); // Fetch user IP (optional)
   
         // Define Funnelback URLs
-        const getUrl = 'https://example.com/funnelback/api'; // Replace with your GET URL
-        const postUrl = 'https://example.com/funnelback/api'; // Replace with your POST URL
+        const getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your GET URL
+        const postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your POST URL
   
         // Trigger GET and POST requests
         const [getResponse, postResponse] = await Promise.all([
