@@ -37,8 +37,8 @@
   
           console.log("response status: " + response.status);
           console.log("response type: " + response.type);
-          const stream = response.body.pipeThrough(new TextDecoderStream());
-          for await (const value of stream) {
+          let stream = response.body.pipeThrough(new TextDecoderStream());
+          for await (let value of stream) {
             console.log("value: " + value);
           }
           // let html = await response.text();
