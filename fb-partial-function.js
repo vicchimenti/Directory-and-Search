@@ -1,8 +1,8 @@
     // Fetch user's IP address
     async function getUserIP() {
         try {
-          const response = await fetch('https://api.ipify.org?format=json');
-          const data = await response.json();
+          let response = await fetch('https://api.ipify.org?format=json');
+          let data = await response.json();
           console.log("getIP: " + data.ip);
           return data.ip;
         } catch (error) {
@@ -20,7 +20,7 @@
             url += `?query=${encodeURIComponent(searchQuery)}`;
           }
   
-          const options = {
+          let options = {
             method,
             headers: {
               'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
@@ -32,10 +32,10 @@
             options.body = `query=${encodeURIComponent(searchQuery)}`;
           }
   
-          const response = await fetch(url, options);
+          let response = await fetch(url, options);
           if (!response.ok) throw new Error(`Error: ${response.status}`);
   
-          const html = await response.text();
+          let html = await response.text();
           console.log(`${method} Response:`, html);
           return html; // Return the HTML response
         } catch (error) {
@@ -48,17 +48,17 @@
       document.getElementById('search-button').addEventListener('submit', async (event) => {
         event.preventDefault(); // Prevent page reload
   
-        const searchQuery = document.getElementById('search-input').value; // Get search query
-        const userIP = await getUserIP(); // Fetch user IP (optional)
-        console.log('const ip: ' + userIP);
+        let searchQuery = document.getElementById('search-input').value; // Get search query
+        let userIP = await getUserIP(); // Fetch user IP (optional)
+        console.log('let ip: ' + userIP);
         console.log("Query: " + searchQuery);
   
         // Define Funnelback URLs
-        const getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your GET URL
-        const postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your POST URL
+        let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your GET URL
+        let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial'; // Replace with your POST URL
   
         // Trigger GET and POST requests
-        const [getResponse, postResponse] = await Promise.all([
+        let [getResponse, postResponse] = await Promise.all([
           fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery),
           fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery),
         ]);
