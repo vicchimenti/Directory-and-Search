@@ -40,28 +40,31 @@
 
 
           let stream = response.body.pipeThrough(new TextDecoderStream());
-          let reader = stream.getReader(); // Create a reader
+          let reader = stream.getReader();
           let text = "";
 
           try {
             while (true) {
               const { value, done } = await reader.read();
+
               console.log("initial value: " + value);
+
               if (done) {
                 console.log("Stream reading complete.");
                 break;
               }
               text += value;
-              console.log("value:", + value); // Process each chunk of data
+
+              console.log("text value:", + text); // Process each chunk of data
             }
+
           } catch (error) {
             console.error("Error reading stream:", error);
           } finally {
-            // Optionally: release the lock if the caller doesn't need the reader
             reader.releaseLock();
           }
         
-          return text; // Return the reader for further consumption
+          return text;
 
         } catch (error) {
           console.error(`Error with ${method} request:`, error);
