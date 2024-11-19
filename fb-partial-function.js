@@ -45,8 +45,9 @@
       }
   
       // Handle form submission
-      document.getElementById('search-button').addEventListener('submit', async (event) => {
+      document.getElementById('search-button').addEventListener('click', async (event) => {
         event.preventDefault(); // Prevent page reload
+        console.log("get element by id: search-button");
   
         let searchQuery = document.getElementById('search-input').value; // Get search query
         let userIP = await getUserIP(); // Fetch user IP (optional)
