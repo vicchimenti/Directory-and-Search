@@ -83,13 +83,16 @@
         console.log("Query: " + searchQuery);
   
         // Define Funnelback URLs
-        let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
+        // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
         let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
   
-        let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
+        // let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
 
-        console.log("getResponse: " + getResponse);
-        // console.log("postResponse: " + postResponse);
+        let postResponse = await(fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery));
+
+
+        // console.log("getResponse: " + getResponse);
+        console.log("postResponse: " + postResponse);
 
   
         // Display results
