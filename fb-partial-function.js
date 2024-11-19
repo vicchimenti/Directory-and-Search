@@ -39,30 +39,30 @@
           console.log("response type: " + response.type);
 
 
-          // let stream = response.body.pipeThrough(new TextDecoderStream());
-          // let reader = stream.getReader();
-          // let text = "";
+          let stream = response.body.pipeThrough(new TextDecoderStream());
+          let reader = stream.getReader();
+          let text = "";
 
-          // try {
-          //   while (true) {
-          //     const { value, done } = await reader.read();
+          try {
+            while (true) {
+              const { value, done } = await reader.read();
 
-          //     console.log("initial value: " + value);
+              console.log("initial value: " + value);
 
-          //     if (done) {
-          //       console.log("Stream reading complete.");
-          //       break;
-          //     }
-          //     text += value;
+              if (done) {
+                console.log("Stream reading complete.");
+                break;
+              }
+              text += value;
 
-          //     console.log("text value:", + text); // Process each chunk of data
-          //   }
+              console.log("text value:", + text); // Process each chunk of data
+            }
 
-          // } catch (error) {
-          //   console.error("Error reading stream:", error);
-          // } finally {
-          //   reader.releaseLock();
-          // }
+          } catch (error) {
+            console.error("Error reading stream:", error);
+          } finally {
+            reader.releaseLock();
+          }
         
           return text;
 
