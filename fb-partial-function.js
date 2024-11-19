@@ -66,7 +66,7 @@
 
         fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery);
 
-        console.log("getResponse: " + getResponse);
+        // console.log("getResponse: " + getResponse);
         // console.log("postResponse: " + postResponse);
 
   
