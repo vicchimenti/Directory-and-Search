@@ -64,7 +64,7 @@
         //   fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery),
         // ]);
 
-        let getResponse = fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery);
+        let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
 
         console.log("getResponse: " + getResponse);
         // console.log("postResponse: " + postResponse);
