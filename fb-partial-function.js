@@ -44,7 +44,8 @@
 
           let stream = response.body.pipeThrough(new TextDecoderStream());
           let reader = stream.getReader(); // Create a reader
-        
+          let text = "";
+
           try {
             while (true) {
               const { value, done } = await reader.read();
@@ -52,7 +53,8 @@
                 console.log("Stream reading complete.");
                 break;
               }
-              console.log("value:", value); // Process each chunk of data
+              text += value;
+              console.log("value:", + value); // Process each chunk of data
             }
           } catch (error) {
             console.error("Error reading stream:", error);
@@ -61,7 +63,7 @@
             reader.releaseLock();
           }
         
-          return reader; // Return the reader for further consumption
+          return text; // Return the reader for further consumption
 
 
           // let html = await response.text();
