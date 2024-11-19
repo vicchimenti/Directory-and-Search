@@ -1,4 +1,4 @@
-async function handleFunnelbackRequest(method, queryParams) {
+async function handleFunnelbackRequest(method, queryParams, ipAddress) {
     const funnelbackEndpoint = "https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial"; // Replace with your Funnelback endpoint
   
     let url = funnelbackEndpoint;
@@ -6,24 +6,6 @@ async function handleFunnelbackRequest(method, queryParams) {
       url += '?' + new URLSearchParams(queryParams).toString();
     }
 
-    let ipAddress = '';
-    document.addEventListener("DOMContentLoaded", function() {
-        // Fetch the IP address from the API
-        fetch("https://ipinfo.io/json") 
-            .then(response => response.json())
-            .then(data => {
-                // log the ip
-                console.log("X-Forwarded-For: " + data.ip);
-                ipAddress = data.ip;
-
-            })
-            .catch(error => {
-                console.error("Error fetching IP address:", error);
-            //     document.getElementById("ip-address").textContent = 
-            //           "Unable to retrieve IP address.";
-            // });
-    });
-  
     try {
       const response = await fetch(url, {
         method: method,
@@ -45,7 +27,7 @@ async function handleFunnelbackRequest(method, queryParams) {
       throw error;
     }
   }
-}
+
 
 
 
@@ -53,13 +35,31 @@ async function handleFunnelbackRequest(method, queryParams) {
 // Get the search query from the input field
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
+let ipAddress = '';
+document.addEventListener("DOMContentLoaded", function() {
+    // Fetch the IP address from the API
+    fetch("https://ipinfo.io/json") 
+        .then(response => response.json())
+        .then(data => {
+            // log the ip
+            console.log("X-Forwarded-For: " + data.ip);
+            ipAddress = data.ip;
+
+        })
+        .catch(error => {
+            console.error("Error fetching IP address:", error);
+        //     document.getElementById("ip-address").textContent = 
+        //           "Unable to retrieve IP address.";
+        // });
+        });
+      };
 
 const queryParamsGet = {
     profile: '_default',
     collection: 'seattleu~sp-search',
     query: searchInput.value,
 };
-handleFunnelbackRequest('GET', queryParamsGet)
+handleFunnelbackRequest('GET', queryParamsGet, ipAddress)
     .then(data => {
     // Process the returned HTML fragment
     console.log(data);
@@ -71,7 +71,7 @@ const queryParamsPost = {
     collection: 'seattleu~sp-search',
     query: searchInput.value,
 };
-handleFunnelbackRequest('POST', queryParamsPost)
+handleFunnelbackRequest('POST', queryParamsPost, ipAddress)
     .then(data => {
     // Process the returned HTML fragment
     console.log(data);
@@ -79,6 +79,6 @@ handleFunnelbackRequest('POST', queryParamsPost)
 
 
 
-searchButton.addEventListener('click', () => {
-    handleFunnelbackRequest(queryParamsGet);
-});
+// searchButton.addEventListener('click', () => {
+//     handleFunnelbackRequest(queryParamsGet);
+// });

@@ -9,7 +9,7 @@ function performPostSearch(query) {
     const formData = new FormData();
     formData.append('query', query);
     formData.append('collection', 'seattleu~sp-search');
-    formData.append('profile', '=_default');
+    formData.append('profile', '_default');
 
 
     let ipAddress = '';
@@ -81,6 +81,7 @@ function performSearch(query) {
 
 searchButton.addEventListener('click', () => {
     const query = searchInput.value;
+    console.log("search input" + query)
     performSearch(query);
 });
 
