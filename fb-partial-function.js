@@ -37,9 +37,13 @@
   
           console.log("response status: " + response.status);
           console.log("response type: " + response.type);
-          let html = await response.text();
-          console.log(`${method} Response:`, html);
-          return html; // Return the HTML response
+          const stream = response.body.pipeThrough(new TextDecoderStream());
+          for await (const value of stream) {
+            console.log(value);
+          }
+          // let html = await response.text();
+          // console.log(`${method} Response:`, html);
+          return stream; // Return the HTML response
         } catch (error) {
           console.error(`Error with ${method} request:`, error);
           return `<p>Error fetching ${method} request. Please try again later.</p>`;
