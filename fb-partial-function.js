@@ -45,7 +45,7 @@
       }
   
       // Handle form submission
-      document.getElementById('search-button').addEventListener('submit', async (event) => {
+      document.getElementById('searchForm').addEventListener('submit', async (event) => {
         event.preventDefault(); // Prevent page reload
   
         let searchQuery = document.getElementById('search-input').value; // Get search query
