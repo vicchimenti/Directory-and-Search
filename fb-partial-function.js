@@ -58,7 +58,7 @@
             console.error("Error reading stream:", error);
           } finally {
             // Optionally: release the lock if the caller doesn't need the reader
-            // reader.releaseLock();
+            reader.releaseLock();
           }
         
           return reader; // Return the reader for further consumption
@@ -66,7 +66,7 @@
 
           // let html = await response.text();
           // console.log(`${method} Response:`, html);
-          return stream; // Return the HTML response
+          // return stream; // Return the HTML response
         } catch (error) {
           console.error(`Error with ${method} request:`, error);
           return `<p>Error fetching ${method} request. Please try again later.</p>`;
