@@ -1,4 +1,6 @@
 // Get the search query from the input field
+document.addEventListener("DOMContentLoaded", function() {
+
 const searchInput = document.getElementById('search-input');
 const searchButton = document.getElementById('search-button');
 
@@ -11,7 +13,7 @@ function performPostSearch(query) {
 
 
     let ipAddress = '';
-    document.addEventListener("DOMContentLoaded", function() {
+    // document.addEventListener("DOMContentLoaded", function() {
         // Fetch the IP address from the API
         fetch("https://ipinfo.io/json") 
             .then(response => response.json())
@@ -26,7 +28,8 @@ function performPostSearch(query) {
                 // document.getElementById("ip-address").textContent = 
                 //       "Unable to retrieve IP address.";
             });
-    });
+        // });
+    
 
     fetch('https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html', {
         method: 'POST',
@@ -79,4 +82,6 @@ function performSearch(query) {
 searchButton.addEventListener('click', () => {
     const query = searchInput.value;
     performSearch(query);
+});
+
 });
