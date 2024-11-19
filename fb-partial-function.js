@@ -37,10 +37,7 @@
   
           console.log("response status: " + response.status);
           console.log("response type: " + response.type);
-          // let stream = response.body.pipeThrough(new TextDecoderStream());
-          // for await (let value of stream) {
-          //   console.log("value: " + value);
-          // }
+
 
           let stream = response.body.pipeThrough(new TextDecoderStream());
           let reader = stream.getReader(); // Create a reader
@@ -49,6 +46,7 @@
           try {
             while (true) {
               const { value, done } = await reader.read();
+              console.log("initial value: " + value);
               if (done) {
                 console.log("Stream reading complete.");
                 break;
@@ -65,10 +63,6 @@
         
           return text; // Return the reader for further consumption
 
-
-          // let html = await response.text();
-          // console.log(`${method} Response:`, html);
-          // return stream; // Return the HTML response
         } catch (error) {
           console.error(`Error with ${method} request:`, error);
           return `<p>Error fetching ${method} request. Please try again later.</p>`;
