@@ -83,12 +83,6 @@
         let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
         let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
   
-        // Trigger GET and POST requests
-        // let [getResponse, postResponse] = await Promise.all([
-        //   fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery),
-        //   fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery),
-        // ]);
-
         let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
 
         console.log("getResponse: " + getResponse);
