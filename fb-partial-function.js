@@ -37,10 +37,33 @@
   
           console.log("response status: " + response.status);
           console.log("response type: " + response.type);
+          // let stream = response.body.pipeThrough(new TextDecoderStream());
+          // for await (let value of stream) {
+          //   console.log("value: " + value);
+          // }
+
           let stream = response.body.pipeThrough(new TextDecoderStream());
-          for await (let value of stream) {
-            console.log("value: " + value);
+          let reader = stream.getReader(); // Create a reader
+        
+          try {
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) {
+                console.log("Stream reading complete.");
+                break;
+              }
+              console.log("value:", value); // Process each chunk of data
+            }
+          } catch (error) {
+            console.error("Error reading stream:", error);
+          } finally {
+            // Optionally: release the lock if the caller doesn't need the reader
+            // reader.releaseLock();
           }
+        
+          return reader; // Return the reader for further consumption
+
+
           // let html = await response.text();
           // console.log(`${method} Response:`, html);
           return stream; // Return the HTML response
