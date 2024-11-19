@@ -1,4 +1,4 @@
-    // Fetch user's IP address (optional)
+    // Fetch user's IP address
     async function getUserIP() {
         try {
           const response = await fetch('https://api.ipify.org?format=json');
