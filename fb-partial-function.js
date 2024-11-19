@@ -74,7 +74,5 @@
         document.getElementById('results').innerHTML = `
           <h3>GET Response:</h3>
           <div>${getResponse}</div>
-        //   <h3>POST Response:</h3>
-        //   <div>${postResponse}</div>
         `;
       });
