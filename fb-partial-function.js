@@ -64,9 +64,9 @@
         //   fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery),
         // ]);
 
-        fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery);
+        let getResponse = fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery);
 
-        // console.log("getResponse: " + getResponse);
+        console.log("getResponse: " + getResponse);
         // console.log("postResponse: " + postResponse);
 
   
@@ -74,7 +74,7 @@
         document.getElementById('results').innerHTML = `
           <h3>GET Response:</h3>
           <div>${getResponse}</div>
-          <h3>POST Response:</h3>
-          <div>${postResponse}</div>
+        //   <h3>POST Response:</h3>
+        //   <div>${postResponse}</div>
         `;
       });
