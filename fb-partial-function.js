@@ -35,6 +35,7 @@
           let response = await fetch(url, options);
           if (!response.ok) throw new Error(`Error: ${response.status}`);
   
+          console.log("response status: " + response.status);
           let html = await response.text();
           console.log(`${method} Response:`, html);
           return html; // Return the HTML response
