@@ -78,7 +78,7 @@
         console.log("get element by id: search-button");
   
         let searchQuery = document.getElementById('search-input').value; // Get search query
-        let userIP = await getUserIP(); // Fetch user IP (optional)
+        let userIP = await getUserIP().toString(); // Fetch user IP (optional)
         console.log('let ip: ' + userIP);
         console.log("Query: " + searchQuery);
   
