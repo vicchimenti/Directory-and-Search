@@ -17,7 +17,7 @@
         console.log("async method: " + method);
         try {
           if (method === 'GET' && searchQuery) {
-            url += `?query=${encodeURIComponent(searchQuery)}`;
+            url += `?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
           }
   
           let options = {
@@ -83,7 +83,7 @@
         console.log("Query: " + searchQuery);
   
         // Define Funnelback URLs
-        let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
+        let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
         // let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
   
         let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
