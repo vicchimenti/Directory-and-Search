@@ -79,14 +79,17 @@
   
         let searchQuery = document.getElementById('search-input').value; // Get search query
         let userIP = await getUserIP(); // Fetch user IP (optional)
+        let ipString = JSON.stringify(userIP);
+
         console.log('let ip: ' + userIP);
+        console.log('ipString: ' + ipString);
         console.log("Query: " + searchQuery);
   
         // Define Funnelback URLs
         let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
         // let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
   
-        let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
+        let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', ipString, searchQuery));
 
         // let postResponse = await(fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery));
 
