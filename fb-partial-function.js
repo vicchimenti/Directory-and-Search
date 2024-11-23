@@ -89,7 +89,7 @@
         let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
         // let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
   
-        let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', ipString, searchQuery));
+        let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
 
         // let postResponse = await(fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery));
 
