@@ -24,7 +24,7 @@
             method,
             headers: {
               'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-              'X-Forwarded-For': userIP,
+              // 'X-Forwarded-For': userIP,
             },
           };
   
