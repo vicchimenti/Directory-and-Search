@@ -1,5 +1,12 @@
-    
-    
+// capture all listeners
+const seachBar = document.getElementById("search-button");
+const allResults = document.getElementById("All_Results0");
+const website1 = document.getElementById("Website1");
+const programs2 = document.getElementById("Programs2");
+const people3 = document.getElementById("People3");
+const news4 = document.getElementById("News4");
+const law5 = document.getElementById("Law5");
+
     
 // Fetch user's IP address
 async function getUserIP() {
