@@ -6,6 +6,7 @@ const programs2 = document.getElementById("Programs2");
 const people3 = document.getElementById("People3");
 const news4 = document.getElementById("News4");
 const law5 = document.getElementById("Law5");
+const searchTab = document.getElementsByClassName("tab__button");
 
 // Fetch user's IP address
 async function getUserIP() {
