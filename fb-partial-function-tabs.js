@@ -101,3 +101,29 @@ searchBar.addEventListener('click', async (event) => {
     <div class="funnelback-search-container">${getResponse}</div>
   `;
 });
+
+// Handle tab request
+searchTab.addEventListener('click', async (event) => {
+  event.preventDefault(); // Prevent page reload
+  console.log("get element by class tab__button");
+
+  let tabId = document.getElementsByClassName("tab__button")[0].id;
+  console.log("tabId: " +tabId);
+  // let searchQuery = document.getElementById(tabId).value; // Get search query
+  let userIP = await getUserIP(); // Fetch user IP (optional)
+  // let ipString = JSON.stringify(userIP);
+
+  console.log('let ip: ' + userIP);
+  // console.log('ipString: ' + ipString);
+  console.log("Query: " + searchQuery);
+
+  // Define Funnelback URLs
+  let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+  // let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
+  // console.log("getResponse: " + getResponse);
+
+  // Display results
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">${getResponse}</div>
+  `;
+});
