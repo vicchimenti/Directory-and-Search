@@ -100,6 +100,6 @@
   
         // Display results
         document.getElementById('results').innerHTML = `
-          <div>${getResponse}</div>
+          <div class="funnelback-search-container">${getResponse}</div>
         `;
       });
