@@ -125,7 +125,8 @@ searchTab.addEventListener('click', async (event) => {
     default : tabName = null;
   }
 
-  let userIP = await getUserIP(); // Fetch user IP (optional)
+  console.log("tabName: " + tabName);
+  let userIP = await getUserIP(); // Fetch user IP
   console.log('let ip: ' + userIP);
   console.log("Query: " + searchQuery);
 
