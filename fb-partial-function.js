@@ -100,7 +100,6 @@
   
         // Display results
         document.getElementById('results').innerHTML = `
-          <h3>GET Response:</h3>
           <div>${getResponse}</div>
         `;
       });
