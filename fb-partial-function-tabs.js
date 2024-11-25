@@ -90,16 +90,8 @@ document.getElementById('search-button').addEventListener('click', async (event)
 
   // Define Funnelback URLs
   let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-  // let postUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html?collection=seattleu~sp-search&profile=_default&form=partial';
-
   let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
-
-  // let postResponse = await(fetchFunnelbackWithQuery(postUrl, 'POST', userIP, searchQuery));
-
-
   console.log("getResponse: " + getResponse);
-  // console.log("postResponse: " + postResponse);
-
 
   // Display results
   document.getElementById('results').innerHTML = `
