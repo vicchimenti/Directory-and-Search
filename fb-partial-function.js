@@ -55,7 +55,7 @@
               }
               text += value;
 
-              console.log("text value:", + text); // Process each chunk of data
+              console.log("text value:", + text.toString()); // Process each chunk of data
             }
 
           } catch (error) {
