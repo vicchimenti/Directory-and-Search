@@ -115,9 +115,9 @@ searchTab.addEventListener('click', async (event) => {
     break;
     case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
     break;
-    case "People3": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
+    case "People3": tabName = "&f.Tabs%7Cseattleu~ds-staff=People";
     break;
-    case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
+    case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-news=News";
     break;
     case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
     break;
