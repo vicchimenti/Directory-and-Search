@@ -31,9 +31,9 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
       },
     };
 
-    if (method === 'POST' && searchQuery) {
-      options.body = `query=${encodeURIComponent(searchQuery)}`;
-    }
+    // if (method === 'POST' && searchQuery) {
+    //   options.body = `query=${encodeURIComponent(searchQuery)}`;
+    // }
 
     let response = await fetch(url, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
