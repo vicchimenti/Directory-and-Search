@@ -109,12 +109,9 @@ searchTab.addEventListener('click', async (event) => {
 
   let tabId = document.getElementsByClassName("tab__button")[0].id;
   console.log("tabId: " +tabId);
-  // let searchQuery = document.getElementById(tabId).value; // Get search query
   let userIP = await getUserIP(); // Fetch user IP (optional)
-  // let ipString = JSON.stringify(userIP);
 
   console.log('let ip: ' + userIP);
-  // console.log('ipString: ' + ipString);
   console.log("Query: " + searchQuery);
 
   // Define Funnelback URLs
