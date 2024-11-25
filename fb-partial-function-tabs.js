@@ -1,13 +1,13 @@
 // capture all listeners
-const seachBar = document.getElementById("search-button").value;
-const allResults = document.getElementById("All_Results0").value;
-const website1 = document.getElementById("Website1").value;
-const programs2 = document.getElementById("Programs2").value;
-const people3 = document.getElementById("People3").value;
-const news4 = document.getElementById("News4").value;
-const law5 = document.getElementById("Law5").value;
+const searchBar = document.getElementById("search-button");
+const allResults = document.getElementById("All_Results0");
+const website1 = document.getElementById("Website1");
+const programs2 = document.getElementById("Programs2");
+const people3 = document.getElementById("People3");
+const news4 = document.getElementById("News4");
+const law5 = document.getElementById("Law5");
 
-console.log("searchBar: " + seachBar)    
+console.log("searchBar: " + searchBar)    
 // Fetch user's IP address
 async function getUserIP() {
   try {
@@ -79,7 +79,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 }
 
 // Handle form submission
-seachBar.addEventListener('click', async (event) => {
+searchBar.addEventListener('click', async (event) => {
   event.preventDefault(); // Prevent page reload
   console.log("get element by id: search-button");
 
