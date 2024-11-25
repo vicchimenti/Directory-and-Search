@@ -80,12 +80,13 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 
 
 // Funnelback fetch function
-async function fetchFunnelbackWithTabs(url, method, userIP, searchQuery) {
+async function fetchFunnelbackWithTabs(url, method, userIP, searchQuery, tabItem) {
 
   console.log("async method: " + method);
   try {
     if (method === 'GET' && searchQuery) {
-      url += `?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
+      // url += `?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
+      url += `?form=partial${tabItem}&query=${encodeURIComponent(searchQuery)}&profile=_default&collection=seattleu~sp-search`;
     }
 
     let options = {
