@@ -7,7 +7,6 @@ const people3 = document.getElementById("People3");
 const news4 = document.getElementById("News4");
 const law5 = document.getElementById("Law5");
 
-console.log("searchBar: " + searchBar)    
 // Fetch user's IP address
 async function getUserIP() {
   try {
