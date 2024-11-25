@@ -79,7 +79,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 }
 
 // Handle form submission
-document.getElementById('search-button').addEventListener('click', async (event) => {
+seachBar.addEventListener('click', async (event) => {
   event.preventDefault(); // Prevent page reload
   console.log("get element by id: search-button");
 
