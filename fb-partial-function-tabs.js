@@ -109,6 +109,7 @@ searchTab.addEventListener('click', async (event) => {
 
   let tabId = document.getElementsByClassName("tab__button")[0].id;
   console.log("tabId: " +tabId);
+  
   let tabName = '';
   switch (tabId) {
     case "Website1": tabName = "&f.Tabs%7Cseattleu%7Eds-web=Website";
@@ -117,14 +118,11 @@ searchTab.addEventListener('click', async (event) => {
     break;
     case "People3": tabName = "&f.Tabs%7Cseattleu~ds-staff=People";
     break;
-    case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-news=News";
+    case "News4": tabName = "&f.Tabs%7Cseattleu~ds-news=News";
     break;
-    case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
+    case "Law5": tabName = "&f.Tabs%7Cseattleu~ds-law=Law";
     break;
-    case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
-    break;
-    
-
+    default : tabName = null;
   }
 
   let userIP = await getUserIP(); // Fetch user IP (optional)
