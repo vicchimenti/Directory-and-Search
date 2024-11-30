@@ -167,6 +167,17 @@ tabElements.forEach(el => {
     console.log('Tab clicked:', this.id);
     let tabLink = document.getElementById(this.id).getAttribute("href");
     console.log('Tab Link:', tabLink);
+    let userTabIP = getUserIP(); // Fetch user IP (optional)
+    let ipTabString = JSON.stringify(userTabIP);
+    console.log('let tabIp: ' + userTabIP);
+    console.log('tabIpString: ' + ipTabString);
+
+
+
+  // Display results
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">${getResponse}</div>
+  `;
 
 })
 
@@ -194,7 +205,7 @@ tabElements.forEach(el => {
 //   }
   // console.log("tabName: " + tabName);
 
-  
+
   let userIP = getUserIP(); // Fetch user IP
   console.log('let ip: ' + userIP);
   console.log("Query: " + searchQuery);
