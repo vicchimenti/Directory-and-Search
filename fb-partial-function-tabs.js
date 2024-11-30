@@ -7,6 +7,7 @@ const people3 = document.getElementById("People3");
 const news4 = document.getElementById("News4");
 const law5 = document.getElementById("Law5");
 const searchTab = document.getElementsByClassName("tab__button");
+const tabItems = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
 // Fetch user's IP address
 async function getUserIP() {
@@ -161,27 +162,27 @@ searchBar.addEventListener('click', async (event) => {
 });
 
 // Handle tab request
-searchTab.addEventListener('click', async (event) => {
-  event.preventDefault(); // Prevent page reload
-  console.log("get element by class tab__button");
+// searchTab.addEventListener('click', async (event) => {
+//   event.preventDefault(); // Prevent page reload
+//   console.log("get element by class tab__button");
 
-  let tabId = document.getElementsByClassName("tab__button")[0].id;
-  console.log("tabId: " +tabId);
+//   let tabId = document.getElementsByClassName("tab__button")[0].id;
+//   console.log("tabId: " +tabId);
   
-  let tabName = '';
-  switch (tabId) {
-    case "Website1": tabName = "&f.Tabs%7Cseattleu%7Eds-web=Website";
-    break;
-    case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
-    break;
-    case "People3": tabName = "&f.Tabs%7Cseattleu~ds-staff=People";
-    break;
-    case "News4": tabName = "&f.Tabs%7Cseattleu~ds-news=News";
-    break;
-    case "Law5": tabName = "&f.Tabs%7Cseattleu~ds-law=Law";
-    break;
-    default : tabName = null;
-  }
+//   let tabName = '';
+//   switch (tabId) {
+//     case "Website1": tabName = "&f.Tabs%7Cseattleu%7Eds-web=Website";
+//     break;
+//     case "Programs2": tabName = "&f.Tabs%7Cseattleu~ds-programs=Programs";
+//     break;
+//     case "People3": tabName = "&f.Tabs%7Cseattleu~ds-staff=People";
+//     break;
+//     case "News4": tabName = "&f.Tabs%7Cseattleu~ds-news=News";
+//     break;
+//     case "Law5": tabName = "&f.Tabs%7Cseattleu~ds-law=Law";
+//     break;
+//     default : tabName = null;
+//   }
 
   console.log("tabName: " + tabName);
   let userIP = await getUserIP(); // Fetch user IP
