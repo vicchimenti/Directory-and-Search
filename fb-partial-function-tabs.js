@@ -7,7 +7,7 @@ const people3 = document.getElementById("People3");
 const news4 = document.getElementById("News4");
 const law5 = document.getElementById("Law5");
 const searchTab = document.getElementsByClassName("tab__button");
-const tabItems = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
+const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
 // Fetch user's IP address
 async function getUserIP() {
@@ -162,6 +162,15 @@ searchBar.addEventListener('click', async (event) => {
 });
 
 // Handle tab request
+tabElements.forEach(el => {
+  el.addEventListener('click', function() {
+    console.log('Tab clicked:', this.id);
+    let tabLink = document.getElementById(this.id).getAttribute("href");
+    console.log('Tab Link:', tabLink);
+
+})
+
+
 // searchTab.addEventListener('click', async (event) => {
 //   event.preventDefault(); // Prevent page reload
 //   console.log("get element by class tab__button");
@@ -183,9 +192,10 @@ searchBar.addEventListener('click', async (event) => {
 //     break;
 //     default : tabName = null;
 //   }
+  // console.log("tabName: " + tabName);
 
-  console.log("tabName: " + tabName);
-  let userIP = await getUserIP(); // Fetch user IP
+  
+  let userIP = getUserIP(); // Fetch user IP
   console.log('let ip: ' + userIP);
   console.log("Query: " + searchQuery);
 
