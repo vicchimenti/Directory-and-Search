@@ -163,11 +163,12 @@ searchBar.addEventListener('click', async (event) => {
 
 // Handle tab request
 tabElements.forEach(el => {
-  el.addEventListener('click', function() {
+  el.addEventListener('click', async function() {
     console.log('Tab clicked:', this.id);
     let tabLink = document.getElementById(this.id).getAttribute("href");
     console.log('Tab Link:', tabLink);
-    let userTabIP = getUserIP(); // Fetch user IP (optional)
+    
+    let userTabIP = await getUserIP(); // Fetch user IP (optional)
     let ipTabString = JSON.stringify(userTabIP);
     console.log('let tabIp: ' + userTabIP);
     console.log('tabIpString: ' + ipTabString);
