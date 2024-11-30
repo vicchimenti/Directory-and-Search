@@ -81,12 +81,14 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 
 
 // Funnelback fetch function
-async function fetchFunnelbackWithTabs(url, method, userIP, searchQuery, tabItem) {
+async function fetchFunnelbackWithTabs(url, method, userIP) {
+
+  let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
 
   console.log("async method: " + method);
   try {
-    if (method === 'GET' && searchQuery) {
-      url += `?form=partial${tabItem}&query=${encodeURIComponent(searchQuery)}&profile=_default&collection=seattleu~sp-search`;
+    if (method === 'GET') {
+      getUrl += `${url}`;
     }
 
     let options = {
@@ -97,7 +99,7 @@ async function fetchFunnelbackWithTabs(url, method, userIP, searchQuery, tabItem
       },
     };
 
-    let response = await fetch(url, options);
+    let response = await fetch(getUrl, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
     console.log("response status: " + response.status);
@@ -173,13 +175,15 @@ tabElements.forEach(el => {
     console.log('let tabIp: ' + userTabIP);
     console.log('tabIpString: ' + ipTabString);
 
+    // Define Funnelback URLs
+    // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+    let getResponse = await (fetchFunnelbackWithQuery(tabLink, 'GET', userIP));
+    console.log("getResponse: " + getResponse);
 
-
-  // Display results
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getResponse}</div>
-  `;
-
+    // Display results
+    document.getElementById('results').innerHTML = `
+      <div class="funnelback-search-container">${getResponse}</div>
+    `;
 })
 
 
