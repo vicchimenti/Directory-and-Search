@@ -156,6 +156,20 @@ searchBar.addEventListener('click', async (event) => {
   `;
 });
 
+
+
+
+// Gather listeners after results post
+const allResults = document.getElementById("All_Results0");
+const website1 = document.getElementById("Website1");
+const programs2 = document.getElementById("Programs2");
+const people3 = document.getElementById("People3");
+const news4 = document.getElementById("News4");
+const law5 = document.getElementById("Law5");
+const searchTab = document.getElementsByClassName("tab__button");
+const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
+
+
 // Handle tab request
 tabElements.forEach(el => {
   el.addEventListener('click', async function() {
@@ -181,17 +195,6 @@ tabElements.forEach(el => {
       <div class="funnelback-search-container">${getResponse}</div>
     `;
 })
-
-
-
-const allResults = document.getElementById("All_Results0");
-const website1 = document.getElementById("Website1");
-const programs2 = document.getElementById("Programs2");
-const people3 = document.getElementById("People3");
-const news4 = document.getElementById("News4");
-const law5 = document.getElementById("Law5");
-const searchTab = document.getElementsByClassName("tab__button");
-const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
   // let userIP = getUserIP(); // Fetch user IP
   // console.log('let ip: ' + userIP);
