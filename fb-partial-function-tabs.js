@@ -161,6 +161,8 @@ searchBar.addEventListener('click', async (event) => {
 
 if (getResponse) {
 
+  console.log("getResponse true");
+
   // Gather listeners after results post
   const allResults = document.getElementById("All_Results0");
   const website1 = document.getElementById("Website1");
@@ -170,7 +172,7 @@ if (getResponse) {
   const law5 = document.getElementById("Law5");
   const searchTab = document.getElementsByClassName("tab__button");
   const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
-
+  // let tablink = null;
 
   // Handle tab request
   tabElements.forEach(el => {
@@ -198,4 +200,6 @@ if (getResponse) {
       `;
     })
   });
+
+
 }
