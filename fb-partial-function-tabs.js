@@ -1,5 +1,6 @@
 // capture search bar
 const searchBar = document.getElementById("search-button");
+let getResponse = null;
 
 
 // Fetch user's IP address
@@ -147,7 +148,7 @@ searchBar.addEventListener('click', async (event) => {
 
   // Define Funnelback URLs
   let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-  let getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
+  getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
   console.log("getResponse: " + getResponse);
 
   // Display results
@@ -158,43 +159,46 @@ searchBar.addEventListener('click', async (event) => {
 
 
 
+if (getResponse) {
 
-// Gather listeners after results post
-const allResults = document.getElementById("All_Results0");
-const website1 = document.getElementById("Website1");
-const programs2 = document.getElementById("Programs2");
-const people3 = document.getElementById("People3");
-const news4 = document.getElementById("News4");
-const law5 = document.getElementById("Law5");
-const searchTab = document.getElementsByClassName("tab__button");
-const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
+  // Gather listeners after results post
+  const allResults = document.getElementById("All_Results0");
+  const website1 = document.getElementById("Website1");
+  const programs2 = document.getElementById("Programs2");
+  const people3 = document.getElementById("People3");
+  const news4 = document.getElementById("News4");
+  const law5 = document.getElementById("Law5");
+  const searchTab = document.getElementsByClassName("tab__button");
+  const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
 
-// Handle tab request
-tabElements.forEach(el => {
-  el.addEventListener('click', async function() {
+  // Handle tab request
+  tabElements.forEach(el => {
+    el.addEventListener('click', async function() {
 
-    alert("tabElements triggered");
-    console.log('Tab clicked:', this.id);
+      alert("tabElements triggered");
+      console.log('Tab clicked:', this.id);
 
-    let tabLink = document.getElementById(this.id).getAttribute("href");
-    alert('Tab Link:', tabLink);
-    
-    let userTabIP = await getUserIP(); // Fetch user IP (optional)
-    let ipTabString = JSON.stringify(userTabIP);
-    console.log('let tabIp: ' + userTabIP);
-    console.log('tabIpString: ' + ipTabString);
+      let tabLink = document.getElementById(this.id).getAttribute("href");
+      alert('Tab Link:', tabLink);
+      
+      let userTabIP = await getUserIP(); // Fetch user IP (optional)
+      let ipTabString = JSON.stringify(userTabIP);
+      console.log('let tabIp: ' + userTabIP);
+      console.log('tabIpString: ' + ipTabString);
 
-    // Define Funnelback URLs
-    // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-    let getResponse = await (fetchFunnelbackWithQuery(tabLink, 'GET', userIP));
-    console.log("getResponse: " + getResponse);
+      // Define Funnelback URLs
+      // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+      let getResponse = await (fetchFunnelbackWithQuery(tabLink, 'GET', userIP));
+      console.log("getResponse: " + getResponse);
 
-    // Display results
-    document.getElementById('results').innerHTML = `
-      <div class="funnelback-search-container">${getResponse}</div>
-    `;
-})
+      // Display results
+      document.getElementById('results').innerHTML = `
+        <div class="funnelback-search-container">${getResponse}</div>
+      `;
+    })
+  });
+}
 
   // let userIP = getUserIP(); // Fetch user IP
   // console.log('let ip: ' + userIP);
@@ -209,4 +213,4 @@ tabElements.forEach(el => {
   // document.getElementById('results').innerHTML = `
   //   <div class="funnelback-search-container">${getTabResponse}</div>
   // `;
-});
+// });
