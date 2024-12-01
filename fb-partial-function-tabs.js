@@ -133,33 +133,9 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
   }
 }
 
-// Handle form submission
-searchBar.addEventListener('click', async (event) => {
-  event.preventDefault(); // Prevent page reload
-  console.log("get element by id: search-button");
-
-  let searchQuery = document.getElementById('search-input').value; // Get search query
-  let userIP = await getUserIP(); // Fetch user IP (optional)
-  let ipString = JSON.stringify(userIP);
-
-  console.log('let ip: ' + userIP);
-  console.log('ipString: ' + ipString);
-  console.log("Query: " + searchQuery);
-
-  // Define Funnelback URLs
-  let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-  getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
-  console.log("getResponse: " + getResponse);
-
-  // Display results
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getResponse}</div>
-  `;
-});
 
 
-
-if (getResponse) {
+function processTabs () {
 
   console.log("getResponse true");
 
@@ -203,3 +179,33 @@ if (getResponse) {
 
 
 }
+
+// Handle form submission
+searchBar.addEventListener('click', async (event) => {
+  event.preventDefault(); // Prevent page reload
+  console.log("get element by id: search-button");
+
+  let searchQuery = document.getElementById('search-input').value; // Get search query
+  let userIP = await getUserIP(); // Fetch user IP (optional)
+  let ipString = JSON.stringify(userIP);
+
+  console.log('let ip: ' + userIP);
+  console.log('ipString: ' + ipString);
+  console.log("Query: " + searchQuery);
+
+  // Define Funnelback URLs
+  let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+  getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
+  console.log("getResponse: " + getResponse);
+
+  // Display results
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">${getResponse}</div>
+  `;
+
+  processTabs();
+});
+
+
+
+
