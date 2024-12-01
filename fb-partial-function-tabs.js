@@ -199,18 +199,3 @@ if (getResponse) {
     })
   });
 }
-
-  // let userIP = getUserIP(); // Fetch user IP
-  // console.log('let ip: ' + userIP);
-  // console.log("Query: " + searchQuery);
-
-  // // Define Funnelback URLs
-  // let getTabUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-  // let getTabResponse = await (fetchFunnelbackWithTabs(getTabUrl, 'GET', userIP, searchQuery, tabName));
-  // console.log("getTabResponse: " + getTabResponse);
-
-  // // Display results
-  // document.getElementById('results').innerHTML = `
-  //   <div class="funnelback-search-container">${getTabResponse}</div>
-  // `;
-// });
