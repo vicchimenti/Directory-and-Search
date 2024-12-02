@@ -156,7 +156,7 @@ function processTabs () {
     el.addEventListener('click', async function() {
 
       alert("tabElements triggered");
-      console.log('Tab clicked:', this.id);
+      console.log('Tab clicked:', + this.id);
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
       alert('Tab Link:', tabLink);
