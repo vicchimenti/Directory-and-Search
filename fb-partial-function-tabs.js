@@ -86,8 +86,6 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 // Funnelback fetch function
 async function fetchFunnelbackWithTabs(url, method) {
 
-  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-
   try {
     if (method === 'GET') {
       prodUrl += `${url}`;
@@ -147,7 +145,6 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 // handle tab listeners
 async function handleClick(e) {
-  // processTabsBool = false;
   e.preventDefault();
   if (e.target.matches('a')) {
 
@@ -157,7 +154,6 @@ async function handleClick(e) {
     document.getElementById('results').innerHTML = `
       <div class="funnelback-search-container">${getResponse}</div>
     `;
-    // processTabsBool = true;
   }
   processTabs();
 }
