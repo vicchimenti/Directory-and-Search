@@ -155,11 +155,11 @@ async function processTabs (userIp) {
       event.preventDefault(); // Prevent page reload
 
       console.log('Tab clicked:' +  this.id);
-      alert("tabElements triggered: " + this.id);
+      // alert("tabElements triggered: " + this.id);
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
       console.log('Logged tab Link: ' + tabLink);
-      alert('Tab Link: ' + tabLink);
+      // alert('Tab Link: ' + tabLink);
       
 
       // Define Funnelback URLs
