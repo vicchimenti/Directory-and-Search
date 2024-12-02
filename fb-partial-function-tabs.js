@@ -162,8 +162,8 @@ async function processTabs () {
 searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
 
-  let searchQuery = document.getElementById('search-input').value;
-  let getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
+  let searchBarQuery = document.getElementById('search-input').value;
+  let getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchBarQuery));
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getResponse}</div>
