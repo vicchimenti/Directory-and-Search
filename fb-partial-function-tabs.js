@@ -137,7 +137,7 @@ async function handleClick(e) {
   e.preventDefault();
   if (e.target.matches('a')) {
 
-    console.log("e.target: " + e.target);
+    console.log("e.target: " + e.target.href);
 
     let tabLink = document.querySelector('a').getAttribute("href");
     console.log("tab link: " + tabLink);
