@@ -2,6 +2,7 @@
 const searchBar = document.getElementById("search-button");
 let getResponse = null;
 let userIpAddress = null;
+let userIp = null;
 
 async function getUserIP() {
   try {
@@ -17,7 +18,7 @@ async function getUserIP() {
 
 // Fetch user's IP address
 document.addEventListener('DOMContentLoaded', async function() {
-  let userIp = await getUserIP();
+  userIp = await getUserIP();
   userIpAddress = JSON.stringify(userIp);
 });
 
@@ -187,11 +188,9 @@ searchBar.addEventListener('click', async (event) => {
   console.log("get element by id: search-button");
 
   let searchQuery = document.getElementById('search-input').value; // Get search query
-  // let userIP = await getUserIP(); // Fetch user IP (optional)
-  // let ipString = JSON.stringify(userIP);
-
+ 
   console.log('let ip: ' + userIpAddress);
-  // console.log('ipString: ' + ipString);
+  console.log('ip object: ' + userIp);
   console.log("Query: " + searchQuery);
 
   // Define Funnelback URLs
