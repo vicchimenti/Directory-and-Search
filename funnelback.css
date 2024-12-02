@@ -2,9 +2,7 @@
 *   Funnelback Stylesheet
 * */
 
-
-
-
+/* Search bar input rules */
 @media print, screen and (min-width: 64.0625em) {
     .site-search .search-block-form input.sq-search {
         width: 100%;
@@ -17,17 +15,21 @@
     width: 100%;
 }
 
+/* search page input rules */
 @media print, screen and (min-width: 64.0625em) {
     .searchArea input.on-page-sq-search {
-        width: 100%;
+        width: 80%;
     }
 }
 
 .searchArea input.on-page-sq-search  {
-    border: 0;
+    border: 2px;
+    border-color: gray;
+    border-style: solid;
     padding: .5rem;
-    width: 100%;
+    width: 80%;
 }
+
 
 
 hr {
