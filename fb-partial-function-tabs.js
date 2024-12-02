@@ -132,6 +132,16 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
+function saveListeners() {
+  if (tabElements) {
+    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+
+  }
+} 
+
+
+
+
 // handle tab listeners
 async function handleClick(e) {
   e.preventDefault();
@@ -144,6 +154,7 @@ async function handleClick(e) {
       <div class="funnelback-search-container">${getResponse}</div>
     `;
   }
+  saveListeners();
 }
 
 
@@ -191,13 +202,3 @@ searchBar.addEventListener('click', async (event) => {
 
   processTabs();
 });
-
-if (tabElements) {
-
-
-    function saveListeners() {
-
-      localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
-
-  }
-};
