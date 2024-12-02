@@ -156,9 +156,9 @@ function processTabs () {
 
   // Handle tab request
   tabElements.forEach(el => {
-    el.addEventListener('click', async (event) {
+    el.addEventListener('click', async (event) => {
       event.preventDefault(); // Prevent page reload
-      
+
       let userTabIP = await getUserIP(); // Fetch user IP (optional)
       let ipTabString = JSON.stringify(userTabIP);
       // console.log('let tabIp: ' + userTabIP);
