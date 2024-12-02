@@ -173,7 +173,7 @@ async function processTabs (userIp) {
       `;
     })
   });
-  processTabs(userIp);
+  
 }
 
 // Handle form submission
