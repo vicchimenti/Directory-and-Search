@@ -139,7 +139,9 @@ async function handleClick(e) {
 
     console.log("e.target: " + e.target.href);
 
-    let tabLink = document.querySelector('a').getAttribute("href");
+    let tabLink = e.target.getAttribute("href");
+
+    // let tabLink = document.querySelector('a').getAttribute("href");
     console.log("tab link: " + tabLink);
     getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
@@ -147,8 +149,8 @@ async function handleClick(e) {
       <div class="funnelback-search-container">${getResponse}</div>
     `;
 
-    const { textContent } = e.target;
-    console.log(`Link Text:  ${textContent} `);
+    // const { textContent } = e.target;
+    // console.log(`Link Text:  ${textContent} `);
   }
 }
 
