@@ -137,6 +137,8 @@ async function handleClick(e) {
   e.preventDefault();
   if (e.target.matches('a')) {
 
+    console.log("e.target: " + e.target);
+
     let tabLink = document.querySelector('a').getAttribute("href");
     console.log("tab link: " + tabLink);
     getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
