@@ -7,16 +7,16 @@ let userIpAddress = null;
 // Fetch user's IP address
 document.addEventListener('DOMContentLoaded', function() {
    async function getUserIP() {
-    try {
-      let response = await fetch('https://api.ipify.org?format=json');
-      let data = await response.json();
-      console.log("getIP: " + data.ip);
-      userIpAddress = JSON.stringify(data.ip);
-    } catch (error) {
-      console.error('Error fetching IP address:', error);
-      return ''; // Default to empty if error occurs
+      try {
+        let response = await fetch('https://api.ipify.org?format=json');
+        let data = await response.json();
+        console.log("getIP: " + data.ip);
+        userIpAddress = JSON.stringify(data.ip);
+      } catch (error) {
+          console.error('Error fetching IP address:', error);
+          // return ''; // Default to empty if error occurs
+      }
     }
-  }
 });
 
 // Funnelback fetch function
