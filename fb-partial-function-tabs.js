@@ -1,9 +1,11 @@
-// capture search bar
+// capture search bar and globaldeclarations
 const searchBar = document.getElementById("search-button");
 let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
 
+
+// gather user ip method
 async function getUserIP() {
   try {
     let response = await fetch('https://api.ipify.org?format=json');
@@ -16,6 +18,8 @@ async function getUserIP() {
   }
 }
 
+
+
 // Fetch user's IP address
 document.addEventListener('DOMContentLoaded', async function() {
   userIp = await getUserIP();
@@ -25,8 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Funnelback fetch function
 async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
-  // console.log("async method: " + method);
-  try {
+   try {
     if (method === 'GET' && searchQuery) {
       url += `?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
     }
@@ -42,9 +45,6 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
     let response = await fetch(url, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-    // console.log("response status: " + response.status);
-    // console.log("response type: " + response.type);
-
 
     let stream = response.body.pipeThrough(new TextDecoderStream());
     let reader = stream.getReader();
@@ -54,15 +54,11 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
       while (true) {
         const { value, done } = await reader.read();
 
-        // console.log("initial value: " + value);
-
         if (done) {
           console.log("Stream reading complete.");
           break;
         }
         text += value;
-
-        // console.log("text value:", + text); // Process each chunk of data
       }
 
     } catch (error) {
@@ -83,13 +79,8 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 // Funnelback fetch function
 async function fetchFunnelbackWithTabs(url, method) {
 
-  console.log("fetchFunnelbackWithTabs");
-  // alert("fetchFunnelbackWithTabs");
-
-  // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
   let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
-  console.log("async method: " + method);
   try {
     if (method === 'GET') {
       prodUrl += `${url}`;
@@ -118,15 +109,12 @@ async function fetchFunnelbackWithTabs(url, method) {
       while (true) {
         const { value, done } = await reader.read();
 
-        // console.log("initial value: " + value);
-
         if (done) {
           console.log("Stream reading complete.");
           break;
         }
         text += value;
 
-        // console.log("text value:", + text); // Process each chunk of data
       }
 
     } catch (error) {
@@ -149,33 +137,19 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 async function processTabs () {
 
-  console.log("getResponse true");
-  console.log("userTabIp true " + userIpAddress);
-
   const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
 
   // Handle tab request
   tabElements.forEach(el => {
     el.addEventListener('click', async function(event) {
-      event.preventDefault(); // Prevent page reload
-
-      console.log('Tab clicked:' +  this.id);
-      // alert("tabElements triggered: " + this.id);
+      event.preventDefault();
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
-      console.log('Logged tab Link: ' + tabLink);
-      // alert('Tab Link: ' + tabLink);
-      
+      getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
-      // Define Funnelback URLs
-      // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-      let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
-      console.log("getTabResponse: ready");
-
-      // Display results
       document.getElementById('results').innerHTML = `
-        <div class="funnelback-search-container">${getTabResponse}</div>
+        <div class="funnelback-search-container">${getResponse}</div>
       `;
     })
   });
@@ -184,22 +158,13 @@ async function processTabs () {
 
 // Handle form submission
 searchBar.addEventListener('click', async (event) => {
-  event.preventDefault(); // Prevent page reload
-  console.log("get element by id: search-button");
+  event.preventDefault();
 
-  let searchQuery = document.getElementById('search-input').value; // Get search query
- 
-  console.log('let ip: ' + userIpAddress);
-  console.log('ip object: ' + userIp);
-  console.log("Query: " + searchQuery);
-
-  // Define Funnelback URLs
-  // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+  let searchQuery = document.getElementById('search-input').value;
   let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
-  console.log("getResponse: ready");
 
-  // Display results
+
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getResponse}</div>
   `;
