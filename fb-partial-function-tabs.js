@@ -120,7 +120,7 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
         }
         text += value;
 
-        console.log("text value:", + text); // Process each chunk of data
+        // console.log("text value:", + text); // Process each chunk of data
       }
 
     } catch (error) {
