@@ -3,6 +3,8 @@ const searchBar = document.getElementById("search-button");
 let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
+let eventListeners = [];
+
 
 
 // gather user ip method
@@ -148,6 +150,8 @@ async function processTabs () {
       `;
     })
   });
+
+  eventListeners.push({ element: tabElements, event: 'click', listener: processTabs }); 
   
 }
 
