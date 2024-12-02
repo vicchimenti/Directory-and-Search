@@ -97,7 +97,7 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
       },
     };
 
-    let response = await fetch(getUrl, options);
+    let response = await fetch(prodUrl, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
     console.log("response status: " + response.status);
