@@ -19,7 +19,7 @@ async function getUserIP() {
 // Funnelback fetch function
 async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 
-  console.log("async method: " + method);
+  // console.log("async method: " + method);
   try {
     if (method === 'GET' && searchQuery) {
       url += `?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
@@ -36,8 +36,8 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
     let response = await fetch(url, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-    console.log("response status: " + response.status);
-    console.log("response type: " + response.type);
+    // console.log("response status: " + response.status);
+    // console.log("response type: " + response.type);
 
 
     let stream = response.body.pipeThrough(new TextDecoderStream());
