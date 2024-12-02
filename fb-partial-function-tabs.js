@@ -6,8 +6,8 @@ let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
 let tabElements = null;
-let eventListeners = [];
-let processTabsBool = false;
+// let eventListeners = [];
+// let processTabsBool = false;
 
 
 
