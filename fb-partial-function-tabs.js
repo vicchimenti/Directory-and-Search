@@ -155,12 +155,12 @@ function processTabs () {
   tabElements.forEach(el => {
     el.addEventListener('click', async function() {
 
-      alert("tabElements triggered");
-      console.log('Tab clicked:', this.id);
+      alert("tabElements triggered: " + this.id);
+      console.log('Tab clicked:' +  this.id);
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
       console.log('Logged tab Link: ' + tabLink);
-      alert('Tab Link:', tabLink);
+      alert('Tab Link: ' + tabLink);
       
       let userTabIP = await getUserIP(); // Fetch user IP (optional)
       let ipTabString = JSON.stringify(userTabIP);
