@@ -162,7 +162,6 @@ async function handleClick(e) {
 
 async function processTabs () {
 
-  // tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
   tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
 
