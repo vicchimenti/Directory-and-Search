@@ -167,23 +167,6 @@ async function processTabs () {
   tabElements.addEventListener('click', handleClick, false);
 
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
-
-  // Handle tab request
-  // tabElements.forEach(el => {
-  //   el.addEventListener('click', async function(event) {
-  //     event.preventDefault();
-
-  //     let tabLink = document.getElementById(this.id).getAttribute("href");
-  //     getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
-
-  //     document.getElementById('results').innerHTML = `
-  //       <div class="funnelback-search-container">${getResponse}</div>
-  //     `;
-  //     // eventListeners.push({ element: el, event: 'click', listener: processTabs }); 
-  //   })
-  // });
-
-  
   
 }
 
