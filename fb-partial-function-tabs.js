@@ -132,25 +132,17 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
-
+// handle tab listeners
 async function handleClick(e) {
   e.preventDefault();
   if (e.target.matches('a')) {
 
-    console.log("e.target: " + e.target.href);
-
     let tabLink = e.target.getAttribute("href");
-
-    // let tabLink = document.querySelector('a').getAttribute("href");
-    console.log("tab link: " + tabLink);
     getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
     document.getElementById('results').innerHTML = `
       <div class="funnelback-search-container">${getResponse}</div>
     `;
-
-    // const { textContent } = e.target;
-    // console.log(`Link Text:  ${textContent} `);
   }
 }
 
@@ -160,8 +152,10 @@ async function handleClick(e) {
 async function processTabs () {
 
   // tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
-  const tabList = document.querySelector('.tab-list__nav');
-  tabList.addEventListener('click', handleClick, false);
+  tabElements = document.querySelector('.tab-list__nav');
+  tabElements.addEventListener('click', handleClick, false);
+
+  eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
 
   // Handle tab request
   // tabElements.forEach(el => {
@@ -198,12 +192,12 @@ searchBar.addEventListener('click', async (event) => {
   processTabs();
 });
 
-// if (tabElements) {
+if (tabElements) {
 
 
-//     function saveListeners() {
+    function saveListeners() {
 
-//       localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+      localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
 
-//   }
-// };
+  }
+};
