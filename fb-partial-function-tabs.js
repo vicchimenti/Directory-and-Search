@@ -1,4 +1,4 @@
-// capture search bar and globaldeclarations
+// capture search bar and global declarations
 const searchBar = document.getElementById("search-button");
 const onPageButton= document.getElementById("on-page-search-button");
 let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
