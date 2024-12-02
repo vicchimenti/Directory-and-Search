@@ -6,8 +6,6 @@ let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
 let tabElements = null;
-// let eventListeners = [];
-// let processTabsBool = false;
 
 
 
@@ -83,6 +81,8 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 }
 
 
+
+
 // Funnelback fetch function
 async function fetchFunnelbackWithTabs(url, method) {
 
@@ -133,16 +133,6 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
-// function saveListeners() {
-//   if (tabElements) {
-//     localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
-
-//   }
-// } 
-
-
-
-
 // handle tab listeners
 async function handleClick(e) {
   e.preventDefault();
@@ -160,15 +150,14 @@ async function handleClick(e) {
 
 
 
-
 async function processTabs () {
 
   tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
-
-  // eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
   
 }
+
+
 
 // Handle form submission
 searchBar.addEventListener('click', async (event) => {
@@ -183,6 +172,8 @@ searchBar.addEventListener('click', async (event) => {
 
   processTabs();
 });
+
+
 
 
 // handle search page input
