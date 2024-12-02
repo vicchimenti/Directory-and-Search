@@ -125,7 +125,7 @@ async function fetchFunnelbackWithTabs(url, method) {
 
   } catch (error) {
     console.error(`Error with ${method} request:`, error);
-    return `<p>Error fetching ${method} request. Please try again later.</p>`;
+    return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
   }
 }
 
