@@ -163,38 +163,34 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
 
 
 
-function processTabs () {
+async function processTabs (userIp) {
 
   console.log("getResponse true");
 
   // Gather listeners after results post
-  const allResults = document.getElementById("All_Results0");
-  const website1 = document.getElementById("Website1");
-  const programs2 = document.getElementById("Programs2");
-  const people3 = document.getElementById("People3");
-  const news4 = document.getElementById("News4");
-  const law5 = document.getElementById("Law5");
-  const searchTab = document.getElementsByClassName("tab__button");
+  // const allResults = document.getElementById("All_Results0");
+  // const website1 = document.getElementById("Website1");
+  // const programs2 = document.getElementById("Programs2");
+  // const people3 = document.getElementById("People3");
+  // const news4 = document.getElementById("News4");
+  // const law5 = document.getElementById("Law5");
+  // const searchTab = document.getElementsByClassName("tab__button");
   const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
   // let tablink = null;
+
+  // let userTabIP = await getUserIP(); // Fetch user IP (optional)
+  // let ipTabString = JSON.stringify(userTabIP);
+  // // console.log('let tabIp: ' + userTabIP);
+  // console.log('tabIpString: ' + ipTabString);
+
 
   // Handle tab request
   tabElements.forEach(el => {
     el.addEventListener('click', async function(event) {
-  
-    
-  
       event.preventDefault(); // Prevent page reload
 
-
-
-      let userTabIP = await getUserIP(); // Fetch user IP (optional)
-      let ipTabString = JSON.stringify(userTabIP);
-      // console.log('let tabIp: ' + userTabIP);
-      console.log('tabIpString: ' + ipTabString);
-
-
-      
+      console.log('Tab clicked:' +  this.id);
+      alert("tabElements triggered: " + this.id);
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
       console.log('Logged tab Link: ' + tabLink);
@@ -212,8 +208,6 @@ function processTabs () {
       `;
     })
   });
-
-
 }
 
 // Handle form submission
@@ -240,5 +234,5 @@ searchBar.addEventListener('click', async (event) => {
     <div class="funnelback-search-container">${getResponse}</div>
   `;
 
-  processTabs();
+  processTabs(ipString);
 });
