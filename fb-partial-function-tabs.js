@@ -1,23 +1,26 @@
 // capture search bar
 const searchBar = document.getElementById("search-button");
 let getResponse = null;
+let userIpAddress = null;
 
 
 // Fetch user's IP address
-async function getUserIP() {
-  try {
-    let response = await fetch('https://api.ipify.org?format=json');
-    let data = await response.json();
-    console.log("getIP: " + data.ip);
-    return data.ip;
-  } catch (error) {
-    console.error('Error fetching IP address:', error);
-    return ''; // Default to empty if error occurs
+document.addEventListener('DOMContentLoaded', function() {
+  userIpAddress = async function getUserIP() {
+    try {
+      let response = await fetch('https://api.ipify.org?format=json');
+      let data = await response.json();
+      console.log("getIP: " + data.ip);
+      return data.ip;
+    } catch (error) {
+      console.error('Error fetching IP address:', error);
+      return ''; // Default to empty if error occurs
+    }
   }
-}
+});
 
 // Funnelback fetch function
-async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
+async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
   // console.log("async method: " + method);
   try {
@@ -29,7 +32,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIP,
+        // 'X-Forwarded-For': userIpAddress,
       },
     };
 
@@ -75,7 +78,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 
 
 // Funnelback fetch function
-async function fetchFunnelbackWithTabs(url, method, userIP) {
+async function fetchFunnelbackWithTabs(url, method) {
 
   console.log("fetchFunnelbackWithTabs");
   // alert("fetchFunnelbackWithTabs");
@@ -93,7 +96,7 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIP,
+        // 'X-Forwarded-For': userIpAddress,
       },
     };
 
@@ -141,10 +144,10 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
 
 
 
-async function processTabs (userIp) {
+async function processTabs () {
 
   console.log("getResponse true");
-  console.log("userTabIp true " + userIp);
+  console.log("userTabIp true " + userIpAddress);
 
   const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
@@ -164,7 +167,7 @@ async function processTabs (userIp) {
 
       // Define Funnelback URLs
       // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-      let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIp));
+      let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
       console.log("getTabResponse: ready");
 
       // Display results
@@ -182,17 +185,17 @@ searchBar.addEventListener('click', async (event) => {
   console.log("get element by id: search-button");
 
   let searchQuery = document.getElementById('search-input').value; // Get search query
-  let userIP = await getUserIP(); // Fetch user IP (optional)
-  let ipString = JSON.stringify(userIP);
+  // let userIP = await getUserIP(); // Fetch user IP (optional)
+  // let ipString = JSON.stringify(userIP);
 
-  console.log('let ip: ' + userIP);
-  console.log('ipString: ' + ipString);
+  console.log('let ip: ' + userIpAddress);
+  // console.log('ipString: ' + ipString);
   console.log("Query: " + searchQuery);
 
   // Define Funnelback URLs
   // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
   let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', userIP, searchQuery));
+  getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
   console.log("getResponse: ready");
 
   // Display results
@@ -200,5 +203,5 @@ searchBar.addEventListener('click', async (event) => {
     <div class="funnelback-search-container">${getResponse}</div>
   `;
 
-  processTabs(ipString);
+  processTabs();
 });
