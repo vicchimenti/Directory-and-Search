@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   userIpAddress = JSON.stringify(userIp);
 });
 
+
+
+
 // Funnelback fetch function
 async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
