@@ -3,6 +3,7 @@ const searchBar = document.getElementById("search-button");
 let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
+let tabElements = null;
 let eventListeners = [];
 
 
@@ -134,7 +135,7 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 async function processTabs () {
 
-  const tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
+  tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
 
 
   // Handle tab request
@@ -170,3 +171,5 @@ searchBar.addEventListener('click', async (event) => {
 
   processTabs();
 });
+
+if (tabElements) {processTabs()};
