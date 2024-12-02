@@ -4,6 +4,8 @@ const onPageButton= document.getElementById("on-page-search-button");
 let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 let userIpAddress = null;
 let userIp = null;
+let tabElements = null;
+
 
 
 
@@ -21,11 +23,23 @@ async function getUserIP() {
 
 
 
+
 // Fetch user's IP address
 document.addEventListener('DOMContentLoaded', async function() {
   userIp = await getUserIP();
   userIpAddress = JSON.stringify(userIp);
 });
+
+
+
+
+// save tab listeners
+function saveListeners() {
+  if (tabElements) {
+    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+
+  }
+} 
 
 
 
@@ -148,12 +162,16 @@ async function handleClick(e) {
 
 
 
+// add listeners to tabs
 async function processTabs() {
 
-  let tabElements = document.querySelector('.tab-list__nav');
+  tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
-  
+
+  eventListeners.push({ element: tabElements, event: 'click', listener: handleClick });
+  saveListeners();  
 }
+
 
 
 
