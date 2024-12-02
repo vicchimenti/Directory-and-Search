@@ -190,7 +190,7 @@ searchBar.addEventListener('click', async (event) => {
   console.log("Query: " + searchQuery);
 
   // Define Funnelback URLs
-  let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+  // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
   let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', userIP, searchQuery));
   console.log("getResponse: " + getResponse);
