@@ -78,7 +78,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 async function fetchFunnelbackWithTabs(url, method, userIP) {
 
   console.log("fetchFunnelbackWithTabs");
-  alert("fetchFunnelbackWithTabs");
+  // alert("fetchFunnelbackWithTabs");
 
   // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
   let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
