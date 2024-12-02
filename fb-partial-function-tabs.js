@@ -133,26 +133,47 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
+function handleClick(e) {
+  e.preventDefault();
+  if (e.target.matches('a')) {
+
+    let tabLink = document.getElementById(this.id).getAttribute("href");
+    getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
+
+    document.getElementById('results').innerHTML = `
+      <div class="funnelback-search-container">${getResponse}</div>
+    `;
+
+    const { textContent } = e.target;
+    console.log(`Link Text:  ${textContent} `);
+  }
+}
+
+
+
+
 async function processTabs () {
 
-  tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
-
+  // tabElements = document.querySelectorAll('#All_Results0, #Website1, #Programs2, #People3, #News4, #Law5');
+  const tabList = document.querySelector('.tab-list__nav');
+  tabList.addEventListener('click', handleClick, false);
 
   // Handle tab request
-  tabElements.forEach(el => {
-    el.addEventListener('click', async function(event) {
-      event.preventDefault();
+  // tabElements.forEach(el => {
+  //   el.addEventListener('click', async function(event) {
+  //     event.preventDefault();
 
-      let tabLink = document.getElementById(this.id).getAttribute("href");
-      getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
+  //     let tabLink = document.getElementById(this.id).getAttribute("href");
+  //     getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
-      document.getElementById('results').innerHTML = `
-        <div class="funnelback-search-container">${getResponse}</div>
-      `;
-    })
-  });
+  //     document.getElementById('results').innerHTML = `
+  //       <div class="funnelback-search-container">${getResponse}</div>
+  //     `;
+  //     // eventListeners.push({ element: el, event: 'click', listener: processTabs }); 
+  //   })
+  // });
 
-  eventListeners.push({ element: tabElements, event: 'click', listener: processTabs }); 
+  
   
 }
 
@@ -172,4 +193,12 @@ searchBar.addEventListener('click', async (event) => {
   processTabs();
 });
 
-if (tabElements) {processTabs()};
+// if (tabElements) {
+
+
+//     function saveListeners() {
+
+//       localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+
+//   }
+// };
