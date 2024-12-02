@@ -78,11 +78,12 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
 async function fetchFunnelbackWithTabs(url, method, userIP) {
 
   let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+  let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
   console.log("async method: " + method);
   try {
     if (method === 'GET') {
-      getUrl += `${url}`;
+      prodUrl += `${url}`;
     }
 
     let options = {
@@ -195,7 +196,8 @@ searchBar.addEventListener('click', async (event) => {
 
   // Define Funnelback URLs
   let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-  getResponse = await (fetchFunnelbackWithQuery(getUrl, 'GET', userIP, searchQuery));
+  let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', userIP, searchQuery));
   console.log("getResponse: " + getResponse);
 
   // Display results
