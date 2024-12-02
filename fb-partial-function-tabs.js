@@ -145,7 +145,7 @@ function saveListeners() {
 
 // handle tab listeners
 async function handleClick(e) {
-  processTabsBool = false;
+  // processTabsBool = false;
   e.preventDefault();
   if (e.target.matches('a')) {
 
@@ -155,7 +155,7 @@ async function handleClick(e) {
     document.getElementById('results').innerHTML = `
       <div class="funnelback-search-container">${getResponse}</div>
     `;
-    processTabsBool = true;
+    // processTabsBool = true;
   }
   processTabs();
 }
