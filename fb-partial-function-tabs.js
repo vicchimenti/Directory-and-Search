@@ -137,7 +137,7 @@ function handleClick(e) {
   e.preventDefault();
   if (e.target.matches('a')) {
 
-    let tabLink = document.getElementById(this.id).getAttribute("href");
+    let tabLink = document.getElementById(e.target).getAttribute("href");
     getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
     document.getElementById('results').innerHTML = `
