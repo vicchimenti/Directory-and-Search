@@ -10,7 +10,20 @@
         width: 100%;
     }
 }
+
 .site-search .search-block-form input.sq-search {
+    border: 0;
+    padding: .5rem;
+    width: 100%;
+}
+
+@media print, screen and (min-width: 64.0625em) {
+    .searchArea input.on-page-sq-search {
+        width: 100%;
+    }
+}
+
+.searchArea input.on-page-sq-search  {
     border: 0;
     padding: .5rem;
     width: 100%;
