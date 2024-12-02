@@ -156,9 +156,10 @@ function processTabs () {
     el.addEventListener('click', async function() {
 
       alert("tabElements triggered");
-      console.log('Tab clicked:', + this.id);
+      console.log('Tab clicked:', this.id);
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
+      console.log('Logged tab Link: ' + tabLink);
       alert('Tab Link:', tabLink);
       
       let userTabIP = await getUserIP(); // Fetch user IP (optional)
@@ -168,12 +169,12 @@ function processTabs () {
 
       // Define Funnelback URLs
       // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-      let getResponse = await (fetchFunnelbackWithQuery(tabLink, 'GET', userIP));
-      console.log("getResponse: " + getResponse);
+      let getTabResponse = await (fetchFunnelbackWithQuery(tabLink, 'GET', userIP));
+      console.log("getTabResponse: " + getTabResponse);
 
       // Display results
       document.getElementById('results').innerHTML = `
-        <div class="funnelback-search-container">${getResponse}</div>
+        <div class="funnelback-search-container">${getTabResponse}</div>
       `;
     })
   });
