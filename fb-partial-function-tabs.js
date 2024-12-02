@@ -10,7 +10,6 @@ async function getUserIP() {
   try {
     let response = await fetch('https://api.ipify.org?format=json');
     let data = await response.json();
-    console.log("getIP: " + data.ip);
     return data.ip;
   } catch (error) {
       console.error('Error fetching IP address:', error);
@@ -55,7 +54,6 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
         const { value, done } = await reader.read();
 
         if (done) {
-          console.log("Stream reading complete.");
           break;
         }
         text += value;
@@ -97,10 +95,6 @@ async function fetchFunnelbackWithTabs(url, method) {
     let response = await fetch(prodUrl, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-    console.log("response status: " + response.status);
-    console.log("response type: " + response.type);
-
-
     let stream = response.body.pipeThrough(new TextDecoderStream());
     let reader = stream.getReader();
     let text = "";
@@ -110,11 +104,9 @@ async function fetchFunnelbackWithTabs(url, method) {
         const { value, done } = await reader.read();
 
         if (done) {
-          console.log("Stream reading complete.");
           break;
         }
         text += value;
-
       }
 
     } catch (error) {
