@@ -5,6 +5,7 @@ let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 let userIpAddress = null;
 let userIp = null;
 let tabElements = null;
+let eventListeners = [];
 
 
 
