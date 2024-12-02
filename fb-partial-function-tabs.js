@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let response = await fetch('https://api.ipify.org?format=json');
       let data = await response.json();
       console.log("getIP: " + data.ip);
-      userIpAddress = data.ip;
+      userIpAddress = JSON.stringify(data.ip);
     } catch (error) {
       console.error('Error fetching IP address:', error);
       return ''; // Default to empty if error occurs
