@@ -2,7 +2,6 @@
 const searchBar = document.getElementById("search-button");
 const onPageButton= document.getElementById("on-page-search-button");
 let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
 let tabElements = null;
@@ -139,10 +138,10 @@ async function handleClick(e) {
   if (e.target.matches('a')) {
 
     let tabLink = e.target.getAttribute("href");
-    getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
+    let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
     document.getElementById('results').innerHTML = `
-      <div class="funnelback-search-container">${getResponse}</div>
+      <div class="funnelback-search-container">${getTabResponse}</div>
     `;
   }
   processTabs();
@@ -164,7 +163,7 @@ searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('search-input').value;
-  getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
+  let getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getResponse}</div>
@@ -181,10 +180,10 @@ onPageButton.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('on-page-search-input').value;
-  getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
+  let getOnPageResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
 
   document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getResponse}</div>
+    <div class="funnelback-search-container">${getOnPageResponse}</div>
   `;
 
   processTabs();
