@@ -187,4 +187,3 @@ searchBar.addEventListener('click', async (event) => {
 
   processTabs();
 });
-
