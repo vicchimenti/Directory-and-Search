@@ -38,7 +38,7 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIpAddress,
+        // 'X-Forwarded-For': userIp,
       },
     };
 
@@ -90,7 +90,7 @@ async function fetchFunnelbackWithTabs(url, method) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIpAddress,
+        // 'X-Forwarded-For': userIp,
       },
     };
 
