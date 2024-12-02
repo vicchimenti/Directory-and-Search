@@ -112,7 +112,7 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
       while (true) {
         const { value, done } = await reader.read();
 
-        console.log("initial value: " + value);
+        // console.log("initial value: " + value);
 
         if (done) {
           console.log("Stream reading complete.");
