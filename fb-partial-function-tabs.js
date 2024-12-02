@@ -170,7 +170,7 @@ async function processTabs () {
   tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
 
-  eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
+  // eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
   
 }
 
@@ -179,9 +179,7 @@ searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('search-input').value;
-  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
-
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getResponse}</div>
@@ -196,9 +194,7 @@ onPageButton.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('on-page-search-input').value;
-  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
-
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getResponse}</div>
