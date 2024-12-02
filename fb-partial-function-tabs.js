@@ -48,7 +48,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
       while (true) {
         const { value, done } = await reader.read();
 
-        console.log("initial value: " + value);
+        // console.log("initial value: " + value);
 
         if (done) {
           console.log("Stream reading complete.");
@@ -56,7 +56,7 @@ async function fetchFunnelbackWithQuery(url, method, userIP, searchQuery) {
         }
         text += value;
 
-        console.log("text value:", + text); // Process each chunk of data
+        // console.log("text value:", + text); // Process each chunk of data
       }
 
     } catch (error) {
