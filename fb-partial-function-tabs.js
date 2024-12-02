@@ -159,13 +159,15 @@ function processTabs () {
     el.addEventListener('click', async (event) => {
       event.preventDefault(); // Prevent page reload
 
+      console.log('Tab clicked:' +  this.id);
+      alert("tabElements triggered: " + this.id);
+
       let userTabIP = await getUserIP(); // Fetch user IP (optional)
       let ipTabString = JSON.stringify(userTabIP);
       // console.log('let tabIp: ' + userTabIP);
       console.log('tabIpString: ' + ipTabString);
 
-      console.log('Tab clicked:' +  this.id);
-      alert("tabElements triggered: " + this.id);
+
       
 
       let tabLink = document.getElementById(this.id).getAttribute("href");
