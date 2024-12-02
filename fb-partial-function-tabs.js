@@ -166,6 +166,8 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
 async function processTabs (userIp) {
 
   console.log("getResponse true");
+  console.log("userTabIp true" + userIp);
+
 
   // Gather listeners after results post
   // const allResults = document.getElementById("All_Results0");
@@ -199,7 +201,7 @@ async function processTabs (userIp) {
 
       // Define Funnelback URLs
       // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-      let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIP));
+      let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIp));
       console.log("getTabResponse: " + getTabResponse);
 
       // Display results
