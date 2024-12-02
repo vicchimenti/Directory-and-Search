@@ -133,7 +133,7 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
-function handleClick(e) {
+async function handleClick(e) {
   e.preventDefault();
   if (e.target.matches('a')) {
 
