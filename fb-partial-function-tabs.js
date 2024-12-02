@@ -1,5 +1,7 @@
 // capture search bar and globaldeclarations
 const searchBar = document.getElementById("search-button");
+const onPageButton= document.getElementById("on-page-search-button");
+let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
@@ -84,7 +86,7 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 // Funnelback fetch function
 async function fetchFunnelbackWithTabs(url, method) {
 
-  let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
   try {
     if (method === 'GET') {
@@ -133,12 +135,12 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
-function saveListeners() {
-  if (tabElements) {
-    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+// function saveListeners() {
+//   if (tabElements) {
+//     localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
 
-  }
-} 
+//   }
+// } 
 
 
 
@@ -177,7 +179,24 @@ searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('search-input').value;
-  let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
+
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">${getResponse}</div>
+  `;
+
+  processTabs();
+});
+
+
+// handle search page input
+onPageButton.addEventListener('click', async (event) => {
+  event.preventDefault();
+
+  let searchQuery = document.getElementById('search-input').value;
+  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
 
 
