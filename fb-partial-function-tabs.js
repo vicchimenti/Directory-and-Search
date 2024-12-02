@@ -139,6 +139,8 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
 
 // handle tab click
 async function handleClick(event) {
+  console.log("handleClick true");
+  alert("handleclick");
   preventDefault(event);
   console.log('Button clicked!');
   console.log('Tab clicked:' +  this.id);
