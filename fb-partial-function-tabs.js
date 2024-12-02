@@ -138,28 +138,28 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
 }
 
 // handle tab click
-async function handleClick(event) {
-  console.log("handleClick true");
-  alert("handleclick");
-  preventDefault(event);
-  console.log('Button clicked!');
-  console.log('Tab clicked:' +  this.id);
-  alert("tabElements triggered: " + this.id);
-  let userTabIP = await getUserIP(); // Fetch user IP (optional)
-  let ipTabString = JSON.stringify(userTabIP);
-  // console.log('let tabIp: ' + userTabIP);
-  console.log('tabIpString: ' + ipTabString);
-  let tabLink = document.getElementById(this.id).getAttribute("href");
-  console.log('Logged tab Link: ' + tabLink);
-  alert('Tab Link: ' + tabLink);
-  let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIP));
-  console.log("getTabResponse: " + getTabResponse);
+// async function handleClick(event) {
+//   console.log("handleClick true");
+//   alert("handleclick");
+//   preventDefault(event);
+//   console.log('Button clicked!');
+//   console.log('Tab clicked:' +  this.id);
+//   alert("tabElements triggered: " + this.id);
+//   let userTabIP = await getUserIP(); // Fetch user IP (optional)
+//   let ipTabString = JSON.stringify(userTabIP);
+//   // console.log('let tabIp: ' + userTabIP);
+//   console.log('tabIpString: ' + ipTabString);
+//   let tabLink = document.getElementById(this.id).getAttribute("href");
+//   console.log('Logged tab Link: ' + tabLink);
+//   alert('Tab Link: ' + tabLink);
+//   let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIP));
+//   console.log("getTabResponse: " + getTabResponse);
 
-  // Display results
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getTabResponse}</div>
-  `;
-}
+//   // Display results
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">${getTabResponse}</div>
+//   `;
+// }
 
 
 
@@ -179,40 +179,42 @@ function processTabs () {
   // let tablink = null;
 
   // Handle tab request
-  tabElements.forEach(el => { el.addEventListener('click', handleClick)})};
+  tabElements.forEach(el => {
+    el.addEventListener('click', async function(event) {
+  
     
-  //   {
-  //     event.preventDefault(); // Prevent page reload
+  
+      event.preventDefault(); // Prevent page reload
 
 
 
-  //     let userTabIP = await getUserIP(); // Fetch user IP (optional)
-  //     let ipTabString = JSON.stringify(userTabIP);
-  //     // console.log('let tabIp: ' + userTabIP);
-  //     console.log('tabIpString: ' + ipTabString);
+      let userTabIP = await getUserIP(); // Fetch user IP (optional)
+      let ipTabString = JSON.stringify(userTabIP);
+      // console.log('let tabIp: ' + userTabIP);
+      console.log('tabIpString: ' + ipTabString);
 
 
       
 
-  //     let tabLink = document.getElementById(this.id).getAttribute("href");
-  //     console.log('Logged tab Link: ' + tabLink);
-  //     alert('Tab Link: ' + tabLink);
+      let tabLink = document.getElementById(this.id).getAttribute("href");
+      console.log('Logged tab Link: ' + tabLink);
+      alert('Tab Link: ' + tabLink);
       
 
-  //     // Define Funnelback URLs
-  //     // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
-  //     let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIP));
-  //     console.log("getTabResponse: " + getTabResponse);
+      // Define Funnelback URLs
+      // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+      let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET', userIP));
+      console.log("getTabResponse: " + getTabResponse);
 
-  //     // Display results
-  //     document.getElementById('results').innerHTML = `
-  //       <div class="funnelback-search-container">${getTabResponse}</div>
-  //     `;
-  //   })
-  // });
+      // Display results
+      document.getElementById('results').innerHTML = `
+        <div class="funnelback-search-container">${getTabResponse}</div>
+      `;
+    })
+  });
 
 
-// }
+}
 
 // Handle form submission
 searchBar.addEventListener('click', async (event) => {
