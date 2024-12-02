@@ -34,17 +34,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 
-// save tab listeners
-function saveListeners() {
-  if (tabElements) {
-    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
-
-  }
-} 
-
-
-
-
 // Funnelback fetch function
 async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
@@ -158,8 +147,15 @@ async function handleClick(e) {
       <div class="funnelback-search-container">${getTabResponse}</div>
     `;
   }
-  processTabs();
 }
+
+
+
+
+// save tab listeners
+function saveListeners() {
+    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+} 
 
 
 
@@ -170,7 +166,7 @@ async function processTabs() {
   tabElements.addEventListener('click', handleClick, false);
 
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick });
-  saveListeners();  
+  saveListeners();
 }
 
 
