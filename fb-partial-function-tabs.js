@@ -155,6 +155,11 @@ function processTabs () {
   tabElements.forEach(el => {
     el.addEventListener('click', async function() {
 
+      let userTabIP = await getUserIP(); // Fetch user IP (optional)
+      let ipTabString = JSON.stringify(userTabIP);
+      console.log('let tabIp: ' + userTabIP);
+      console.log('tabIpString: ' + ipTabString);
+
       alert("tabElements triggered: " + this.id);
       console.log('Tab clicked:' +  this.id);
 
@@ -162,10 +167,6 @@ function processTabs () {
       console.log('Logged tab Link: ' + tabLink);
       alert('Tab Link: ' + tabLink);
       
-      let userTabIP = await getUserIP(); // Fetch user IP (optional)
-      let ipTabString = JSON.stringify(userTabIP);
-      console.log('let tabIp: ' + userTabIP);
-      console.log('tabIpString: ' + ipTabString);
 
       // Define Funnelback URLs
       // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
