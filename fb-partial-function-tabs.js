@@ -80,7 +80,7 @@ async function fetchFunnelbackWithTabs(url, method, userIP) {
   console.log("fetchFunnelbackWithTabs");
   alert("fetchFunnelbackWithTabs");
 
-  let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
+  // let getUrl = 'https://dxp-us-stage-search.funnelback.squiz.cloud/s/search.html';
   let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
   console.log("async method: " + method);
