@@ -143,6 +143,14 @@ function saveListeners() {
 
 
 
+
+async function processListeners() {
+  tabElements.removeEventListener('click', handleClick, false);
+  processTabs();
+}
+
+
+
 // handle tab listeners
 async function handleClick(e) {
   e.preventDefault();
@@ -159,8 +167,8 @@ async function handleClick(e) {
   }
 
   tabBool = true;
-  tabElements.removeEventListener ('click', handleClick, false);
-  processTabs();
+  
+  processListeners();
 }
 
 
