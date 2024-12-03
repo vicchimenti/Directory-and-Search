@@ -6,6 +6,7 @@ let userIpAddress = null;
 let userIp = null;
 let tabElements = null;
 let eventListeners = [];
+let tabBool = false;
 
 
 
@@ -132,12 +133,21 @@ async function fetchFunnelbackWithTabs(url, method) {
   }
 }
 
+function saveListeners() {
+  if (tabElements) {
+    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+
+  }
+} 
+
 
 
 
 // handle tab listeners
 async function handleClick(e) {
   e.preventDefault();
+  tabBool = false;
+
   if (e.target.matches('a')) {
 
     let tabLink = e.target.getAttribute("href");
@@ -147,29 +157,24 @@ async function handleClick(e) {
       <div class="funnelback-search-container">${getTabResponse}</div>
     `;
   }
-  
+
+  tabBool = true;
+  tabElements.removeEventListener ('click', handleClick, false);
   processTabs();
 }
 
 
 
 
-// save tab listeners
-function saveListeners() {
-    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
-} 
-
-
 
 // add listeners to tabs
-async function processTabs () {
+async function processTabs() {
 
   tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
 
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick });
 
-  saveListeners();
 }
 
 
@@ -192,16 +197,16 @@ searchBar.addEventListener('click', async (event) => {
 
 
 
-// handle search page input
-onPageButton.addEventListener('click', async (event) => {
-  event.preventDefault();
+// // handle search page input
+// onPageButton.addEventListener('click', async (event) => {
+//   event.preventDefault();
 
-  let searchQuery = document.getElementById('on-page-search-input').value;
-  let getOnPageResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
+//   let searchQuery = document.getElementById('on-page-search-input').value;
+//   let getOnPageResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getOnPageResponse}</div>
-  `;
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">${getOnPageResponse}</div>
+//   `;
 
-  processTabs();
-});
+//   processTabs();
+// });
