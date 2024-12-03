@@ -153,7 +153,7 @@ async function processListeners() {
 
 // handle tab listeners
 async function handleClick(e) {
-  e.preventDefault();
+  // e.preventDefault();
   tabBool = false;
 
   if (e.target.matches('a')) {
