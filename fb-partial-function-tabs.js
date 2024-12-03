@@ -147,6 +147,8 @@ async function handleClick(e) {
       <div class="funnelback-search-container">${getTabResponse}</div>
     `;
   }
+  
+  processTabs();
 }
 
 
@@ -160,12 +162,13 @@ function saveListeners() {
 
 
 // add listeners to tabs
-async function processTabs() {
+async function processTabs () {
 
   tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
 
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick });
+
   saveListeners();
 }
 
