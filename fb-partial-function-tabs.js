@@ -1,5 +1,6 @@
 // capture search bar and globaldeclarations
 const searchBar = document.getElementById("search-button");
+let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
@@ -84,7 +85,7 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 // Funnelback fetch function
 async function fetchFunnelbackWithTabs(url, method) {
 
-  let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
   try {
     if (method === 'GET') {
@@ -177,7 +178,7 @@ searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('search-input').value;
-  let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  // let prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodUrl, 'GET', searchQuery));
 
 
