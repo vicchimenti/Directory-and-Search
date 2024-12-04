@@ -220,12 +220,14 @@ async function handleFacet(e) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+  console.log("DOMContentLoaded");
   // Attach a single event listener to a parent element
   document.body.addEventListener('click', (e) => {
     if (e.target && e.target.matches('button.facet-group__title')) {
       handleFacet(e);
     }
   });
+  console.log("listener triggered")
 });
 
 
