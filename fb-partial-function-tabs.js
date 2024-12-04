@@ -9,6 +9,7 @@ let processTabsBool = false;
 
 
 
+
 // gather user ip method
 async function getUserIP() {
   try {
@@ -23,6 +24,7 @@ async function getUserIP() {
 
 
 
+
 // Fetch user's IP address
 document.addEventListener('DOMContentLoaded', async function() {
   userIp = await getUserIP();
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 
-// Funnelback fetch function
+// Funnelback fetch search input function
 async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
    try {
@@ -81,7 +83,9 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 }
 
 
-// Funnelback fetch function
+
+
+// Funnelback fetch tabs function
 async function fetchFunnelbackWithTabs(url, method) {
 
   let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
@@ -133,6 +137,7 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
+// Store listeners
 function saveListeners() {
   if (tabElements) {
     localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
@@ -163,6 +168,7 @@ async function handleClick(e) {
 
 
 
+// Create tab group listener
 async function processTabs () {
 
   tabElements = document.querySelector('.tab-list__nav');
@@ -171,6 +177,9 @@ async function processTabs () {
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
   
 }
+
+
+
 
 // Handle search bar submission
 searchBar.addEventListener('click', async (event) => {
