@@ -193,6 +193,22 @@ async function handleFacet(e) {
 
 
 
+// Create facet group listener
+async function processFacets() {
+  console.log("process facets");
+
+  let facetElements = document.querySelectorAll('.facet-group__title');
+  facetElements.forEach(facet => {facet.addEventListener('click', handleFacet, false)});
+
+  console.log("facet listener added");
+
+  eventListeners.push({ element: facetElements, event: 'click', listener: handleFacet }); 
+  
+}
+
+
+
+
 // Create tab group listener
 async function processTabs() {
 
@@ -200,22 +216,6 @@ async function processTabs() {
   tabElements.addEventListener('click', handleClick, false);
 
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
-  
-}
-
-
-
-
-// Create facet group listener
-async function processFacets() {
-  console.log("process facets");
-
-  let facetElements = document.querySelectorAll('.facet-group__title');
-  facetElements.forEach(facet => {facet.addEventListener('checked', handleFacet, false)});
-
-  console.log("facet listener added");
-
-  eventListeners.push({ element: facetElements, event: 'checked', listener: handleFacet }); 
   
 }
 
