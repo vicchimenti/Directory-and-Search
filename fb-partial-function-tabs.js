@@ -257,9 +257,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Attach a single event listener to the parent container
   document.body.addEventListener('click', (e) => {
     // Check if the clicked element is an anchor inside the facet group
+    console.log("Clicked element:", e.target);
     if (e.target.matches('.facet-group__list a')) {
+      console.log("Matches anchor:", e.target.matches('.facet-group__list a'));
       handleFacetAnchor(e); // Handle anchor clicks
     } else if (e.target.matches('button.facet-group__title')) {
+      console.log("Matches button:", e.target.matches('button.facet-group__title'));
       handleFacetButton(e); // Handle button clicks
     }
   });
