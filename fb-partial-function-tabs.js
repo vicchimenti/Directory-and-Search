@@ -219,24 +219,40 @@ async function handleFacet(e) {
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Attach a single event listener to a parent element
+  document.body.addEventListener('click', (e) => {
+    if (e.target && e.target.matches('button.facet-group__title')) {
+      handleFacet(e);
+    }
+  });
+});
+
+
+
+
+
+
+
+
 // Create facet group listener
-async function processFacets() {
-  console.log("process facets");
+// async function processFacets() {
+//   console.log("process facets");
 
-  let facetElements = document.querySelectorAll('button.facet-group__title');
-  facetElements.forEach(facet => {
-    facet.removeEventListener('click', handleFacet);
-    facet.addEventListener('click', handleFacet, false)
-  });
+//   let facetElements = document.querySelectorAll('button.facet-group__title');
+//   facetElements.forEach(facet => {
+//     facet.removeEventListener('click', handleFacet);
+//     facet.addEventListener('click', handleFacet, false)
+//   });
 
-  console.log("facet listener added");
+//   console.log("facet listener added");
 
-  facetElements.forEach(facet => {
-    eventListeners.push({ element: facet, event: 'click', listener: handleFacet });
-  });
+//   facetElements.forEach(facet => {
+//     eventListeners.push({ element: facet, event: 'click', listener: handleFacet });
+//   });
 
-  console.log("facet listener pushed");
-}
+//   console.log("facet listener pushed");
+// }
 
 
 
