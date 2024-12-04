@@ -254,15 +254,30 @@ async function handleFacetAnchor(e) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("DOMContentLoaded");
-  // Attach a single event listener to a parent element
+  // Attach a single event listener to the parent container
   document.body.addEventListener('click', (e) => {
-    if (e.target && e.target.matches('button.facet-group__title')) {
-      handleFacet(e);
+    // Check if the clicked element is an anchor inside the facet group
+    if (e.target.matches('.facet-group__list a')) {
+      handleFacetAnchor(e); // Handle anchor clicks
+    } else if (e.target.matches('button.facet-group__title')) {
+      handleFacetButton(e); // Handle button clicks
     }
   });
-  console.log("listener triggered")
 });
+
+
+
+
+// document.addEventListener('DOMContentLoaded', () => {
+//   console.log("DOMContentLoaded");
+//   // Attach a single event listener to a parent element
+//   document.body.addEventListener('click', (e) => {
+//     if (e.target && e.target.matches('button.facet-group__title')) {
+//       handleFacet(e);
+//     }
+//   });
+//   console.log("listener triggered")
+// });
 
 
 
