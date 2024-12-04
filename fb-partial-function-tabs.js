@@ -169,7 +169,20 @@ async function handleClick(e) {
 
 
 // Create tab group listener
-async function processTabs () {
+async function processTabs() {
+
+  tabElements = document.querySelector('.tab-list__nav');
+  tabElements.addEventListener('click', handleClick, false);
+
+  eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
+  
+}
+
+
+
+
+// Create facet group listener
+async function processFacets() {
 
   tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
