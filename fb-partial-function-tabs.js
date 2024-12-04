@@ -216,7 +216,7 @@ async function processTabs() {
 async function processFacets() {
   console.log("process facets");
 
-  let facetElements = document.querySelectorAll('.facet-group__list-item');
+  let facetElements = document.querySelectorAll('.facet-group__title');
   facetElements.forEach(facet => {facet.addEventListener('change', handleFacet, false)});
 
   console.log("facet listener added");
