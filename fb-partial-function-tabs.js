@@ -170,7 +170,7 @@ async function handleClick(e) {
 
 
 // handle facet listeners
-async function handleFacetClick(e) {
+async function handleFacet(e) {
   e.preventDefault();
   alert("handle facet click");
   console.log("target: " + e.target);
@@ -215,15 +215,15 @@ async function processTabs() {
 //   }
 // });
 
-links.forEach(link => {
-  link.addEventListener('click', (event) => {
-    // Prevent default link behavior (e.g., navigating to a new page)
-    event.preventDefault();
+// links.forEach(link => {
+//   link.addEventListener('click', (event) => {
+//     // Prevent default link behavior (e.g., navigating to a new page)
+//     event.preventDefault();
 
-    // Your custom code here
-    console.log('Link clicked:', link.textContent);
-  });
-});
+//     // Your custom code here
+//     console.log('Link clicked:', link.textContent);
+//   });
+// });
 
 
 // Create facet group listener
@@ -231,11 +231,11 @@ async function processFacets() {
   console.log("process facets");
 
   let facetElements = document.querySelectorAll('.facet-group__list-item');
-  facetElements.forEach(facet => {facet.addEventListener('change', handleFacetClick, false)});
+  facetElements.forEach(facet => {facet.addEventListener('change', handleFacet, false)});
 
   console.log("facet listener added");
 
-  eventListeners.push({ element: facetElements, event: 'change', listener: handleFacetClick }); 
+  eventListeners.push({ element: facetElements, event: 'change', listener: handleFacet }); 
   
 }
 
