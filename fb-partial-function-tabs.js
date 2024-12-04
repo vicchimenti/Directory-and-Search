@@ -3,8 +3,8 @@ const searchBar = document.getElementById("search-button");
 const onPageSearch = document.getElementById("on-page-search-button");
 let userIpAddress = null;
 let userIp = null;
-let tabElements = null;
-let facetElements = null;
+// let tabElements = null;
+// let facetElements = null;
 let eventListeners = [];
 let processTabsBool = false;
 
@@ -202,22 +202,36 @@ async function handleFacetClick(e) {
 // Create tab group listener
 async function processTabs() {
 
-  tabElements = document.querySelector('.tab-list__nav');
+  let tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
 
   eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
   
 }
 
+// document.querySelectorAll('.classname').forEach( button => {
+//   button.onclick = function () {
+//   // rest of code
+//   }
+// });
 
+links.forEach(link => {
+  link.addEventListener('click', (event) => {
+    // Prevent default link behavior (e.g., navigating to a new page)
+    event.preventDefault();
+
+    // Your custom code here
+    console.log('Link clicked:', link.textContent);
+  });
+});
 
 
 // Create facet group listener
 async function processFacets() {
   console.log("process facets");
 
-  facetElements = document.querySelector('.facet-group__list');
-  facetElements.addEventListener('change', handleFacetClick, false);
+  let facetElements = document.querySelectorAll('.facet-group__list-item');
+  facetElements.forEach(facet => {facet.addEventListener('change', handleFacetClick, false)});
 
   console.log("facet listener added");
 
