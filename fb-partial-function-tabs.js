@@ -210,10 +210,10 @@ async function processTabs() {
 // Create facet group listener
 async function processFacets() {
 
-  tabElements = document.querySelector('.facet-groups');
-  tabElements.addEventListener('change', handleFacetClick, false);
+  facetElements = document.querySelector('.facet-groups');
+  facetElements.addEventListener('change', handleFacetClick, false);
 
-  eventListeners.push({ element: tabElements, event: 'change', listener: handleFacetClick }); 
+  eventListeners.push({ element: facetElements, event: 'change', listener: handleFacetClick }); 
   
 }
 
