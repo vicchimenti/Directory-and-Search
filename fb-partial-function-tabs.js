@@ -151,10 +151,10 @@ async function handleClick(e) {
   if (e.target.matches('a')) {
 
     let tabLink = e.target.getAttribute("href");
-    getResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
+    let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
 
     document.getElementById('results').innerHTML = `
-      <div class="funnelback-search-container">${getResponse}</div>
+      <div class="funnelback-search-container">${getTabResponse}</div>
     `;
     processTabsBool = true;
   }
@@ -179,7 +179,7 @@ searchBar.addEventListener('click', async (event) => {
 
   let searchQuery = document.getElementById('search-input').value;
   let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  getResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
+  let getResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
 
 
   document.getElementById('results').innerHTML = `
@@ -197,12 +197,12 @@ onPageSearch.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('on-page-search-input').value;
-  let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  getResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
+  let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  let getOnPageResponse = await (fetchFunnelbackWithQuery(prodOnPageSearchUrl, 'GET', searchQuery));
 
 
   document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getResponse}</div>
+    <div class="funnelback-search-container">${getOnPageResponse}</div>
   `;
 
   processTabs();
