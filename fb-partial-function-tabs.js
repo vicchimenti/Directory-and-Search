@@ -4,6 +4,7 @@ const onPageSearch = document.getElementById("on-page-search-button");
 let userIpAddress = null;
 let userIp = null;
 let tabElements = null;
+let facetElements = null;
 let eventListeners = [];
 let processTabsBool = false;
 
@@ -168,6 +169,31 @@ async function handleClick(e) {
 
 
 
+// handle facet listeners
+async function handleFacetClick(e) {
+  e.preventDefault();
+  if (e.target.matches('a')) {
+
+    if (e.target.checked) {
+        console.log("Checkbox is checked..");
+
+        let facetLink = e.target.getAttribute("href");
+        let getFacetResponse = await (fetchFunnelbackWithTabs(facetLink, 'GET'));
+    
+        document.getElementById('results').innerHTML = `
+          <div class="funnelback-search-container">${getFacetResponse}</div>
+        `;
+
+      } else {
+        console.log("Checkbox is not checked..");
+      }
+    };
+  processFacets();
+}
+
+
+
+
 // Create tab group listener
 async function processTabs() {
 
@@ -184,10 +210,10 @@ async function processTabs() {
 // Create facet group listener
 async function processFacets() {
 
-  tabElements = document.querySelector('.tab-list__nav');
-  tabElements.addEventListener('click', handleClick, false);
+  tabElements = document.querySelector('.facet-groups');
+  tabElements.addEventListener('change', handleFacetClick, false);
 
-  eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
+  eventListeners.push({ element: tabElements, event: 'change', listener: handleFacetClick }); 
   
 }
 
