@@ -174,7 +174,7 @@ async function handleFacetClick(e) {
   e.preventDefault();
   alert("handle facet click");
   console.log("target: " + e.target);
-  
+
   if (e.target.matches('a')) {
     alert("target matches");
 
@@ -216,7 +216,7 @@ async function processTabs() {
 async function processFacets() {
   console.log("process facets");
 
-  facetElements = document.querySelector('.facet-groups');
+  facetElements = document.querySelector('.facet-group__list');
   facetElements.addEventListener('change', handleFacetClick, false);
 
   console.log("facet listener added");
