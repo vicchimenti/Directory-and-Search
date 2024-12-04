@@ -172,14 +172,19 @@ async function handleClick(e) {
 // handle facet listeners
 async function handleFacetClick(e) {
   e.preventDefault();
+  alert("handle facet click");
+  console.log("target: " + e.target);
+  
   if (e.target.matches('a')) {
+    alert("target matches");
 
     if (e.target.checked) {
         console.log("Checkbox is checked..");
 
         let facetLink = e.target.getAttribute("href");
         let getFacetResponse = await (fetchFunnelbackWithTabs(facetLink, 'GET'));
-    
+        alert("get facet response");
+
         document.getElementById('results').innerHTML = `
           <div class="funnelback-search-container">${getFacetResponse}</div>
         `;
@@ -209,9 +214,12 @@ async function processTabs() {
 
 // Create facet group listener
 async function processFacets() {
+  console.log("process facets");
 
   facetElements = document.querySelector('.facet-groups');
   facetElements.addEventListener('change', handleFacetClick, false);
+
+  console.log("facet listener added");
 
   eventListeners.push({ element: facetElements, event: 'change', listener: handleFacetClick }); 
   
