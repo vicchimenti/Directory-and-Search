@@ -215,7 +215,7 @@ async function processFacets() {
 
   console.log("facet listener added");
 
-  eventListeners.push({ element: facetElements, event: 'change', listener: handleFacet }); 
+  eventListeners.push({ element: facetElements, event: 'checked', listener: handleFacet }); 
   
 }
 
