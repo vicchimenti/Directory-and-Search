@@ -1,6 +1,6 @@
 // capture search bar and globaldeclarations
 const searchBar = document.getElementById("search-button");
-const onPageSearch = document.getElementById("on-page-search-input");
+const onPageSearch = document.getElementById("on-page-search-button");
 let getResponse = null;
 let userIpAddress = null;
 let userIp = null;
@@ -173,11 +173,30 @@ async function processTabs () {
   
 }
 
-// Handle form submission
+// Handle search bar submission
 searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('search-input').value;
+  let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  getResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
+
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">${getResponse}</div>
+  `;
+
+  processTabs();
+});
+
+
+
+
+// Handle on page search bar submission
+onPageSearch.addEventListener('click', async (event) => {
+  event.preventDefault();
+
+  let searchQuery = document.getElementById('on-page-search-input').value;
   let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   getResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
 
