@@ -207,8 +207,6 @@ async function processFacets() {
   });
 
   console.log("facet listener pushed");
-
-  
 }
 
 
