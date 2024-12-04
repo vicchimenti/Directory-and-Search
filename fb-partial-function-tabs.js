@@ -176,7 +176,7 @@ async function handleFacet(e) {
   console.log("target: " + e.target);
 
   let facetButton = e.target;
-  let facetLink = facetButton.parentElement.querySelector('.facet-group__list a');
+  let facetAnchor = facetButton.parentElement.querySelector('.facet-group__list a');
 
   // if (e.target.matches('a')) {
   //   alert("target matches");
@@ -184,13 +184,16 @@ async function handleFacet(e) {
   //   if (e.target.checked) {
   //       console.log("Checkbox is checked..");
 
-  //       let facetLink = e.target.getAttribute("href");
+  let facetLink = (facetAnchor) ? facetAnchor.href : null;
+  console.log("facet link: " + facetLink);
+  let getFacetResponse = (facetLink) ? await (fetchFunnelbackWithTabs(facetLink, 'GET')) : null;
+  // = e.target.getAttribute("href");
   //       let getFacetResponse = await (fetchFunnelbackWithTabs(facetLink, 'GET'));
   //       alert("get facet response");
 
-  //       document.getElementById('results').innerHTML = `
-  //         <div class="funnelback-search-container">${getFacetResponse}</div>
-  //       `;
+        document.getElementById('results').innerHTML = `
+          <div class="funnelback-search-container">${getFacetResponse}</div>
+        `;
 
   //     } else {
   //       console.log("Checkbox is not checked..");
