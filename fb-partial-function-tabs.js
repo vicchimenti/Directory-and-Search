@@ -175,24 +175,27 @@ async function handleFacet(e) {
   alert("handle facet click");
   console.log("target: " + e.target);
 
-  if (e.target.matches('a')) {
-    alert("target matches");
+  let facetButton = e.target;
+  let facetLink = facetButton.parentElement.querySelector('.facet-group__list a');
 
-    if (e.target.checked) {
-        console.log("Checkbox is checked..");
+  // if (e.target.matches('a')) {
+  //   alert("target matches");
 
-        let facetLink = e.target.getAttribute("href");
-        let getFacetResponse = await (fetchFunnelbackWithTabs(facetLink, 'GET'));
-        alert("get facet response");
+  //   if (e.target.checked) {
+  //       console.log("Checkbox is checked..");
 
-        document.getElementById('results').innerHTML = `
-          <div class="funnelback-search-container">${getFacetResponse}</div>
-        `;
+  //       let facetLink = e.target.getAttribute("href");
+  //       let getFacetResponse = await (fetchFunnelbackWithTabs(facetLink, 'GET'));
+  //       alert("get facet response");
 
-      } else {
-        console.log("Checkbox is not checked..");
-      }
-    };
+  //       document.getElementById('results').innerHTML = `
+  //         <div class="funnelback-search-container">${getFacetResponse}</div>
+  //       `;
+
+  //     } else {
+  //       console.log("Checkbox is not checked..");
+  //     }
+  //   };
   processFacets();
 }
 
