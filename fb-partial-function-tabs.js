@@ -211,7 +211,7 @@ async function processFacets() {
   console.log("process facets");
 
   let facetElements = document.querySelectorAll('.facet-group__title');
-  facetElements.forEach(facet => {facet.addEventListener('change', handleFacet, false)});
+  facetElements.forEach(facet => {facet.addEventListener('checked', handleFacet, false)});
 
   console.log("facet listener added");
 
