@@ -209,21 +209,7 @@ async function processTabs() {
   
 }
 
-// document.querySelectorAll('.classname').forEach( button => {
-//   button.onclick = function () {
-//   // rest of code
-//   }
-// });
 
-// links.forEach(link => {
-//   link.addEventListener('click', (event) => {
-//     // Prevent default link behavior (e.g., navigating to a new page)
-//     event.preventDefault();
-
-//     // Your custom code here
-//     console.log('Link clicked:', link.textContent);
-//   });
-// });
 
 
 // Create facet group listener
