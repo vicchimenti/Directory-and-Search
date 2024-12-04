@@ -242,7 +242,7 @@ searchBar.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  processFacets()
+  processFacets();
 });
 
 
@@ -262,5 +262,5 @@ onPageSearch.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  processFacets()
+  processFacets();
 });
