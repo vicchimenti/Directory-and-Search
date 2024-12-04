@@ -179,11 +179,11 @@ searchBar.addEventListener('click', async (event) => {
 
   let searchQuery = document.getElementById('search-input').value;
   let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  let getResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
+  let getSearchBarResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
 
 
   document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getResponse}</div>
+    <div class="funnelback-search-container">${getSearchBarResponse}</div>
   `;
 
   processTabs();
