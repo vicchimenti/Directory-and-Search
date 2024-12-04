@@ -190,13 +190,47 @@ async function handleClick(e) {
 //   processFacets();
 // }
 
-async function handleFacet(e) {
-  e.preventDefault();
-  console.log("HandleFacet triggered:", e.target);
+// async function handleFacet(e) {
+//   e.preventDefault();
+//   console.log("HandleFacet triggered:", e.target);
 
-  let facetButton = e.target; // The button clicked
-  let facetAnchor = facetButton.parentElement.querySelector('.facet-group__list a');
-  let facetLink = facetAnchor ? facetAnchor.href : null;
+//   let facetButton = e.target; // The button clicked
+//   let facetAnchor = facetButton.parentElement.querySelector('.facet-group__list a');
+//   let facetLink = facetAnchor ? facetAnchor.href : null;
+//   console.log("Facet link:", facetLink);
+
+//   let getFacetResponse = null;
+//   if (facetLink) {
+//     try {
+//       getFacetResponse = await fetchFunnelbackWithTabs(facetLink, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching facet data:", error);
+//       getFacetResponse = "Error loading facet results.";
+//     }
+//   }
+
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getFacetResponse || "No results found."}
+//     </div>
+//   `;
+// }
+
+// Function to handle button clicks
+async function handleFacetButton(e) {
+  e.preventDefault();
+  console.log("Button clicked:", e.target);
+  // Add your button-specific logic here
+}
+
+// Function to handle anchor clicks
+async function handleFacetAnchor(e) {
+  e.preventDefault();
+  console.log("Anchor clicked:", e.target);
+
+  let facetAnchor = e.target;
+  let facetLink = facetAnchor.href;
+
   console.log("Facet link:", facetLink);
 
   let getFacetResponse = null;
