@@ -134,7 +134,6 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
-
 // handle tab listeners
 async function handleTab(e) {
   e.preventDefault(); // Prevent default navigation
@@ -159,20 +158,6 @@ async function handleTab(e) {
     </div>
   `;
 }
-// async function handleTab(e) {
-//   e.preventDefault();
-//   if (e.target.matches('a')) {
-
-//     let tabLink = e.target.getAttribute("href");
-//     let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
-
-//     document.getElementById('results').innerHTML = `
-//       <div class="funnelback-search-container">${getTabResponse}</div>
-//     `;
-//   }
-//   processTabs();
-// }
-
 
 
 
@@ -205,8 +190,6 @@ async function handleFacetAnchor(e) {
 
 
 
-
-
 // establish body listener
 document.body.addEventListener('click', (e) => {
   console.log("Clicked element:", e.target);
@@ -231,18 +214,6 @@ document.body.addEventListener('click', (e) => {
 
 
 
-
-// Create tab group listener
-// async function processTabs() {
-
-//   let tabElements = document.querySelector('.tab-list__nav');
-//   tabElements.addEventListener('click', handleClick, false);
-  
-// }
-
-
-
-
 // Handle search bar submission
 searchBar.addEventListener('click', async (event) => {
   event.preventDefault();
@@ -255,8 +226,6 @@ searchBar.addEventListener('click', async (event) => {
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getSearchBarResponse}</div>
   `;
-
-  // processTabs();
 });
 
 
@@ -274,6 +243,4 @@ onPageSearch.addEventListener('click', async (event) => {
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">${getOnPageResponse}</div>
   `;
-
-  // processTabs();
 });
