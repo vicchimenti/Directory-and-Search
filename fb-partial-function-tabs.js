@@ -225,18 +225,16 @@ async function handleClick(e) {
 
 // Function to handle anchor clicks
 async function handleFacetAnchor(e) {
-  e.preventDefault();
-  console.log("Anchor clicked:", e.target);
+  e.preventDefault(); // Prevent default navigation
+  const facetAnchor = e.target.closest('.facet-group__list a'); // Get the clicked anchor
+  const relativeHref = facetAnchor.getAttribute('href'); // Get relative link
+  console.log("Relative href:", relativeHref);
 
-  let facetAnchor = e.target;
-  let facetLink = facetAnchor.getAttribute("href");
-
-  console.log("Facet link:", facetLink);
-
+  // Fetch and process data using the relative link
   let getFacetResponse = null;
-  if (facetLink) {
+  if (relativeHref) {
     try {
-      getFacetResponse = await fetchFunnelbackWithTabs(facetLink, 'GET');
+      getFacetResponse = await fetchFunnelbackWithTabs(relativeHref, 'GET');
     } catch (error) {
       console.error("Error fetching facet data:", error);
       getFacetResponse = "Error loading facet results.";
@@ -248,27 +246,8 @@ async function handleFacetAnchor(e) {
       ${getFacetResponse || "No results found."}
     </div>
   `;
-
-  // processFacets();
 }
 
-
-
-// Create facet group listener
-// async function processFacets() {
-//   console.log("Processing facets...");
-
-//   let facetElements = document.querySelectorAll('.facet-group__list a');
-//   console.log("Facet elements found:", facetElements);
-
-//   facetElements.forEach(facet => {
-//     // Always remove existing listeners first to avoid duplicates
-//     facet.removeEventListener('click', handleFacetAnchor);
-//     facet.addEventListener('click', handleFacetAnchor, false);
-//   });
-
-//   console.log("Facet listeners added successfully.");
-// }
 
 
 
