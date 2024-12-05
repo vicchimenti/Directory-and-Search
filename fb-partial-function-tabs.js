@@ -136,19 +136,42 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 // handle tab listeners
-async function handleClick(e) {
-  e.preventDefault();
-  if (e.target.matches('a')) {
+async function handleTab(e) {
+  e.preventDefault(); // Prevent default navigation
+  const fetchTab = e.target.closest('.tab-list__nav a'); // Get the clicked tab
+  const tabHref = fetchTab.getAttribute('href'); // Get relative link
+  console.log("Relative href:", tabHref);
 
-    let tabLink = e.target.getAttribute("href");
-    let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
-
-    document.getElementById('results').innerHTML = `
-      <div class="funnelback-search-container">${getTabResponse}</div>
-    `;
+  // Fetch and process data using the relative link
+  let getTabResponse = null;
+  if (relativeHref) {
+    try {
+      getTabResponse = await fetchFunnelbackWithTabs(fetchTab, 'GET');
+    } catch (error) {
+      console.error("Error fetching tab data:", error);
+      getTabResponse = "Error loading tab results.";
+    }
   }
-  processTabs();
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">
+      ${getTabResponse || "No results found."}
+    </div>
+  `;
 }
+// async function handleTab(e) {
+//   e.preventDefault();
+//   if (e.target.matches('a')) {
+
+//     let tabLink = e.target.getAttribute("href");
+//     let getTabResponse = await (fetchFunnelbackWithTabs(tabLink, 'GET'));
+
+//     document.getElementById('results').innerHTML = `
+//       <div class="funnelback-search-container">${getTabResponse}</div>
+//     `;
+//   }
+//   processTabs();
+// }
 
 
 
@@ -195,6 +218,14 @@ document.body.addEventListener('click', (e) => {
   } else {
     console.log("Click was not on an anchor.");
   }
+
+  const tabElement = e.target.closest('.tab-list__nav a');
+  if (tabElement) {
+    console.log("tab found:", tabElement);
+    handleTab(e);
+  } else {
+    console.log("Click was not on a tab.");
+  }
 });
 
 
@@ -202,12 +233,12 @@ document.body.addEventListener('click', (e) => {
 
 
 // Create tab group listener
-async function processTabs() {
+// async function processTabs() {
 
-  let tabElements = document.querySelector('.tab-list__nav');
-  tabElements.addEventListener('click', handleClick, false);
+//   let tabElements = document.querySelector('.tab-list__nav');
+//   tabElements.addEventListener('click', handleClick, false);
   
-}
+// }
 
 
 
@@ -225,7 +256,7 @@ searchBar.addEventListener('click', async (event) => {
     <div class="funnelback-search-container">${getSearchBarResponse}</div>
   `;
 
-  processTabs();
+  // processTabs();
 });
 
 
@@ -244,5 +275,5 @@ onPageSearch.addEventListener('click', async (event) => {
     <div class="funnelback-search-container">${getOnPageResponse}</div>
   `;
 
-  processTabs();
+  // processTabs();
 });
