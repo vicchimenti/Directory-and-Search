@@ -144,7 +144,7 @@ async function handleTab(e) {
 
   // Fetch and process data using the relative link
   let getTabResponse = null;
-  if (relativeHref) {
+  if (tabHref) {
     try {
       getTabResponse = await fetchFunnelbackWithTabs(fetchTab, 'GET');
     } catch (error) {
