@@ -249,46 +249,46 @@ async function handleFacetAnchor(e) {
     </div>
   `;
 
-  processFacets();
+  // processFacets();
 }
 
 
 
 // Create facet group listener
-async function processFacets() {
-  console.log("Processing facets...");
+// async function processFacets() {
+//   console.log("Processing facets...");
 
-  let facetElements = document.querySelectorAll('.facet-group__list a');
-  console.log("Facet elements found:", facetElements);
+//   let facetElements = document.querySelectorAll('.facet-group__list a');
+//   console.log("Facet elements found:", facetElements);
 
-  facetElements.forEach(facet => {
-    // Always remove existing listeners first to avoid duplicates
-    facet.removeEventListener('click', handleFacetAnchor);
-    facet.addEventListener('click', handleFacetAnchor, false);
-  });
-
-  console.log("Facet listeners added successfully.");
-}
-
-
-
-
-
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   // Attach a single event listener to the parent container
-//   document.body.addEventListener('click', (e) => {
-//     // Check if the clicked element is an anchor inside the facet group
-//     console.log("Clicked element:", e.target);
-//     if (e.target.matches('.facet-group__list a')) {
-//       console.log("Matches anchor:", e.target.matches('.facet-group__list a'));
-//       handleFacetAnchor(e); // Handle anchor clicks
-//     } else if (e.target.matches('button.facet-group__title')) {
-//       console.log("Matches button:", e.target.matches('button.facet-group__title'));
-//       handleFacetButton(e); // Handle button clicks
-//     }
+//   facetElements.forEach(facet => {
+//     // Always remove existing listeners first to avoid duplicates
+//     facet.removeEventListener('click', handleFacetAnchor);
+//     facet.addEventListener('click', handleFacetAnchor, false);
 //   });
-// });
+
+//   console.log("Facet listeners added successfully.");
+// }
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Attach a single event listener to the parent container
+  document.body.addEventListener('click', (e) => {
+    // Check if the clicked element is an anchor inside the facet group
+    console.log("Clicked element:", e.target);
+    if (e.target.matches('.facet-group__list a')) {
+      console.log("Matches anchor:", e.target.matches('.facet-group__list a'));
+      handleFacetAnchor(e); // Handle anchor clicks
+    } else if (e.target.matches('button.facet-group__title')) {
+      console.log("Matches button:", e.target.matches('button.facet-group__title'));
+      handleFacetButton(e); // Handle button clicks
+    }
+  });
+});
 
 
 
@@ -320,7 +320,7 @@ searchBar.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  processFacets();
+  // processFacets();
 });
 
 
@@ -340,5 +340,5 @@ onPageSearch.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  processFacets();
+  // processFacets();
 });
