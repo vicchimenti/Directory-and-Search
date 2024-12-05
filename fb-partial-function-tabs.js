@@ -217,11 +217,11 @@ async function handleClick(e) {
 // }
 
 // Function to handle button clicks
-async function handleFacetButton(e) {
-  e.preventDefault();
-  console.log("Button clicked:", e.target);
-  // Add your button-specific logic here
-}
+// async function handleFacetButton(e) {
+//   e.preventDefault();
+//   console.log("Button clicked:", e.target);
+//   // Add your button-specific logic here
+// }
 
 // Function to handle anchor clicks
 async function handleFacetAnchor(e) {
