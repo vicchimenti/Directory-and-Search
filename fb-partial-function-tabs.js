@@ -146,7 +146,7 @@ async function handleTab(e) {
   let getTabResponse = null;
   if (tabHref) {
     try {
-      getTabResponse = await fetchFunnelbackWithTabs(fetchTab, 'GET');
+      getTabResponse = await fetchFunnelbackWithTabs(tabHref, 'GET');
     } catch (error) {
       console.error("Error fetching tab data:", error);
       getTabResponse = "Error loading tab results.";
