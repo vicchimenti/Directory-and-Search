@@ -3,10 +3,6 @@ const searchBar = document.getElementById("search-button");
 const onPageSearch = document.getElementById("on-page-search-button");
 let userIpAddress = null;
 let userIp = null;
-// let tabElements = null;
-// let facetElements = null;
-let eventListeners = [];
-let processTabsBool = false;
 
 
 
@@ -141,7 +137,6 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 // handle tab listeners
 async function handleClick(e) {
-  processTabsBool = false;
   e.preventDefault();
   if (e.target.matches('a')) {
 
@@ -151,7 +146,6 @@ async function handleClick(e) {
     document.getElementById('results').innerHTML = `
       <div class="funnelback-search-container">${getTabResponse}</div>
     `;
-    processTabsBool = true;
   }
   processTabs();
 }
