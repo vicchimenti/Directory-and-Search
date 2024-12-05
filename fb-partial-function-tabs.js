@@ -229,7 +229,7 @@ async function handleFacetAnchor(e) {
   console.log("Anchor clicked:", e.target);
 
   let facetAnchor = e.target;
-  let facetLink = facetAnchor.href;
+  let facetLink = facetAnchor.getAttribute("href");
 
   console.log("Facet link:", facetLink);
 
