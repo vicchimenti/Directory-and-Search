@@ -206,8 +206,6 @@ async function processTabs() {
 
   let tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
-
-  // eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
   
 }
 
