@@ -138,16 +138,6 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
-// Store listeners
-// function saveListeners() {
-//   if (tabElements) {
-//     localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
-
-//   }
-// } 
-
-
-
 
 // handle tab listeners
 async function handleClick(e) {
@@ -169,59 +159,6 @@ async function handleClick(e) {
 
 
 
-// handle facet listeners
-// async function handleFacet(e) {
-//   e.preventDefault();
-//   alert("handle facet click");
-//   console.log("target: " + e.target);
-
-//   let facetButton = e.target;
-//   let facetAnchor = facetButton.parentElement.querySelector('.facet-group__list a');
-
-//   let facetLink = (facetAnchor) ? facetAnchor.href : null;
-//   console.log("facet link: " + facetLink);
-//   let getFacetResponse = (facetLink) ? await (fetchFunnelbackWithTabs(facetLink, 'GET')) : null;
-
-
-//   document.getElementById('results').innerHTML = `
-//     <div class="funnelback-search-container">${getFacetResponse}</div>
-//   `;
-
-//   processFacets();
-// }
-
-// async function handleFacet(e) {
-//   e.preventDefault();
-//   console.log("HandleFacet triggered:", e.target);
-
-//   let facetButton = e.target; // The button clicked
-//   let facetAnchor = facetButton.parentElement.querySelector('.facet-group__list a');
-//   let facetLink = facetAnchor ? facetAnchor.href : null;
-//   console.log("Facet link:", facetLink);
-
-//   let getFacetResponse = null;
-//   if (facetLink) {
-//     try {
-//       getFacetResponse = await fetchFunnelbackWithTabs(facetLink, 'GET');
-//     } catch (error) {
-//       console.error("Error fetching facet data:", error);
-//       getFacetResponse = "Error loading facet results.";
-//     }
-//   }
-
-//   document.getElementById('results').innerHTML = `
-//     <div class="funnelback-search-container">
-//       ${getFacetResponse || "No results found."}
-//     </div>
-//   `;
-// }
-
-// Function to handle button clicks
-// async function handleFacetButton(e) {
-//   e.preventDefault();
-//   console.log("Button clicked:", e.target);
-//   // Add your button-specific logic here
-// }
 
 // Function to handle anchor clicks
 async function handleFacetAnchor(e) {
@@ -297,7 +234,6 @@ searchBar.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  // processFacets();
 });
 
 
@@ -317,5 +253,4 @@ onPageSearch.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  // processFacets();
 });
