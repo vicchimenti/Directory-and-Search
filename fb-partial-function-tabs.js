@@ -139,12 +139,12 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 // Store listeners
-function saveListeners() {
-  if (tabElements) {
-    localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
+// function saveListeners() {
+//   if (tabElements) {
+//     localStorage.setItem('eventListeners', JSON.stringify(eventListeners));
 
-  }
-} 
+//   }
+// } 
 
 
 
@@ -248,7 +248,29 @@ async function handleFacetAnchor(e) {
       ${getFacetResponse || "No results found."}
     </div>
   `;
+
+  processFacets();
 }
+
+
+
+// Create facet group listener
+async function processFacets() {
+  console.log("Processing facets...");
+
+  let facetElements = document.querySelectorAll('.facet-group__list a');
+  console.log("Facet elements found:", facetElements);
+
+  facetElements.forEach(facet => {
+    // Always remove existing listeners first to avoid duplicates
+    facet.removeEventListener('click', handleFacetAnchor);
+    facet.addEventListener('click', handleFacetAnchor, false);
+  });
+
+  console.log("Facet listeners added successfully.");
+}
+
+
 
 
 
@@ -271,53 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// document.addEventListener('DOMContentLoaded', () => {
-//   console.log("DOMContentLoaded");
-//   // Attach a single event listener to a parent element
-//   document.body.addEventListener('click', (e) => {
-//     if (e.target && e.target.matches('button.facet-group__title')) {
-//       handleFacet(e);
-//     }
-//   });
-//   console.log("listener triggered")
-// });
-
-
-
-
-
-
-
-
-// Create facet group listener
-// async function processFacets() {
-//   console.log("process facets");
-
-//   let facetElements = document.querySelectorAll('button.facet-group__title');
-//   facetElements.forEach(facet => {
-//     facet.removeEventListener('click', handleFacet);
-//     facet.addEventListener('click', handleFacet, false)
-//   });
-
-//   console.log("facet listener added");
-
-//   facetElements.forEach(facet => {
-//     eventListeners.push({ element: facet, event: 'click', listener: handleFacet });
-//   });
-
-//   console.log("facet listener pushed");
-// }
-
-
-
-
 // Create tab group listener
 async function processTabs() {
 
   let tabElements = document.querySelector('.tab-list__nav');
   tabElements.addEventListener('click', handleClick, false);
 
-  eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
+  // eventListeners.push({ element: tabElements, event: 'click', listener: handleClick }); 
   
 }
 
@@ -338,7 +320,7 @@ searchBar.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  // processFacets();
+  processFacets();
 });
 
 
@@ -358,5 +340,5 @@ onPageSearch.addEventListener('click', async (event) => {
   `;
 
   processTabs();
-  // processFacets();
+  processFacets();
 });
