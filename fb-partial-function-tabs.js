@@ -207,7 +207,7 @@ async function handleTab(e) {
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">
-      ${getTabResponse || "No results found."}
+      ${getTabResponse || "No tab results found."}
     </div>
   `;
 }
@@ -220,14 +220,14 @@ async function handleFacetAnchor(e) {
   e.preventDefault();
 
   const facetAnchor = e.target.closest('.facet-group__list a');
-  const relativeHref = facetAnchor.getAttribute('href');
-  console.log("Relative href:", relativeHref);
+  const facetHref = facetAnchor.getAttribute('href');
+  console.log("Relative href:", facetHref);
 
   // Fetch and process data using the relative link
   let getFacetResponse = null;
-  if (relativeHref) {
+  if (facetHref) {
     try {
-      getFacetResponse = await fetchFunnelbackResults(relativeHref, 'GET');
+      getFacetResponse = await fetchFunnelbackResults(facetHref, 'GET');
     } catch (error) {
       console.error("Error fetching facet data:", error);
       getFacetResponse = "Error loading facet results.";
@@ -236,7 +236,7 @@ async function handleFacetAnchor(e) {
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">
-      ${getFacetResponse || "No results found."}
+      ${getFacetResponse || "No facet results found."}
     </div>
   `;
 }
