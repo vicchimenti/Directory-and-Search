@@ -332,6 +332,36 @@ async function handlePagination(e) {
 
 
 
+// handle click
+async function handleClick(e, href) {
+  e.preventDefault();
+
+  // click could be on either a list item or directly on the anchor
+  // const pagHref = 
+  //   e.target.getAttribute('href') ||
+  //   e.target.querySelector('a')?.getAttribute('href');
+
+  // Fetch and process data using the relative link
+  let getClickResponse = null;
+  if (href) {
+    try {
+      getClickResponse = await fetchFunnelbackResults(href, 'GET');
+    } catch (error) {
+      console.error("Error fetching clear data:", error);
+      getClickResponse = "Error click results.";
+    }
+  }
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">
+      ${getClickResponse || "No click results found."}
+    </div>
+  `;
+}
+
+
+
+
 // establish body listener
 document.body.addEventListener('click', (e) => {
   console.log("Clicked element:", e.target);
@@ -354,6 +384,17 @@ document.body.addEventListener('click', (e) => {
   const clearFacets = e.target.closest('a.facet-group__clear');
   if (clearFacets) {
     handleClearFacet(e);
+  }
+
+  const facetBreadcrumbLink = e.target.closest('.facet-breadcrumb__link');
+  const facetBreadcrumbs = e.target.closest('.facet-breadcrumb__item');
+  const targetFacetBc = facetBreadcrumbLink || facetBreadcrumbs;
+  if (targetFacetBc) {
+    const fbcHref = targetFacetBc.getAttribute('href') ||
+      targetFacetBc.querySelector('a')?.getAttribute('href');
+    handleClick(e, fbcHref);
+  } else {
+    console.log("facet breadcrumb link: " + targetFacetBc)
   }
 
   const paginationLink = e.target.closest('.pagination__item');
