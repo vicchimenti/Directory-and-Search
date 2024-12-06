@@ -137,11 +137,11 @@ async function fetchFunnelbackWithTabs(url, method) {
 // Funnelback fetch search tools function
 async function fetchFunnelbackTools(url, method) {
 
-  let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
 
   try {
     if (method === 'GET') {
-      prodTabUrl += `${url}`;
+      prodToolsUrl += `${url}`;
     }
 
     let options = {
@@ -152,7 +152,7 @@ async function fetchFunnelbackTools(url, method) {
       },
     };
 
-    let response = await fetch(prodTabUrl, options);
+    let response = await fetch(prodToolsUrl, options);
     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
     let stream = response.body.pipeThrough(new TextDecoderStream());
