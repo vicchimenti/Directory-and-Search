@@ -83,7 +83,7 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
 
 // Funnelback fetch tabs function
-async function fetchFunnelbackWithTabs(url, method) {
+async function fetchFunnelbackResults(url, method) {
 
   let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
@@ -198,7 +198,7 @@ async function handleTab(e) {
   let getTabResponse = null;
   if (tabHref) {
     try {
-      getTabResponse = await fetchFunnelbackWithTabs(tabHref, 'GET');
+      getTabResponse = await fetchFunnelbackResults(tabHref, 'GET');
     } catch (error) {
       console.error("Error fetching tab data:", error);
       getTabResponse = "Error loading tab results.";
@@ -227,7 +227,7 @@ async function handleFacetAnchor(e) {
   let getFacetResponse = null;
   if (relativeHref) {
     try {
-      getFacetResponse = await fetchFunnelbackWithTabs(relativeHref, 'GET');
+      getFacetResponse = await fetchFunnelbackResults(relativeHref, 'GET');
     } catch (error) {
       console.error("Error fetching facet data:", error);
       getFacetResponse = "Error loading facet results.";
@@ -273,6 +273,35 @@ async function handleSearchTools(e) {
 
 
 
+// handle facet cleaners
+async function handleClearFacet(e) {
+  e.preventDefault();
+
+  const fetchClear = e.target.closest('a.facet-group__clear');
+  const clearHref = fetchClear.getAttribute('href');
+  console.log("Relative href:", clearHref);
+
+  // Fetch and process data using the relative link
+  let getClearResponse = null;
+  if (clearHref) {
+    try {
+      getClearResponse = await fetchFunnelbackResults(clearHref, 'GET');
+    } catch (error) {
+      console.error("Error fetching clear data:", error);
+      getClearResponse = "Error loading clear results.";
+    }
+  }
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">
+      ${getClearResponse || "No clear results found."}
+    </div>
+  `;
+}
+
+
+
+
 // establish body listener
 document.body.addEventListener('click', (e) => {
   console.log("Clicked element:", e.target);
@@ -290,6 +319,11 @@ document.body.addEventListener('click', (e) => {
   const searchTools = e.target.closest('.search-tools__button-group a');
   if (searchTools) {
     handleSearchTools(e);
+  }
+
+  const clearFacets = e.target.closest('a.facet-group__clear');
+  if (clearFacets) {
+
   }
 });
 
