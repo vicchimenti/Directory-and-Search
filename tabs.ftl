@@ -39,8 +39,8 @@
                                 href="${value.toggleUrl}"
                             > 
                                 <#-- Display the icon if it is configured -->
-                                <#if question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")??>
-                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")}"></span>
+                                <#if question.getCurrentProfileConfig().get("stencils.tabs.${value.label}")??>
+                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.${value.label}")}"></span>
                                 </#if>                            
 
                                 ${value.label}                            
