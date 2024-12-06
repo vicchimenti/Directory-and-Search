@@ -36,6 +36,7 @@
     content: none;
 }
 
+/* style h3 as facet buttons were replaced with a div */
 .funnelback-search-container .facet-group__title h3 {
     font-size: 1.125rem;
     font-weight: 700;
