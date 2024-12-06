@@ -323,7 +323,7 @@ document.body.addEventListener('click', (e) => {
 
   const clearFacets = e.target.closest('a.facet-group__clear');
   if (clearFacets) {
-
+    handleClearFacet(e);
   }
 });
 
