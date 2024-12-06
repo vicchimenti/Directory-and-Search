@@ -358,10 +358,10 @@ document.body.addEventListener('click', (e) => {
   }
 
   const paginationLink = e.target.closest('.pagination__item');
-  if (paginationLink) {
+  const paginationAnchor = e.target.closest('.pagination__link');
+  const targetPagination = paginationLink || paginationAnchor;
+  if (targetPagination) {
     handlePagination(e);
-  } else {
-    console.log('pagination undefined: ' + paginationLink);
   }
 });
 
