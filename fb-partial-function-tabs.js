@@ -307,7 +307,12 @@ async function handlePagination(e) {
   e.preventDefault();
   console.log("handle pag");
 
-  const pagHref = e.target.querySelector('a').getAttribute('href');
+
+  const pagHref = 
+    e.target.getAttribute('href') ||
+    e.target.querySelector('a')?.getAttribute('href');
+
+  // const pagHref = e.target.querySelector('a').getAttribute('href');
   // const fetchPag = e.target.closest('a.pagination__link');
   // const pagHref = fetchPag.getAttribute('href');
   console.log("Relative href:", pagHref);
