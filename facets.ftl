@@ -50,13 +50,9 @@
                         <#if facet.allValues?size gt 0>
                             <#--  Facet  -->
                             <div class="facet-group" data-component="facet-group">
-                                <div class="facet-group__title facet-group__title--open" data-component="facet-group-control" >
-                                    <h2>
-    
-                                    ${facet.name}
-
-                                    </h2>
-                                 <div>
+                                <div class="facet-group__title facet-group__title--open" data-component="facet-group-control">
+                                    <h2>${facet.name}</h2>
+                                 </div>
 
                                 <#--  
                                     Show the name of the facet as a heading which allows the 
