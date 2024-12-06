@@ -306,7 +306,7 @@ async function handleClearFacet(e) {
 async function handlePagination(e) {
   e.preventDefault();
 
-  const fetchPag = e.target.closest('a.pagination__link');
+  const fetchPag = e.target.closest('.pagination__item a.pagination__link');
   const pagHref = fetchClear.getAttribute('href');
   console.log("Relative href:", pagHref);
 
@@ -355,7 +355,7 @@ document.body.addEventListener('click', (e) => {
     handleClearFacet(e);
   }
 
-  const paginationLink = e.target.closest('a.pagination__link');
+  const paginationLink = e.target.closest('.pagination__item a.pagination__link');
   if (paginationLink) {
     handlePagination(e);
   }
