@@ -134,10 +134,62 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 
 
+// Funnelback fetch search tools function
+async function fetchFunnelbackTools(url, method) {
+
+  let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+
+  try {
+    if (method === 'GET') {
+      prodTabUrl += `${url}`;
+    }
+
+    let options = {
+      method,
+      headers: {
+        'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+        // 'X-Forwarded-For': userIp,
+      },
+    };
+
+    let response = await fetch(prodTabUrl, options);
+    if (!response.ok) throw new Error(`Error: ${response.status}`);
+
+    let stream = response.body.pipeThrough(new TextDecoderStream());
+    let reader = stream.getReader();
+    let text = "";
+
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+
+        if (done) {
+          break;
+        }
+        text += value;
+      }
+
+    } catch (error) {
+      console.error("Error reading stream:", error);
+    } finally {
+      reader.releaseLock();
+    }
+  
+    return text;
+
+  } catch (error) {
+    console.error(`Error with ${method} request:`, error);
+    return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+  }
+}
+
+
+
+
 // handle tab listeners
 async function handleTab(e) {
   e.preventDefault();
-  
+
   const fetchTab = e.target.closest('.tab-list__nav a');
   const tabHref = fetchTab.getAttribute('href');
   console.log("Relative href:", tabHref);
@@ -204,7 +256,7 @@ async function handleSearchTools(e) {
   let getToolResponse = null;
   if (tabHref) {
     try {
-      getToolResponse = await fetchFunnelbackWithTabs(tabHref, 'GET');
+      getToolResponse = await fetchFunnelbackTools(tabHref, 'GET');
     } catch (error) {
       console.error("Error fetching tab data:", error);
       getToolResponse = "Error loading tab results.";
