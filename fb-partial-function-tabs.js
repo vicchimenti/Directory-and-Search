@@ -162,6 +162,34 @@ async function handleTab(e) {
 
 
 
+// handle search tool listeners
+async function handleSearchTools(e) {
+  e.preventDefault(); // Prevent default navigation
+  const fetchTab = e.target.closest('.tab-list__nav a'); // Get the clicked tab
+  const tabHref = fetchTab.getAttribute('href'); // Get relative link
+  console.log("Relative href:", tabHref);
+
+  // Fetch and process data using the relative link
+  let getTabResponse = null;
+  if (tabHref) {
+    try {
+      getTabResponse = await fetchFunnelbackWithTabs(tabHref, 'GET');
+    } catch (error) {
+      console.error("Error fetching tab data:", error);
+      getTabResponse = "Error loading tab results.";
+    }
+  }
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">
+      ${getTabResponse || "No results found."}
+    </div>
+  `;
+}
+
+
+
+
 // Function to handle anchor clicks
 async function handleFacetAnchor(e) {
   e.preventDefault(); // Prevent default navigation
@@ -205,6 +233,9 @@ document.body.addEventListener('click', (e) => {
   }
 
   const searchTools = e.target.closest('.search-tools__button-group');
+  if (searchTools) {
+    handleSearchTools(e);
+  }
 });
 
 
