@@ -385,11 +385,10 @@ document.body.addEventListener('click', (e) => {
   const facetBreadcrumbs = e.target.closest('.facet-breadcrumb__item');
   const targetFacetBc = facetBreadcrumbLink || facetBreadcrumbs;
   if (targetFacetBc) {
+    console.log("targetFacetBc: " + targetFacetBc);
     const fbcHref = targetFacetBc.getAttribute('href') ||
       targetFacetBc.querySelector('a')?.getAttribute('href');
     handleClick(e, fbcHref);
-  } else {
-    console.log("facet breadcrumb link: " + targetFacetBc)
   }
 
   const paginationLink = e.target.closest('.pagination__item');
