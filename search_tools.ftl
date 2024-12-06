@@ -37,26 +37,26 @@
 
   @param limits Array of number of results to provide (defaults to 10, 20, 50)
 -->
-<#macro LimitDropdown limits=[10, 20, 50, 100]>
+<#--  <#macro LimitDropdown limits=[10, 20, 50, 100]>  -->
     <!-- search_tools.LimitDropdown -->
-    <div class="sq-form-question sq-form-question-select">
+    <#--  <div class="sq-form-question sq-form-question-select">
         <label class="sq-form-question-title sr-only" for="search-tools__results-per-page">Results per page:</label>
         <div class="sq-form-question-answer">
             <select name="num_ranks" class="sq-form-field" id="search-tools__results-per-page">
                 <#list limits as limit>
-                    <#if ((question.inputParameters["num_ranks"]?first?number)!0) == limit>
+                    <#if ((question.inputParameters["num_ranks"]?first?number)!0) == limit>  -->
                         <#-- Selected case -->
-                        <option value="${limit}" selected>${limit}</option>
+                        <#--  <option value="${limit}" selected>${limit}</option>  -->
                         <#--  <a class="dropdown-list__list-link" title="Limit to ${limit} results" href="${question.collection.configuration.value("ui.modern.search_link")}?${removeParam(QueryString, "num_ranks")}&num_ranks=${limit}">  -->
-                    <#else>
+                    <#--  <#else>  -->
                         <#-- Unselected case -->
-                        <option value="${limit}">${limit}</option>
+                        <#--  <option value="${limit}">${limit}</option>
                     </#if>
                 </#list>
             </select>
         </div>
     </div>
-</#macro>
+</#macro>  -->
 
 <#--
   Generate an HTML drop-down for sorting results
