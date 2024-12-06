@@ -54,25 +54,6 @@
                                 <div class="facet-group__title facet-group__title--open" data-component="facet-group-control">
                                     <h3>${facet.name}</h3>
                                  </div>
-
-                                <#--  
-                                    Show the name of the facet as a heading which allows the 
-                                    user to expland and collapse the associated facet categories.  
-                                -->
-                                <#--  <button 
-                                    type="button" 
-                                    class="facet-group__title facet-group__title--open"
-                                    data-component="facet-group-control" 
-                                    >
-                                    ${facet.name}
-                                    <svg class="facet-group__icon facet-group__icon--closed">
-                                        <use href="#add"></use>
-                                    </svg>
-                                    <svg class="facet-group__icon facet-group__icon--open">
-                                        <use href="#subtract"></use>
-                                    </svg>
-                                </button>  -->
-
                                 <#--  Facet categories  -->
                                 <@FacetCategories facet=facet maxCategories=maxCategories />
                                       
