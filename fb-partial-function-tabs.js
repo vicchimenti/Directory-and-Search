@@ -385,7 +385,6 @@ document.body.addEventListener('click', (e) => {
   const facetBreadcrumbs = e.target.closest('.facet-breadcrumb__item');
   const targetFacetBc = facetBreadcrumbLink || facetBreadcrumbs;
   if (targetFacetBc) {
-    console.log("targetFacetBc: " + targetFacetBc);
     const fbcHref = targetFacetBc.getAttribute('href') ||
       targetFacetBc.querySelector('a')?.getAttribute('href');
     handleClick(e, fbcHref);
@@ -395,9 +394,8 @@ document.body.addEventListener('click', (e) => {
   const relatedLink = e.target.closest('.related-links__link');
   const relatedTarget = relatedItem || relatedLink;
   if (relatedTarget) {
-    console.log("relatedTarget: " + relatedTarget);
     const relatedHref = relatedTarget.getAttribute('href') ||
-    relatedTarget.querySelector('a')?.getAttribute('href');
+      relatedTarget.querySelector('a')?.getAttribute('href');
     handleClick(e, relatedHref);
   }
 
