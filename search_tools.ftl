@@ -93,27 +93,27 @@
 </#macro>  -->
 
 <#-- Obtain the result mode from the CGI paramters; Valid values are LIST and CARD -->
-<#function getDisplayMode question>
+<#--  <#function getDisplayMode question>  -->
     <#-- Default the display mode to "list" -->
-    <#assign displayMode = ""> 
+    <#--  <#assign displayMode = "">   -->
 
     <#-- Get the mode that is currently configured -->
-    <#if (question.inputParameters["displayMode"]?first)!?has_content>
+    <#--  <#if (question.inputParameters["displayMode"]?first)!?has_content>  -->
         <#-- Get the value from the user's selection -->
-        <#assign displayMode = question.inputParameters["displayMode"]?first!?upper_case>    
-    <#elseif (question.getCurrentProfileConfig().get("stencils.results.display_mode."+ response.customData.stencils.tabs.selected))!?has_content>
+        <#--  <#assign displayMode = question.inputParameters["displayMode"]?first!?upper_case>    
+    <#elseif (question.getCurrentProfileConfig().get("stencils.results.display_mode."+ response.customData.stencils.tabs.selected))!?has_content>  -->
         <#-- Get the value from the profile config to see if a default has been specified from tabs. -->
-        <#assign displayMode = question.getCurrentProfileConfig().get("stencils.results.display_mode."+ response.customData.stencils.tabs.selected)!?upper_case>
-    <#elseif (question.getCurrentProfileConfig().get("stencils.results.display_mode"))!?has_content>
+        <#--  <#assign displayMode = question.getCurrentProfileConfig().get("stencils.results.display_mode."+ response.customData.stencils.tabs.selected)!?upper_case>
+    <#elseif (question.getCurrentProfileConfig().get("stencils.results.display_mode"))!?has_content>  -->
         <#-- Get the value from profile config -->
-        <#assign displayMode = question.getCurrentProfileConfig().get("stencils.results.display_mode")!?upper_case>
-    <#else>
+        <#--  <#assign displayMode = question.getCurrentProfileConfig().get("stencils.results.display_mode")!?upper_case>
+    <#else>  -->
         <#-- Default -->
-        <#assign displayMode = "LIST"> 
+        <#--  <#assign displayMode = "LIST"> 
     </#if>
 
     <#return displayMode>
-</#function>
+</#function>  -->
 
 <#--
     Runs the best code when the specified display mode is selected.
