@@ -336,11 +336,6 @@ async function handlePagination(e) {
 async function handleClick(e, href) {
   e.preventDefault();
 
-  // click could be on either a list item or directly on the anchor
-  // const pagHref = 
-  //   e.target.getAttribute('href') ||
-  //   e.target.querySelector('a')?.getAttribute('href');
-
   // Fetch and process data using the relative link
   let getClickResponse = null;
   if (href) {
