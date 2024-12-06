@@ -19,7 +19,7 @@
     <div class="facet funnelback-facet no-wysiwyg" data-component="facet">
         <#--  Title for all facets -->
         <div class="facet__group">
-        <div class="facet-group__title"><div>
+            <div class="facet-group__title"><div>
             <#--  <button 
                 type="button" 
                 class="facet-group__title facet-group__title--open facet-groups-controller" 
