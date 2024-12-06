@@ -136,9 +136,10 @@ async function fetchFunnelbackWithTabs(url, method) {
 
 // handle tab listeners
 async function handleTab(e) {
-  e.preventDefault(); // Prevent default navigation
-  const fetchTab = e.target.closest('.tab-list__nav a'); // Get the clicked tab
-  const tabHref = fetchTab.getAttribute('href'); // Get relative link
+  e.preventDefault();
+  
+  const fetchTab = e.target.closest('.tab-list__nav a');
+  const tabHref = fetchTab.getAttribute('href');
   console.log("Relative href:", tabHref);
 
   // Fetch and process data using the relative link
@@ -164,9 +165,10 @@ async function handleTab(e) {
 
 // Function to handle anchor clicks
 async function handleFacetAnchor(e) {
-  e.preventDefault(); // Prevent default navigation
-  const facetAnchor = e.target.closest('.facet-group__list a'); // Get the clicked anchor
-  const relativeHref = facetAnchor.getAttribute('href'); // Get relative link
+  e.preventDefault();
+
+  const facetAnchor = e.target.closest('.facet-group__list a');
+  const relativeHref = facetAnchor.getAttribute('href');
   console.log("Relative href:", relativeHref);
 
   // Fetch and process data using the relative link
@@ -192,9 +194,10 @@ async function handleFacetAnchor(e) {
 
 // handle search tool listeners
 async function handleSearchTools(e) {
-  e.preventDefault(); // Prevent default navigation
-  const fetchTab = e.target.closest('.search-tools__button-group a'); // Get the clicked tab
-  const tabHref = fetchTab.getAttribute('href'); // Get relative link
+  e.preventDefault();
+
+  const fetchTab = e.target.closest('.search-tools__button-group a');
+  const tabHref = fetchTab.getAttribute('href');
   console.log("Relative href:", tabHref);
 
   // Fetch and process data using the relative link
