@@ -306,8 +306,10 @@ async function handleClearFacet(e) {
 async function handlePagination(e) {
   e.preventDefault();
   console.log("handle pag");
-  const fetchPag = e.target.closest('a.pagination__link');
-  const pagHref = fetchPag.getAttribute('href');
+
+  const pagHref = e.target.querySelector('a').getAttribute('href');
+  // const fetchPag = e.target.closest('a.pagination__link');
+  // const pagHref = fetchPag.getAttribute('href');
   console.log("Relative href:", pagHref);
 
   // Fetch and process data using the relative link
