@@ -305,17 +305,11 @@ async function handleClearFacet(e) {
 // handle facet cleaners
 async function handlePagination(e) {
   e.preventDefault();
-  console.log("handle pag");
 
-
+  // click could be on either a list item or directly on the anchor
   const pagHref = 
     e.target.getAttribute('href') ||
     e.target.querySelector('a')?.getAttribute('href');
-
-  // const pagHref = e.target.querySelector('a').getAttribute('href');
-  // const fetchPag = e.target.closest('a.pagination__link');
-  // const pagHref = fetchPag.getAttribute('href');
-  console.log("Relative href:", pagHref);
 
   // Fetch and process data using the relative link
   let getPagResponse = null;
