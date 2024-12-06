@@ -355,7 +355,7 @@ document.body.addEventListener('click', (e) => {
     handleClearFacet(e);
   }
 
-  const paginationLink = e.target.closest('.pagination__item a.pagination__link');
+  const paginationLink = e.target.closest('.pagination__item');
   if (paginationLink) {
     handlePagination(e);
   } else {
