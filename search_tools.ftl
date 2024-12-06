@@ -63,34 +63,7 @@
 
   @param options Map of sort options, where keys are the `sort` paratmeter (e.g. `date`) and values the label (e.g. `Date (Newest first)`)
 -->
-<#--  <#macro SortDropdown options={
-  "": "Relevance",
-  "date": "Date (Newest first)",
-  "adate": "Date (Oldest first)",
-  "title": "Title (A-Z)",
-  "dtitle": "Title (Z-A)",
-  "prox": "Distance",
-  "url": "URL (A-Z)",
-  "durl": "URL (Z-A)",
-  "shuffle": "Shuffle"} >  -->
-    <!-- search_tools.SortDropdown -->
-    <#--  <div class="sq-form-question sq-form-question-select">
-        <label class="sq-form-question-title sr-only" for="search-tools__sort">Results per page:</label>
-        <div class="sq-form-question-answer">
-            <select name="sort" class="sq-form-field" id="search-tools__sort">
-                <#list options as key, value>
-                    <#if ((options[question.inputParameters["sort"]?first])!"") == value>  -->
-                        <#-- Selected case -->
-                        <#--  <option value="${key}" selected>${value}</option>
-                    <#else>  -->
-                        <#-- Unselected case -->
-                        <#--  <option value="${key}">${value}</option>
-                    </#if>
-                </#list>
-            </select>
-        </div>
-    </div>    
-</#macro>  -->
+
 
 <#-- Obtain the result mode from the CGI paramters; Valid values are LIST and CARD -->
 <#function getDisplayMode question>
