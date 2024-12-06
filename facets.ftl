@@ -62,7 +62,7 @@
                                     Show the name of the facet as a heading which allows the 
                                     user to expland and collapse the associated facet categories.  
                                 -->
-                                <button 
+                                <#--  <button 
                                     type="button" 
                                     class="facet-group__title facet-group__title--open"
                                     data-component="facet-group-control" 
@@ -74,7 +74,7 @@
                                     <svg class="facet-group__icon facet-group__icon--open">
                                         <use href="#subtract"></use>
                                     </svg>
-                                </button>
+                                </button>  -->
 
                                 <#--  Facet categories  -->
                                 <@FacetCategories facet=facet maxCategories=maxCategories />
