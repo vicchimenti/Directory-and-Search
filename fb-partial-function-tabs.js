@@ -196,19 +196,15 @@ document.body.addEventListener('click', (e) => {
 
   const anchor = e.target.closest('.facet-group__list a');
   if (anchor) {
-    console.log("Anchor found:", anchor);
     handleFacetAnchor(e);
-  } else {
-    console.log("Click was not on an anchor.");
   }
 
   const tabElement = e.target.closest('.tab-list__nav a');
   if (tabElement) {
-    console.log("tab found:", tabElement);
     handleTab(e);
-  } else {
-    console.log("Click was not on a tab.");
   }
+
+  const searchTools = e.target.closest('.search-tools__button-group');
 });
 
 
