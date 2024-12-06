@@ -302,6 +302,35 @@ async function handleClearFacet(e) {
 
 
 
+// handle facet cleaners
+async function handlePagination(e) {
+  e.preventDefault();
+
+  const fetchPag = e.target.closest('a.pagination__link');
+  const pagHref = fetchClear.getAttribute('href');
+  console.log("Relative href:", pagHref);
+
+  // Fetch and process data using the relative link
+  let getClearResponse = null;
+  if (pagHref) {
+    try {
+      getClearResponse = await fetchFunnelbackResults(pagHref, 'GET');
+    } catch (error) {
+      console.error("Error fetching clear data:", error);
+      getClearResponse = "Error loading pagination results.";
+    }
+  }
+
+  document.getElementById('results').innerHTML = `
+    <div class="funnelback-search-container">
+      ${getClearResponse || "No pagination results found."}
+    </div>
+  `;
+}
+
+
+
+
 // establish body listener
 document.body.addEventListener('click', (e) => {
   console.log("Clicked element:", e.target);
@@ -324,6 +353,11 @@ document.body.addEventListener('click', (e) => {
   const clearFacets = e.target.closest('a.facet-group__clear');
   if (clearFacets) {
     handleClearFacet(e);
+  }
+
+  const paginationLink = e.target.closest('a.pagination__link');
+  if (paginationLink) {
+    handlePagination(e);
   }
 });
 
