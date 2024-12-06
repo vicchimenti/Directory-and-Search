@@ -248,24 +248,24 @@ async function handleFacetAnchor(e) {
 async function handleSearchTools(e) {
   e.preventDefault();
 
-  const fetchTab = e.target.closest('.search-tools__button-group a');
-  const tabHref = fetchTab.getAttribute('href');
-  console.log("Relative href:", tabHref);
+  const fetchTools = e.target.closest('.search-tools__button-group a');
+  const toolHref = fetchTools.getAttribute('href');
+  console.log("Relative href:", toolHref);
 
   // Fetch and process data using the relative link
   let getToolResponse = null;
-  if (tabHref) {
+  if (toolHref) {
     try {
-      getToolResponse = await fetchFunnelbackTools(tabHref, 'GET');
+      getToolResponse = await fetchFunnelbackTools(toolHref, 'GET');
     } catch (error) {
       console.error("Error fetching tab data:", error);
-      getToolResponse = "Error loading tab results.";
+      getToolResponse = "Error loading tool results.";
     }
   }
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">
-      ${getToolResponse || "No results found."}
+      ${getToolResponse || "No tool results found."}
     </div>
   `;
 }
