@@ -24,7 +24,7 @@
 
             <#--  <@LimitDropdown />
             <@SortDropdown />  -->
-            <@DisplayMode />                    
+            <#--  <@DisplayMode />                      -->
             <button type="submit" class="sr-only">
                 Submit
             </button>
