@@ -19,7 +19,8 @@
     <div class="facet funnelback-facet no-wysiwyg" data-component="facet">
         <#--  Title for all facets -->
         <div class="facet__group">
-            <button 
+        <div class="facet-group__title"><div>
+            <#--  <button 
                 type="button" 
                 class="facet-group__title facet-group__title--open facet-groups-controller" 
                 data-component="collapse-all"
@@ -32,7 +33,7 @@
                     <use href="#subtract"></use>
                 </svg>
                 <span class="sr-only">Collapse all facets</span>
-            </button>
+            </button>  -->
         </div>
         <div 
             class="facet-groups"
