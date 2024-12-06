@@ -311,19 +311,19 @@ async function handlePagination(e) {
   console.log("Relative href:", pagHref);
 
   // Fetch and process data using the relative link
-  let getClearResponse = null;
+  let getPagResponse = null;
   if (pagHref) {
     try {
-      getClearResponse = await fetchFunnelbackResults(pagHref, 'GET');
+      getPagResponse = await fetchFunnelbackResults(pagHref, 'GET');
     } catch (error) {
       console.error("Error fetching clear data:", error);
-      getClearResponse = "Error loading pagination results.";
+      getPagResponse = "Error loading pagination results.";
     }
   }
 
   document.getElementById('results').innerHTML = `
     <div class="funnelback-search-container">
-      ${getClearResponse || "No pagination results found."}
+      ${getPagResponse || "No pagination results found."}
     </div>
   `;
 }
