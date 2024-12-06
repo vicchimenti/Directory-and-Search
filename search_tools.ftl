@@ -127,11 +127,11 @@
 <#--
     Show the various display mode options to the user
 -->
-<#--  <#macro DisplayMode>  -->
+<#macro DisplayMode>
     <!-- search_tools.DisplayMode -->
-    <#--  <div class="search-tools__button-group">  -->
+    <div class="search-tools__button-group">
         <#-- Card view -->
-        <#--  <a 
+        <a 
             class="search-tools__button <#if getDisplayMode(question) != 'CARD'>search-tools__button--inactive</#if>" 
             title="Card view"
             href='${question.getCurrentProfileConfig().get("ui.modern.search_link")}?${removeParam(QueryString, "displayMode")}&displayMode=card' 
@@ -139,10 +139,10 @@
             <svg class="svg-icon search-tools__icon">
                 <use href="#grid-view"></use>
             </svg>
-        </a>  -->
+        </a>
         
         <#-- List view -->
-        <#--  <a 
+        <a 
             class="search-tools__button <#if getDisplayMode(question) != 'LIST'>search-tools__button--inactive</#if>" 
             title="List view" 
             href='${question.getCurrentProfileConfig().get("ui.modern.search_link")}?${removeParam(QueryString, "displayMode")}&displayMode=list'>
@@ -151,4 +151,4 @@
             </svg>
         </a>
     </div>    
-</#macro>  -->
+</#macro>
