@@ -307,7 +307,7 @@ async function handlePagination(e) {
   e.preventDefault();
 
   const fetchPag = e.target.closest('.pagination__item a.pagination__link');
-  const pagHref = fetchClear.getAttribute('href');
+  const pagHref = fetchPag.getAttribute('href');
   console.log("Relative href:", pagHref);
 
   // Fetch and process data using the relative link
