@@ -123,32 +123,3 @@
         <#nested> 
     </#if>
 </#macro>
-
-<#--
-    Show the various display mode options to the user
--->
-<#--  <#macro DisplayMode>  -->
-    <!-- search_tools.DisplayMode -->
-    <#--  <div class="search-tools__button-group">  -->
-        <#-- Card view -->
-        <#--  <a 
-            class="search-tools__button <#if getDisplayMode(question) != 'CARD'>search-tools__button--inactive</#if>" 
-            title="Card view"
-            href='${question.getCurrentProfileConfig().get("ui.modern.search_link")}?${removeParam(QueryString, "displayMode")}&displayMode=card' 
-        >
-            <svg class="svg-icon search-tools__icon">
-                <use href="#grid-view"></use>
-            </svg>
-        </a>  -->
-        
-        <#-- List view -->
-        <#--  <a 
-            class="search-tools__button <#if getDisplayMode(question) != 'LIST'>search-tools__button--inactive</#if>" 
-            title="List view" 
-            href='${question.getCurrentProfileConfig().get("ui.modern.search_link")}?${removeParam(QueryString, "displayMode")}&displayMode=list'>
-            <svg class="svg-icon search-tools__icon">
-                <use href="#list-view"></use>
-            </svg>
-        </a>
-    </div>    
-</#macro>  -->
