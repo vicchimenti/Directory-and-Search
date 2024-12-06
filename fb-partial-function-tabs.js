@@ -305,7 +305,7 @@ async function handleClearFacet(e) {
 // handle facet cleaners
 async function handlePagination(e) {
   e.preventDefault();
-
+  console.log("handle pag")
   const fetchPag = e.target.closest('.pagination__item a.pagination__link');
   const pagHref = fetchPag.getAttribute('href');
   console.log("Relative href:", pagHref);
@@ -358,6 +358,8 @@ document.body.addEventListener('click', (e) => {
   const paginationLink = e.target.closest('.pagination__item a.pagination__link');
   if (paginationLink) {
     handlePagination(e);
+  } else {
+    console.log('pagination undefined: ' + paginationLink);
   }
 });
 
