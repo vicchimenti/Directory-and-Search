@@ -391,8 +391,8 @@ document.body.addEventListener('click', (e) => {
     handleClick(e, fbcHref);
   }
 
-  const relatedItem = e.target.closest('.facet-breadcrumb__link');
-  const relatedLink = e.target.closest('.facet-breadcrumb__item');
+  const relatedItem = e.target.closest('.related-links__item');
+  const relatedLink = e.target.closest('.related-links__link');
   const relatedTarget = relatedItem || relatedLink;
   if (relatedTarget) {
     console.log("relatedTarget: " + relatedTarget);
