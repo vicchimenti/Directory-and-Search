@@ -305,7 +305,7 @@ async function handleClearFacet(e) {
 // handle facet cleaners
 async function handlePagination(e) {
   e.preventDefault();
-  console.log("handle pag")
+  console.log("handle pag");
   const fetchPag = e.target.closest('a.pagination__link');
   const pagHref = fetchPag.getAttribute('href');
   console.log("Relative href:", pagHref);
