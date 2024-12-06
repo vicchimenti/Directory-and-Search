@@ -391,6 +391,16 @@ document.body.addEventListener('click', (e) => {
     handleClick(e, fbcHref);
   }
 
+  const relatedItem = e.target.closest('.facet-breadcrumb__link');
+  const relatedLink = e.target.closest('.facet-breadcrumb__item');
+  const relatedTarget = relatedItem || relatedLink;
+  if (relatedTarget) {
+    console.log("relatedTarget: " + relatedTarget);
+    const relatedHref = relatedTarget.getAttribute('href') ||
+    relatedTarget.querySelector('a')?.getAttribute('href');
+    handleClick(e, relatedHref);
+  }
+
   const paginationLink = e.target.closest('.pagination__item');
   const paginationAnchor = e.target.closest('.pagination__link');
   const targetPagination = paginationLink || paginationAnchor;
