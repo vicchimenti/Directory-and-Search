@@ -50,7 +50,7 @@
                         <#if facet.allValues?size gt 0>
                             <#--  Facet  -->
                             <div class="facet-group" data-component="facet-group">
-                                <h2 hidden class="sr-only">Refine your search</h2>
+                                <h2 hidden class="sr-only">Refine by ${facet.name}</h2>
                                 <div class="facet-group__title facet-group__title--open" data-component="facet-group-control">
                                     <h3>${facet.name}</h3>
                                  </div>
