@@ -1,0 +1,87 @@
+[ {
+    "created" : "2018-11-21T09:35:16.971+11:00",
+    "lastModified" : "2018-11-21T09:35:16.971+11:00",
+    "id" : "3f3c203c-75a2-40f8-88f5-9e582896a514",
+    "name" : "",
+    "label" : "BEST_BETS",
+    "enabled" : true,
+    "trigger" : {
+      "type" : "AllQueryWords",
+      "triggerWords" : [ "admissions" ]
+    },
+    "actions" : [ {
+      "type" : "DisplayUrlAdvert",
+      "titleHtml" : "Admissions open Dec 30th",
+      "displayUrl" : "funnelback.edu/apply",
+      "linkUrl" : "https://funnelback.edu/apply",
+      "descriptionHtml" : "Apply to Funnelback University now to join thousands of students and access numerous academic opportunities!",
+      "additionalProperties" : null,
+      "category" : "BEST_BETS",
+      "removeCollectionUrl" : false
+    } ]
+  }, {
+    "created" : "2018-11-21T09:35:16.971+11:00",
+    "lastModified" : "2018-11-21T09:35:16.971+11:00",
+    "id" : "3f3c203c-75a2-40f8-88f5-9e582896a514",
+    "name" : "",
+    "label" : "BEST_BETS",
+    "enabled" : true,
+    "trigger" : {
+      "type" : "AllQueryWords",
+      "triggerWords" : [ "admissions" ]
+    },
+    "actions" : [ {
+      "type" : "DisplayUrlAdvert",
+      "titleHtml" : "Admissions open Dec 30th",
+      "displayUrl" : "funnelback.edu/apply",
+      "linkUrl" : "https://funnelback.edu/apply",
+      "descriptionHtml" : "Apply to Funnelback University now to join thousands of students and access numerous academic opportunities!",
+      "additionalProperties" : null,
+      "category" : "BEST_BETS",
+      "removeCollectionUrl" : false
+    } ]
+  }, {
+    "created" : "2019-09-27T04:48:27.842603+10:00",
+    "lastModified" : "2024-12-05T17:59:17.043606Z",
+    "id" : "2ce1abc6-3992-48a6-8ee1-31e5e86998bd",
+    "name" : "",
+    "label" : "BEST_BETS",
+    "enabled" : true,
+    "trigger" : {
+      "type" : "ExactQuery",
+      "triggerQuery" : "Biology",
+      "ignoreCase" : false
+    },
+    "actions" : [ {
+      "type" : "DisplayUrlAdvert",
+      "titleHtml" : "Seattle University Biology test",
+      "displayUrl" : "https://www.seattleu.edu/academics/all-programs/biology-bs/",
+      "linkUrl" : "https://www.seattleu.edu/academics/all-programs/biology-bs/",
+      "descriptionHtml" : "The major will initially cover fundamental concepts in biology, such as life, the structure and function of molecules, cells and organisms and processes including metabolism and respiration.",
+      "additionalProperties" : null,
+      "category" : "BEST_BETS",
+      "removeCollectionUrl" : true
+    } ]
+  }, {
+    "created" : "2019-10-08T06:16:40.573387+11:00",
+    "lastModified" : "2019-10-08T06:16:40.590868+11:00",
+    "id" : "195b11a3-3c0f-4258-b192-e239a5796b60",
+    "name" : "",
+    "label" : "BEST_BETS",
+    "enabled" : true,
+    "trigger" : {
+      "type" : "ExactQuery",
+      "triggerQuery" : "Monday Night in Milwaukee",
+      "ignoreCase" : false
+    },
+    "actions" : [ {
+      "type" : "DisplayUrlAdvert",
+      "titleHtml" : "Kick off Monday Night at the Hilton!",
+      "displayUrl" : "highedweb.org/2019/09/heweb19-monday-night-in-milwaukee",
+      "linkUrl" : "highedweb.org/2019/09/heweb19-monday-night-in-milwaukee",
+      "descriptionHtml" : "Join us 4:45-6:30 PM at Miller Time Pub for a drink, post-conference shop-talk, dinner recommendations or a group to carpool with to your next destination.",
+      "additionalProperties" : null,
+      "category" : "BEST_BETS",
+      "removeCollectionUrl" : false
+    } ]
+  } ]
