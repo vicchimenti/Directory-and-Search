@@ -94,8 +94,6 @@
                         <@s.boldicize>
                            ${result.listMetadata["c"]?first}
                         </@s.boldicize>
-                 <#--   <#else>
-                        ${result.summary!?no_esc} -->
                     </#if>  
                 </div>
 
