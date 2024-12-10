@@ -84,11 +84,11 @@
         aria-label="${facet.name}"
         class="
         facet-group__list
-        facet-group__type-${(facet.guessedDisplayType?lower_case)?replace('_','-')}
+        facet-group__type-${(facet.guessedDisplayType)?replace('_','-')}
         facet-group__list--open
         "
         data-component="facet-group-content"
-        data-type="${(facet.guessedDisplayType?lower_case)?replace('_','-')}"
+        data-type="${(facet.guessedDisplayType)?replace('_','-')}"
     >
         <#list facet.allValues as category>
             <a 
