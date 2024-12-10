@@ -112,7 +112,7 @@
 
                 <#-- Metadata should as tags/pills -->        
                 <#if (result.listMetadata["expertiseArea"])!?has_content>
-                    <p class="listing-item__subtitle">Areas of Expertise</p>
+                    <h4 class="listing-item__subtitle"><strong>Areas of Expertise</strong></h4>
                     <ul aria-label="Result tags" class="listing-item__tags">
                         <#list result.listMetadata["expertiseArea"] as expertiseArea>
                             <li class="listing-item__tag">${expertiseArea}</li>
