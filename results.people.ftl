@@ -85,7 +85,7 @@
                             </#if>  -->
                             <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
                                 <p class="listing-item__subtitle">
-                                  ${(result.listMetadata["peoplePosition"]?first)!}<br>${(result.listMetadata["college"]?first)!}<br>${(result.listMetadata["peopleDepartment"]?first)!}
+                                  ${(result.listMetadata["peoplePosition"]?first)!}<br>${(result.listMetadata["peopleDepartment"]?first)!}
                                 </p>
                                 <#--  <p class="listing-item__subtitle">
                                     ${(result.listMetadata["peopleDepartment"]?first)!}
@@ -147,9 +147,18 @@
                         ${(result.listMetadata["peoplePhone"]?first)!}
                     </a>
                 </#if>  -->
-                <#if (result.listMetadata["affiliation"]?first)!?has_content>
+                <#if (result.listMetadata["affiliation"])!?has_content>
                     <div class="listing-item__footer-block listing-item__footer-block">
-                        ${(result.listMetadata["affiliation"]?first)!}
+                        <ul aria-label="Result tags" class="listing-item__tags">
+                            <#list result.listMetadata["affiliation"] as expertiseArea>
+                                <li class="listing-item__tag">${affiliation}</li>
+                            </#list>
+                        </ul>
+                        <#if (result.listMetadata["college"])!?has_content>
+                            <@s.boldicize>
+                            ${result.listMetadata["college"]?first}
+                            </@s.boldicize>
+                        </#if> 
                     </div>
                 </#if>                  
             </div>
