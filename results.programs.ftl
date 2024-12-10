@@ -172,7 +172,7 @@
 </#macro>
 
 <#-- Output the cart template -->
-<#macro ShortlistTemplate>
+<#--  <#macro ShortlistTemplate>  -->
     <!-- results.programs::ShortlistTemplate -->    
     <#-- 
         Note: Cart templates as assigned to document types in profile.cfg/collection.cfg using 
@@ -187,7 +187,7 @@
 
         e.g. id="shorlist-template-programs"
     -->
-    <script id="shortlist-template-programs" type="text/x-handlebars-template">
+    <#--  <script id="shortlist-template-programs" type="text/x-handlebars-template">
         <article class="listing-item listing-item--program listing-item--background-grey10 listing-item--color-black" data-fb-result="{{indexUrl}}">   
 
             {{#if metaData.programImage}} 
@@ -195,16 +195,16 @@
                     <img class="listing-item__image" alt="Thumbnail for {{title}}" src="{{metaData.programImage}}"> 
                 </div> 
                 <#-- Show a placeholder image for showcase -->     
-                <#if ((question.getCurrentProfileConfig().get("stencils.showcase"))!"FALSE")?upper_case == "TRUE">
+                <#--  <#if ((question.getCurrentProfileConfig().get("stencils.showcase"))!"FALSE")?upper_case == "TRUE">
                     {{else}}
                     <div class="listing-item__image-wrapper">
                         <img class="listing-item__image" alt="Thumbnail for {{title}}" src="https://picsum.photos/300/300?sig={{title}}">
                     </div>
                 </#if>
             {{/if}} 
-            <div class="listing-item__content">
+            <div class="listing-item__content">  -->
                 <#-- Title -->
-                {{#if title}} 
+                <#--  {{#if title}} 
                     <div class="listing-item__header">
                         <a href="{{indexUrl}}" title="{{title}}" class="listing-item__title-link">
                             <h3 class="listing-item__title">
@@ -212,38 +212,38 @@
                                     {{title}}  
                                 {{/truncate}}
                             </h3>
-                        </a>
+                        </a>  -->
 
                         <#-- Subtitle -->
-                        {{#if metaData.programFaculty}}  
+                        <#--  {{#if metaData.programFaculty}}  
                             <div class="listing-item__subtitle">
                                 {{metaData.programFaculty}}       
                             </div>
-                        {{/if}} 
+                        {{/if}}   -->
 
                         <#-- Pretty version of the url of the document -->
-                        {{#if indexUrl}}  
+                        <#--  {{#if indexUrl}}  
                             <cite class="listing-item__subtitle listing-item__subtitle--highlight">
                                 {{indexUrl}}
                             </cite>
                         {{/if}} 
                     </div>
-                {{/if}} 
+                {{/if}}   -->
                 
                 
                 <#-- Body -->
-                <div class="listing-item__body">
+                <#--  <div class="listing-item__body">  -->
                     <#-- Summary -->
-                    {{#if metaData.c}} 
+                    <#--  {{#if metaData.c}} 
                         <div class="listing-item__summary">
                             {{#truncate 255}}
                                 {{metaData.c}}  
                             {{/truncate}}
                         </div>
-                    {{/if}} 
+                    {{/if}}   -->
 
                     <#-- Metadata should as tags/pills -->        
-                    <ul aria-label="Result tags" class="listing-item__tags">                                    
+                    <#--  <ul aria-label="Result tags" class="listing-item__tags">                                    
                         {{#list metaData.programCredentialType joinWith=", "}}
                             <li class="listing-item__tag">{{ this }}</li>
                         {{/list}}
@@ -254,8 +254,8 @@
 
                         {{#list metaData.programCredits joinWith=", "}}
                             <li class="listing-item__tag">{{ this }} credits</li>
-                        {{/list}}
-                    </ul>
+                        {{/list}}  -->
+                    <#--  </ul>
 
                     <p>
                         <span class="fb-cart__remove"></span>
@@ -264,10 +264,10 @@
                     <span class="enable-cart-on-result listing-item__action" 
                             aria-label="Add result to the shortlist">
                     </span> 
-                </div>          
+                </div>            -->
 
                 <#-- Footer -->                    
-                <div class="listing-item__footer">
+                <#--  <div class="listing-item__footer">
                     {{#if metaData.programLengthYears}} 
                         <div class="listing-item__footer-block listing-item__footer-block">
                             <svg class="svg-icon listing-item__icon">
@@ -291,6 +291,6 @@
                 </div>                                        
             </div>
         </article>    
-    </script>
-  
-  </#macro>
+    </script>  -->
+
+  <#--  </#macro>  -->
