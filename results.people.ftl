@@ -111,10 +111,11 @@
                 </div>
 
                 <#-- Metadata should as tags/pills -->        
-                <#if (result.listMetadata["author"])!?has_content>
+                <#if (result.listMetadata["expertiseArea"])!?has_content>
+                    <h4>Areas of Expertise</h4>
                     <ul aria-label="Result tags" class="listing-item__tags">
-                        <#list result.listMetadata["author"] as author>
-                            <li class="listing-item__tag">${author}</li>
+                        <#list result.listMetadata["expertiseArea"] as expertiseArea>
+                            <li class="listing-item__tag">${expertiseArea}</li>
                         </#list>
                     </ul>
                 </#if>
