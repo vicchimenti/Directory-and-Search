@@ -151,7 +151,7 @@
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <#if (result.listMetadata["affiliation"])!?has_content>
                         <ul aria-label="Result tags" class="listing-item__tags">
-                            <#list result.listMetadata["affiliation"] as expertiseArea>
+                            <#list result.listMetadata["affiliation"] as affiliation>
                                 <li class="listing-item__tag">${affiliation}</li>
                             </#list>
                         </ul>
