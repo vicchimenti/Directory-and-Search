@@ -103,10 +103,8 @@
                 <#if (result.listMetadata["credential"])!?has_content
                     || (result.listMetadata["programMode"])!?has_content 
                     || (result.listMetadata["areaOfStudy"])!?has_content 
-                    || (result.listMetadata["provider"])!?has_content 
                     || (result.listMetadata["credential"])!?has_content 
-                    || (result.listMetadata["type"])!?has_content 
-                    || (result.listMetadata["credits"])!?has_content>
+                    || (result.listMetadata["type"])!?has_content>
                     <ul aria-label="Result tags" class="listing-item__tags">
                         <#list (result.listMetadata["credential"])![] as value>
                             <li class="listing-item__tag">${value}</li>
