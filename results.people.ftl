@@ -113,26 +113,6 @@
 
             <#-- Footer -->                    
             <div class="listing-item__footer">
-            <#--  results.people.ftl: Emails and Phone Numbers  -->
-                <#--  <#if (result.listMetadata["peopleEmail"]?first)!?has_content>                
-                    <a href="mailto:${(result.listMetadata["peopleEmail"]?first)!}" class="listing-item__footer-block listing-item__footer-block--highlight">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Contact email</title>
-                            <use href="#email"></use>
-                        </svg>
-                        ${(result.listMetadata["peopleEmail"]?first)!}
-                    </a>
-                </#if>
-                <#if (result.listMetadata["peoplePhone"]?first)!?has_content>
-                    <a href="tel:${(result.listMetadata["peoplePhone"]?first)!}" class="listing-item__footer-block listing-item__footer-block--highlight">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Contact phone</title>
-                            <use href="#phone"></use>
-                        </svg>
-                        ${(result.listMetadata["peoplePhone"]?first)!}
-                    </a>
-                </#if>  -->
-
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <#if (result.listMetadata["affiliation"])!?has_content && (result.listMetadata["college"])!?has_content>
                         <p>
