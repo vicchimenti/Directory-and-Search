@@ -78,18 +78,10 @@
                     <#--  Subtitle -->
                     <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
                         <div class="listing-item__subtitle">
-                            <#--  <#if (result.listMetadata["pronouns"]?first)!?has_content>
-                               <p class="listing-item__subtitle"> 
-                                  ${(result.listMetadata["pronouns"]?first)!} 
-                               </p>      
-                            </#if>  -->
                             <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
                                 <p class="listing-item__subtitle">
                                   ${(result.listMetadata["peoplePosition"]?first)!}<br>${(result.listMetadata["peopleDepartment"]?first)!}
                                 </p>
-                                <#--  <p class="listing-item__subtitle">
-                                    ${(result.listMetadata["peopleDepartment"]?first)!}
-                                </p>                -->
                             </#if>
                         </div>
                     </#if>
