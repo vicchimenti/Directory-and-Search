@@ -52,7 +52,7 @@
             </div>  
         <#elseif ((question.getCurrentProfileConfig().get("stencils.showcase"))!"FALSE")?upper_case == "TRUE">
             <div class="listing-item__image-wrapper">
-                <img class="listing-item__image" alt="Thumbnail for ${result.title!}" src="https://picsum.photos/300/300?sig=${(result.title)!''?url}">
+                <#--  <img class="listing-item__image" alt="Thumbnail for ${result.title!}" src="https://picsum.photos/300/300?sig=${(result.title)!''?url}">  -->
             </div>
         </#if>
         <div class="listing-item__content">
@@ -78,16 +78,18 @@
                     <#--  Subtitle -->
                     <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
                         <div class="listing-item__subtitle">
-                            <#if (result.listMetadata["pronouns"]?first)!?has_content>
+                            <#--  <#if (result.listMetadata["pronouns"]?first)!?has_content>
                                <p class="listing-item__subtitle"> 
                                   ${(result.listMetadata["pronouns"]?first)!} 
                                </p>      
-                            </#if>
+                            </#if>  -->
                             <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
                                 <p class="listing-item__subtitle">
                                   ${(result.listMetadata["peoplePosition"]?first)!}
-                                - ${(result.listMetadata["peopleDepartment"]?first)!}
-                                </p>                
+                                </p>
+                                <p class="listing-item__subtitle">
+                                    ${(result.listMetadata["peopleDepartment"]?first)!}
+                                </p>              
                             </#if>
                         </div>
                     </#if>
@@ -126,7 +128,7 @@
 
             <#-- Footer -->                    
             <div class="listing-item__footer">
-                <#if (result.listMetadata["peopleEmail"]?first)!?has_content>                
+                <#--  <#if (result.listMetadata["peopleEmail"]?first)!?has_content>                
                     <a href="mailto:${(result.listMetadata["peopleEmail"]?first)!}" class="listing-item__footer-block listing-item__footer-block--highlight">
                         <svg class="svg-icon listing-item__icon">
                             <title>Contact email</title>
@@ -143,7 +145,7 @@
                         </svg>
                         ${(result.listMetadata["peoplePhone"]?first)!}
                     </a>
-                </#if>
+                </#if>  -->
                 <#if (result.listMetadata["affiliation"]?first)!?has_content>
                     <div class="listing-item__footer-block listing-item__footer-block">
                         ${(result.listMetadata["affiliation"]?first)!}
