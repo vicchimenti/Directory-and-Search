@@ -487,7 +487,7 @@ document.body.addEventListener('click', (e) => {
   const spellingSuggestions = e.target.closest('.search-spelling-suggestions__link');
   if (spellingSuggestions) {
     const spellingHref = spellingSuggestions.getAttribute('href');
-    handleClick(e, spellingHref);
+    handleSpellingClick(e, spellingHref);
   }
 });
 
