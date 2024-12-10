@@ -119,9 +119,6 @@
                         </#list>
                     </ul>
                 </#if>
-
-                <#-- Call to Action (CTA) -->                        
-                <#--  <a href="${result.clickTrackingUrl!}" class="listing-item__action">VIEW MORE</a>   -->
             </div>          
 
             <#-- Display the time which this result has last been visited by the user -->
