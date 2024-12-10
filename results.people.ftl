@@ -85,7 +85,7 @@
                             </#if>  -->
                             <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
                                 <p class="listing-item__subtitle">
-                                  ${(result.listMetadata["peoplePosition"]?first)!}<br>${(result.listMetadata["peopleDepartment"]?first)!}
+                                  ${(result.listMetadata["peoplePosition"]?first)!}<br>${(result.listMetadata["college"]?first)!}<br>${(result.listMetadata["peopleDepartment"]?first)!}
                                 </p>
                                 <#--  <p class="listing-item__subtitle">
                                     ${(result.listMetadata["peopleDepartment"]?first)!}
