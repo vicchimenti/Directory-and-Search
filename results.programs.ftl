@@ -116,15 +116,6 @@
                         <#list (result.listMetadata["areaOfStudy"])![] as value>
                             <li class="listing-item__tag">${value}</li>
                         </#list>
-                        <#--  <#list (result.listMetadata["provider"])![] as value>
-                            <li class="listing-item__tag">${value}</li>
-                        </#list>  -->
-                        <#--  <#list (result.listMetadata["credential"])![] as value>
-                            <li class="listing-item__tag">${value}</li>
-                        </#list>  -->
-                        <#--  <#list (result.listMetadata["credits"])![] as value>
-                            <li class="listing-item__tag">${value} Credits</li>
-                        </#list>  -->
                         <#list (result.listMetadata["type"])![] as value>
                             <li class="listing-item__tag">${value}</li>
                         </#list>
