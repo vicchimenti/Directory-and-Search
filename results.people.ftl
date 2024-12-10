@@ -147,20 +147,22 @@
                         ${(result.listMetadata["peoplePhone"]?first)!}
                     </a>
                 </#if>  -->
-                <#if (result.listMetadata["affiliation"])!?has_content>
-                    <div class="listing-item__footer-block listing-item__footer-block">
+
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <#if (result.listMetadata["affiliation"])!?has_content>
                         <ul aria-label="Result tags" class="listing-item__tags">
                             <#list result.listMetadata["affiliation"] as expertiseArea>
                                 <li class="listing-item__tag">${affiliation}</li>
                             </#list>
                         </ul>
-                        <#if (result.listMetadata["college"])!?has_content>
-                            <@s.boldicize>
+                    </#if>   
+                    <#if (result.listMetadata["college"])!?has_content>
+                        <@s.boldicize>
                             ${result.listMetadata["college"]?first}
-                            </@s.boldicize>
-                        </#if> 
-                    </div>
-                </#if>                  
+                        </@s.boldicize>
+                    </#if> 
+                </div>
+               
             </div>
         </div>
     </article>    
