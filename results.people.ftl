@@ -149,14 +149,22 @@
                 </#if>  -->
 
                 <div class="listing-item__footer-block listing-item__footer-block">
-                    <#if (result.listMetadata["affiliation"])!?has_content>
+                    <#--  <#if (result.listMetadata["affiliation"])!?has_content>
                         <ul aria-label="Result tags" class="listing-item__tags">
                             <#list result.listMetadata["affiliation"] as affiliation>
                                 <li class="listing-item__tag">${affiliation}</li>
                             </#list>
                         </ul>
-                    </#if>   
-
+                    </#if>  -->
+                    <#if (result.listMetadata["affiliation"])!?has_content && (result.listMetadata["college"])!?has_content>
+                        <p class="listing-item__footer">
+                            ${(result.listMetadata["affiliation"]?first)!} | ${(result.listMetadata["college"]?first)!}
+                        </p>
+                    <#elseif (result.listMetadata["affiliation"])!?has_content>
+                        <p class="listing-item__footer">
+                            ${(result.listMetadata["affiliation"]?first)!}
+                        </p>
+                    </#if>
                 </div>
                
             </div>
