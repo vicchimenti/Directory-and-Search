@@ -94,7 +94,6 @@
                 <#-- Summary -->
                 <div class="listing-item__summary">
                     <@s.boldicize>
-                     <#--   ${result.summary!?no_esc} -->
                       ${(result.listMetadata["c"]?first)!} 
                     </@s.boldicize>
                 </div>
