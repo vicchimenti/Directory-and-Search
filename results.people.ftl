@@ -68,7 +68,6 @@
                         <h3 class="listing-item__title">
                             <@s.boldicize>
                                 <@s.Truncate length=90>
-                                 <#--   ${(result.listMetadata["peopleFirstName"]?first)!} ${(result.listMetadata["peopleLastName"]?first)!}-->
                                   ${(result.listMetadata["t"]?first)!}
                                 </@s.Truncate>
                             </@s.boldicize>
