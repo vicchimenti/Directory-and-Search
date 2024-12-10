@@ -405,6 +405,11 @@ document.body.addEventListener('click', (e) => {
   if (targetPagination) {
     handlePagination(e);
   }
+
+  const spellingSuggestions = e.target.closest('.search-spelling-suggestions__link');
+  if (spellingSuggestions) {
+    handleClick(e, spellingSuggestions);
+  }
 });
 
 
