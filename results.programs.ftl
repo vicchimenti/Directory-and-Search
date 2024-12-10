@@ -135,7 +135,22 @@
 
             <#-- Footer -->                    
             <div class="listing-item__footer">
-                <#if (result.listMetadata["programLengthYears"]?first)!?has_content>
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <#if (result.listMetadata["category"])!?has_content && (result.listMetadata["provider"])!?has_content>
+                        <p>
+                            ${(result.listMetadata["category"]?first)!} | ${(result.listMetadata["provider"]?first)!}
+                        </p>
+                    <#elseif (result.listMetadata["category"])!?has_content>
+                        <p>
+                            ${(result.listMetadata["category"]?first)!}
+                        </p>
+                    <#elseif (result.listMetadata["provider"])!?has_content>
+                        <p>
+                            ${(result.listMetadata["provider"]?first)!}
+                        </p>
+                    </#if>
+                </div>
+                <#--  <#if (result.listMetadata["provider"]?first)!?has_content>
                     <div class="listing-item__footer-block listing-item__footer-block">
                         <svg class="svg-icon listing-item__icon">
                             <title>Duration</title>
@@ -154,7 +169,7 @@
                         </svg>
                         ${(result.listMetadata["programCampus"]?first)!}
                     </div> 
-                </#if>
+                </#if>  -->
             </div>                                        
         </div>
     </article>    
