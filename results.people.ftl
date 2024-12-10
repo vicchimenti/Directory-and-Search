@@ -112,7 +112,7 @@
 
                 <#-- Metadata should as tags/pills -->        
                 <#if (result.listMetadata["expertiseArea"])!?has_content>
-                    <h4 class="listing-item__title">Areas of Expertise</h4>
+                    <p class="listing-item__subtitle">Areas of Expertise</p>
                     <ul aria-label="Result tags" class="listing-item__tags">
                         <#list result.listMetadata["expertiseArea"] as expertiseArea>
                             <li class="listing-item__tag">${expertiseArea}</li>
@@ -157,11 +157,11 @@
                         </ul>
                     </#if>  -->
                     <#if (result.listMetadata["affiliation"])!?has_content && (result.listMetadata["college"])!?has_content>
-                        <p class="listing-item__footer">
+                        <p>
                             ${(result.listMetadata["affiliation"]?first)!} | ${(result.listMetadata["college"]?first)!}
                         </p>
                     <#elseif (result.listMetadata["affiliation"])!?has_content>
-                        <p class="listing-item__footer">
+                        <p>
                             ${(result.listMetadata["affiliation"]?first)!}
                         </p>
                     </#if>
