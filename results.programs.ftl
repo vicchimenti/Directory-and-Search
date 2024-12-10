@@ -150,26 +150,6 @@
                         </p>
                     </#if>
                 </div>
-                <#--  <#if (result.listMetadata["provider"]?first)!?has_content>
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Duration</title>
-                            <use href="#time">
-                            </use>
-                        </svg>
-                        ${(result.listMetadata["programLengthYears"]?first)!} years
-                    </div>
-                </#if>
-
-                <#if (result.listMetadata["programCampus"]?first)!?has_content>
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Campus</title>
-                            <use href="#map"></use>
-                        </svg>
-                        ${(result.listMetadata["programCampus"]?first)!}
-                    </div> 
-                </#if>  -->
             </div>                                        
         </div>
     </article>    
