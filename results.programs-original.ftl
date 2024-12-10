@@ -60,18 +60,21 @@
             <#-- Title -->
             <#if (result.title)!?has_content>
                 <div class="listing-item__header">
-                    <h3 class="listing-item__title h4 funderline">
-                        <a 
+                    <a 
                         href="${result.clickTrackingUrl!}" 
                         data-live-url="${result.liveUrl}" 
                         title="${result.title!}" 
                         class="listing-item__title-link"
                     >
-                            <@s.Truncate length=90>
-                                ${(result.title)!} 
-                            </@s.Truncate>
-                        </a>    
-                    </h3>
+                        <h3 class="listing-item__title">
+                            <@s.boldicize>
+                                <@s.Truncate length=90>
+                                    ${(result.title)!} 
+                                </@s.Truncate>
+                            </@s.boldicize>
+                        </h3>
+                    </a>
+
                     <#-- Subtitle -->
                     <#if (result.listMetadata["programFaculty"]?first)!?has_content>
                         <div class="listing-item__subtitle">
