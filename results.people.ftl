@@ -156,11 +156,7 @@
                             </#list>
                         </ul>
                     </#if>   
-                    <#--  <#if (result.listMetadata["college"])!?has_content>
-                        <@s.boldicize>
-                            ${result.listMetadata["college"]?first}
-                        </@s.boldicize>
-                    </#if>   -->
+
                 </div>
                
             </div>
