@@ -113,7 +113,7 @@
 
             <#-- Footer -->                    
             <div class="listing-item__footer">
-            <#--  Emails and Phone Numbers  -->
+            <#--  results.people.ftl: Emails and Phone Numbers  -->
                 <#--  <#if (result.listMetadata["peopleEmail"]?first)!?has_content>                
                     <a href="mailto:${(result.listMetadata["peopleEmail"]?first)!}" class="listing-item__footer-block listing-item__footer-block--highlight">
                         <svg class="svg-icon listing-item__icon">
