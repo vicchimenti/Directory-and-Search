@@ -489,6 +489,12 @@ document.body.addEventListener('click', (e) => {
     const spellingHref = spellingSuggestions.getAttribute('href');
     handleSpellingClick(e, spellingHref);
   }
+
+  const queryBlend = e.target.closest('.query-blending__highlight');
+  if (queryBlend) {
+    const blendHref = queryBlend.getAttribute('href');
+    handleClick(e, blendHref);
+  }
 });
 
 
