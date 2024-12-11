@@ -60,9 +60,24 @@
             <#-- Title -->
             <#if (headline)!?has_content>
                 <div class="listing-item__header">
-                headline
+                    <a 
+                        href="${result.clickTrackingUrl!}" 
+                        data-live-url="${result.liveUrl}" 
+                        title="${(result.listMetadata["author"]?first)!} ${(result.listMetadata["headline"]?first)!}"
+                        class="listing-item__title-link"
+                        target="_blank"
+                    >
+                        <h3 class="listing-item__title h4 funderline">
+                            <@s.boldicize>
+                                <@s.Truncate length=90>
+                                  ${(result.listMetadata["headline"]?first)!}
+                                </@s.Truncate>
+                            </@s.boldicize>
+                        </h3>
+                    </a>
+                
 
-                    <@QuickView result=result />
+                    <#--  <@QuickView result=result />  -->
 
                     <#-- Pretty version of the url of the document -->
                     <#--  <cite class="listing-item__subtitle listing-item__subtitle--highlight">
@@ -79,8 +94,8 @@
                 <#-- Summary -->
                 <div class="listing-item__summary">
                     <@s.boldicize>
-                        <#if (result.listMetadata["courseDesc"]?first)!?has_content>
-                            ${(result.listMetadata["courseDesc"]?first)!}
+                        <#if (result.listMetadata["c"]?first)!?has_content>
+                            ${(result.listMetadata["c"]?first)!}
                         <#else>
                             <#--  ${result.summary!}  -->
                         </#if>
