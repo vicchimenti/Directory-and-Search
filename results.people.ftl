@@ -46,7 +46,7 @@
 <#macro GenericView result>
     <!--results.people::GenericView -->
     <article class="listing-item listing-item--people listing-item--background-grey10 listing-item--color-black dataListing peopleData" data-fb-result="${(result.indexUrl)!}">
-                <div class="container">
+        <div class="container">
             <div class="row">
                 <div class="col">
                     <#if (result.listMetadata["image"]?first)!?has_content>
@@ -55,7 +55,7 @@
                         </div>  
                     </#if>
                 </div>
-                <div class="col">
+                <div class="col listing-item__content">
                     <#-- Title -->
                     <#if (result.title)!?has_content>
                         <div class="listing-item__header">
@@ -89,7 +89,7 @@
                     </#if>
                 </div>
             </div>
-            <div class="row">
+            <div class="row listing-item__content">
                 <#-- Body -->
                 <div class="listing-item__body">
                     <#-- Summary -->
@@ -112,7 +112,7 @@
                     </#if>
                 </div>  
             </div>
-            <div class="row">
+            <div class="row listing-item__content">
                 <#-- Footer -->                    
                 <div class="listing-item__footer">
                     <div class="listing-item__footer-block listing-item__footer-block">
