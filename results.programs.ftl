@@ -58,7 +58,7 @@
         </#if>
         <div class="listing-item__content">
             <#-- Title -->
-            <#if (results.title)!?has_content>
+            <#if (result.title)!?has_content>
                 <div class="listing-item__header">
                     <h3 class="listing-item__title h4 funderline">
                         <a 
@@ -69,7 +69,7 @@
                         target="_blank"
                     >
                             <@s.Truncate length=90>
-                                ${(results.title)!} 
+                                ${(result.title)!} 
                             </@s.Truncate>
                         </a>    
                     </h3>
