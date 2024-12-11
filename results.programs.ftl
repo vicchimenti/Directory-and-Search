@@ -87,9 +87,9 @@
             <div class="listing-item__body">
                 <#-- Summary -->
                 <div class="listing-item__summary">
-                    <@s.boldicize>
+                    <@s.boldicize><@s.Truncate length=200>
                       ${(result.listMetadata["c"]?first)!} 
-                    </@s.boldicize>
+                    </@s.Truncate></@s.boldicize>
                 </div>
 
                 <#-- Metadata should as tags/pills -->        
