@@ -62,8 +62,9 @@
                         data-live-url="${result.liveUrl}" 
                         title="${(result.listMetadata["peopleFirstName"]?first)!} ${(result.listMetadata["peopleLastName"]?first)!}"
                         class="listing-item__title-link"
+                        target="_blank"
                     >
-                        <h3 class="listing-item__title">
+                        <h3 class="listing-item__title h4 funderline">
                             <@s.boldicize>
                                 <@s.Truncate length=90>
                                   ${(result.listMetadata["t"]?first)!}
