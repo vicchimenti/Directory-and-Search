@@ -45,7 +45,7 @@
 -->
 <#macro GenericView result>
     <!--results.people::GenericView -->
-    <article class="listing-item listing-item--people listing-item--background-grey10 listing-item--color-black tabListing peopleTab" data-fb-result="${(result.indexUrl)!}">
+    <article class="listing-item listing-item--people listing-item--background-grey10 listing-item--color-black dataListing peopleData" data-fb-result="${(result.indexUrl)!}">
         <#if (result.listMetadata["image"]?first)!?has_content>
             <div class="listing-item__image-wrapper">
                 <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="${(result.listMetadata["image"]?first)!}" data-deferred-src="${(result.listMetadata["image"]?first)!}"> 
