@@ -87,29 +87,6 @@
                       ${(result.listMetadata["c"]?first)!} 
                     </@s.Truncate></@s.boldicize>
                 </div>
-
-                <#-- Metadata should as tags/pills -->        
-                <#--  <#if (result.listMetadata["credential"])!?has_content
-                    || (result.listMetadata["programMode"])!?has_content 
-                    || (result.listMetadata["areaOfStudy"])!?has_content 
-                    || (result.listMetadata["credential"])!?has_content 
-                    || (result.listMetadata["type"])!?has_content>
-                    <ul aria-label="Result tags" class="listing-item__tags">
-                        <#list (result.listMetadata["credential"])![] as value>
-                            <li class="listing-item__tag">${value}</li>
-                        </#list>
-
-                        <#list (result.listMetadata["programMode"])![] as value>
-                            <li class="listing-item__tag">${value}</li>
-                        </#list>
-                        <#list (result.listMetadata["areaOfStudy"])![] as value>
-                            <li class="listing-item__tag">${value}</li>
-                        </#list>
-                        <#list (result.listMetadata["type"])![] as value>
-                            <li class="listing-item__tag">${value}</li>
-                        </#list>
-                    </ul>
-                </#if>  -->
             </div>          
 
             <#-- Display the time which this result has last been visited by the user -->
