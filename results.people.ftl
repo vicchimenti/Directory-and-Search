@@ -90,14 +90,15 @@
             
             <#-- Body -->
             <div class="listing-item__body">
-                <#-- Summary -->
-                <div class="listing-item__summary">
-                    <#if (result.listMetadata["c"])!?has_content>
+                <#if (result.listMetadata["c"])!?has_content>
+                    <#-- Summary -->
+                    <div class="listing-item__summary">
                         <@s.boldicize>
-                           ${result.listMetadata["c"]?first}
+                            ${result.listMetadata["c"]?first}
                         </@s.boldicize>
-                    </#if>  
-                </div>
+                    </div>
+                </#if>  
+
 
                 <#-- Metadata should as tags/pills -->        
                 <#if (result.listMetadata["expertiseArea"])!?has_content>
