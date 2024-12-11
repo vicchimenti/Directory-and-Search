@@ -93,7 +93,7 @@
                 </div>
 
                 <#-- Metadata should as tags/pills -->        
-                <#if (result.listMetadata["credential"])!?has_content
+                <#--  <#if (result.listMetadata["credential"])!?has_content
                     || (result.listMetadata["programMode"])!?has_content 
                     || (result.listMetadata["areaOfStudy"])!?has_content 
                     || (result.listMetadata["credential"])!?has_content 
@@ -113,7 +113,7 @@
                             <li class="listing-item__tag">${value}</li>
                         </#list>
                     </ul>
-                </#if>
+                </#if>  -->
             </div>          
 
             <#-- Display the time which this result has last been visited by the user -->
