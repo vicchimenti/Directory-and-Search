@@ -45,7 +45,7 @@
 -->
 <#macro GenericView result>
     <!-- results.courses::GenericView -->
-    <article class="listing-item listing-item--course listing-item--background-grey10 listing-item--color-black" data-fb-result="${(result.indexUrl)!}">   
+    <article class="listing-item listing-item--course listing-item--background-grey10 listing-item--color-black dataListing newsData" data-fb-result="${(result.indexUrl)!}">   
 
         <#if (result.listMetadata["image"]?first)!?has_content >
             <div class="listing-item__image-wrapper">
