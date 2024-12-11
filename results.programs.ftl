@@ -47,6 +47,74 @@
     <!-- results.programs::GenericView -->
     <article class="listing-item listing-item--program listing-item--background-grey10 listing-item--color-black dataListing programData" data-fb-result="${(result.indexUrl)!}">   
 
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <#if (result.listMetadata["programImage"]?first)!?has_content >
+                        <div class="listing-item__image-wrapper">
+                            <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="//${httpRequest.getHeader('host')}/s/resources/${question.collection.id}/${question.profile}/img/pixel.gif" data-deferred-src="${(result.listMetadata["programImage"]?first)!}"> 
+                        </div>  
+                    </#if>
+                </div>
+                <div class="col">
+                    <#if (result.title)!?has_content>
+                        <div class="listing-item__header">
+                            <h3 class="listing-item__title h4 funderline">
+                                <a 
+                                href="${result.clickTrackingUrl!}" 
+                                data-live-url="${result.liveUrl}" 
+                                title="${result.title!}" 
+                                class="listing-item__title-link"
+                                target="_blank"
+                            >
+                                    <@s.Truncate length=90>
+                                        ${(result.title)!} 
+                                    </@s.Truncate>
+                                </a>    
+                            </h3>
+                            <#-- Subtitle -->
+                            <#if (result.listMetadata["programFaculty"]?first)!?has_content>
+                                <div class="listing-item__subtitle">
+                                    ${(result.listMetadata["programFaculty"]?first)!}     
+                                </div>
+                            </#if>
+                        </div>
+                    </#if>
+                </div>
+            </div>
+            <div class="row">
+                <div class="listing-item__body">
+                    <#-- Summary -->
+                    <div class="listing-item__summary">
+                        <@s.boldicize><@s.Truncate length=200>
+                        ${(result.listMetadata["c"]?first)!} 
+                        </@s.Truncate></@s.boldicize>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="listing-item__footer">
+                    <div class="listing-item__footer-block listing-item__footer-block">
+                        <#if (result.listMetadata["category"])!?has_content && (result.listMetadata["provider"])!?has_content>
+                            <p>
+                                ${(result.listMetadata["category"]?first)!} | ${(result.listMetadata["provider"]?first)!}
+                            </p>
+                        <#elseif (result.listMetadata["category"])!?has_content>
+                            <p>
+                                ${(result.listMetadata["category"]?first)!}
+                            </p>
+                        <#elseif (result.listMetadata["provider"])!?has_content>
+                            <p>
+                                ${(result.listMetadata["provider"]?first)!}
+                            </p>
+                        </#if>
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </article>    
+</#macro>
+
         <#if (result.listMetadata["programImage"]?first)!?has_content >
             <div class="listing-item__image-wrapper">
                 <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="//${httpRequest.getHeader('host')}/s/resources/${question.collection.id}/${question.profile}/img/pixel.gif" data-deferred-src="${(result.listMetadata["programImage"]?first)!}"> 
