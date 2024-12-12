@@ -52,13 +52,13 @@
                 <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="//${httpRequest.getHeader('host')}/s/resources/${question.collection.id}/${question.profile}/img/pixel.gif" data-deferred-src="${(result.listMetadata["image"]?first)!}"> 
             </div>  
         <#elseif ((question.getCurrentProfileConfig().get("stencils.showcase"))!"FALSE")?upper_case == "TRUE">
-            <div class="listing-item__image-wrapper">
-                <#--  <img class="listing-item__image" alt="Thumbnail for ${result.title!}" src="https://picsum.photos/300/300?sig=${(result.title)!''?url}">  -->
-            </div>
+            <#--  <div class="listing-item__image-wrapper">
+                <img class="listing-item__image" alt="Thumbnail for ${result.title!}" src="https://picsum.photos/300/300?sig=${(result.title)!''?url}">
+            </div>  -->
         </#if>
         <div class="listing-item__content">
             <#-- Title -->
-            <#if (headline)!?has_content>
+            <#if (t)!?has_content>
                 <div class="listing-item__header">
                     <a 
                         href="${result.clickTrackingUrl!}" 
@@ -70,7 +70,7 @@
                         <h3 class="listing-item__title h4 funderline">
                             <@s.boldicize>
                                 <@s.Truncate length=90>
-                                  ${(result.listMetadata["headline"]?first)!}
+                                  ${(result.listMetadata["t"]?first)!}
                                 </@s.Truncate>
                             </@s.boldicize>
                         </h3>
