@@ -65,7 +65,7 @@
                         target="_blank"
                     >
                             <@s.Truncate length=90>
-                                ${(t)!} 
+                                ${(result.title)!} 
                             </@s.Truncate>
                         </a>    
                     </h3>
