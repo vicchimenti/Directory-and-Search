@@ -124,28 +124,20 @@
             <#-- Display the time which this result has last been visited by the user -->
             <@sessions.LastVisitedLink result=result/> 
 
+            <#-- Footer -->                    
             <div class="listing-item__footer">
-                <#if (result.listMetadata["courseTerm"])!?has_content>
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Credits</title>
-                            <use href="#time">
-                            </use>
-                        </svg>
-                        ${result.listMetadata["courseTerm"]!?join(", ")!}
-                    </div>
-                </#if> 
-
-                 <#if (result.listMetadata["courseCampus"])!?has_content>
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Campus</title>
-                            <use href="#map"></use>
-                        </svg>
-                        ${result.listMetadata["courseCampus"]!?join(", ")!}
-                    </div> 
-                </#if> 
-            </div>                                                        
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <#if (result.listMetadata["type"])!?has_content && (result.listMetadata["department"])!?has_content>
+                        <p>
+                            ${(result.listMetadata["type"]?first)!} | ${(result.listMetadata["department"]?first)!}
+                        </p>
+                    <#elseif (result.listMetadata["type"])!?has_content>
+                        <p>
+                            ${(result.listMetadata["type"]?first)!}
+                        </p>
+                    </#if>
+                </div>
+            </div>                                            
         </div>
     </article>    
 </#macro>
