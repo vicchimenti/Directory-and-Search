@@ -116,9 +116,9 @@
                 <#-- Call to Action (CTA) -->                        
                 <#--  <a href="${result.clickTrackingUrl!}" class="listing-item__action">VIEW PROGRAM DETAILS</a>  -->
 
-                <span class="enable-cart-on-result listing-item__action" 
+                <#--  <span class="enable-cart-on-result listing-item__action" 
                         aria-label="Add result to the shortlist">
-                </span> 
+                </span>   -->
             </div>          
 
             <#-- Display the time which this result has last been visited by the user -->
