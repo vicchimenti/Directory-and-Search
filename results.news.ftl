@@ -49,7 +49,9 @@
 
         <#if (result.listMetadata["image"]?first)!?has_content >
             <div class="listing-item__image-wrapper">
-                <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="//${httpRequest.getHeader('host')}/s/resources/${question.collection.id}/${question.profile}/img/pixel.gif" data-deferred-src="${(result.listMetadata["image"]?first)!}"> 
+                <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="${(result.listMetadata["image"]?first)!}" data-deferred-src="${(result.listMetadata["image"]?first)!}"> 
+
+                <#--  <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="//${httpRequest.getHeader('host')}/s/resources/${question.collection.id}/${question.profile}/img/pixel.gif" data-deferred-src="${(result.listMetadata["image"]?first)!}">   -->
             </div>  
         <#elseif ((question.getCurrentProfileConfig().get("stencils.showcase"))!"FALSE")?upper_case == "TRUE">
             <div class="listing-item__image-wrapper">
