@@ -92,7 +92,7 @@
                         class="listing-item__title-link"
                     >
                             <@s.Truncate length=90>
-                                ${(result.title)!} 
+                                ${(t)!} 
                             </@s.Truncate>
                         </a>    
                     </h3>
