@@ -6,3 +6,7 @@
 - [ ] How do we set up a new meta item?
 - [ ] Why do some meta mappings that show content not make it the page?
 - [ ] How can I get two word queries to be treated as a phrase?
+- [ ] How do I prevent multiple categories in the same tag?
+- [ ] Can I whitelist per facet?
+- [ ] How do I set a facet category to default?
+- [ ] How do I handle the show more?
