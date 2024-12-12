@@ -4,7 +4,7 @@
 
 - [ ] Why are Meta tags inconsistent in pulling content?
 - [ ] How do we set up a new meta item?
-- [ ] Why do some meta mappings that show content not make it to tothe page?
+- [ ] Why do some meta mappings that show content not make it to the page?
 - [ ] How can I get two word queries to be treated as a phrase?
 - [ ] How do I prevent multiple categories in the same tag?
 - [ ] Can I whitelist per facet?
