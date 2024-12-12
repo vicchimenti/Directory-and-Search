@@ -65,7 +65,7 @@
                         target="_blank"
                     >
                             <@s.Truncate length=90>
-                                ${(t)!} 
+                                ${(result.listMetadata["t"]?first)!}
                             </@s.Truncate>
                         </a>    
                     </h3>
