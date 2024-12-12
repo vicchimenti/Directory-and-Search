@@ -54,7 +54,7 @@
         </#if>
         <div class="listing-item__content">
             <#-- Title -->
-            <#if (t)!?has_content>
+            <#if (result.title)!?has_content>
                 <div class="listing-item__header">
                     <a 
                         href="${result.clickTrackingUrl!}" 
