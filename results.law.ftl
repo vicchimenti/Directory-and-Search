@@ -50,7 +50,7 @@
 -->
 <#macro GenericView result>
     <!-- results::GenericView -->
-    <article class="listing-item listing-item--generic listing-item--background-grey10 listing-item--color-black" data-fb-result="${(result.indexUrl)!}">
+    <article class="listing-item listing-item--generic listing-item--background-grey10 listing-item--color-black dataListing lawData" data-fb-result="${(result.indexUrl)!}">
         <#if (result.listMetadata["image"]?first)!?has_content>
             <div class="listing-item__image-wrapper">
                 <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="${result.listMetadata["image"]?first}" data-deferred-src="${result.listMetadata["image"]?first}"> 
@@ -71,9 +71,9 @@
                         title="${result.title!}" 
                         class="listing-item__title-link"
                     >
-                            <@s.Truncate length=90><@s.boldicize>
+                            <@s.Truncate length=90>
                                 ${(result.listMetadata["t"]?first)!} 
-                            </@s.boldicize></@s.Truncate>
+                            </@s.Truncate>
                         </a>    
                     </h3>  
                 </div>
