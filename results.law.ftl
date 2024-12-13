@@ -64,26 +64,6 @@
             <#-- Title -->
             <#if (result.title)!?has_content>
                 <div class="listing-item__header">
-                    <#-- Show an icon to represented the file type of the current document -->
-                    <#switch result.fileType>
-                        <#case "pdf">
-                            <i class="far fa-file-pdf" aria-hidden="true"></i>
-                            <#break>
-                        <#case "doc">
-                        <#case "docx">
-                        <#case "rtf">
-                            <i class="far fa-file-word" aria-hidden="true"></i>
-                            <#break>
-                        <#case "xls">
-                        <#case "xlsx">
-                            <i class="far fa-file-excel" aria-hidden="true"></i>
-                            <#break>
-                        <#case "ppt">
-                        <#case "pptx">
-                            <i class="far fa-file-powerpoint" aria-hidden="true"></i>
-                            <#break>
-                    </#switch>
-
                     <h3 class="listing-item__title h4 funderline">
                         <a 
                         href="${result.clickTrackingUrl!}" 
@@ -91,23 +71,11 @@
                         title="${result.title!}" 
                         class="listing-item__title-link"
                     >
-                            <@s.Truncate length=90>
+                            <@s.Truncate length=90><@s.boldicize>
                                 ${(result.listMetadata["t"]?first)!} 
-                            </@s.Truncate>
+                            <@s.boldicize></@s.Truncate>
                         </a>    
-                    </h3>
-                   
-                    <#if (result.listMetadata["d"]?first)!?has_content>
-                           <#--${result.listMetadata["d"]?first}-->
-                                    <#assign dateString = result.listMetadata["d"]?first />
-                                    
-                                    <#-- Parse the date if dateString is not null -->
-                                    <#if dateString?has_content>
-                                        <#assign parsedDate = dateString?date("yyyy/MM/dd")>
-                                        <#assign formattedDate = parsedDate?string("MMM dd yyyy")>
-                                        <p class="listing-item__subtitle">${formattedDate?upper_case}</p>
-                                    </#if>
-                    </#if>    
+                    </h3>  
                 </div>
             </#if>
             
@@ -117,11 +85,9 @@
                 <#-- Summary -->
                 <div class="listing-item__summary">
                      <#if (result.listMetadata["c"])!?has_content>
-                        <@s.boldicize>
+                        <@s.Truncate length=150><@s.boldicize>
                            ${result.listMetadata["c"]?first}
-                        </@s.boldicize>
-                    <#else>
-                        ${result.summary!?no_esc}
+                        </@s.boldicize></@s.Truncate>
                     </#if>    
                 </div>
 
