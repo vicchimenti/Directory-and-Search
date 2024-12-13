@@ -70,14 +70,19 @@
                         data-live-url="${result.liveUrl}" 
                         title="${result.title!}" 
                         class="listing-item__title-link"
+                        target="_blank"
                     >
                         <#if (result.listMetadata["lawTitle"])!?has_content>
                             <@s.Truncate length=90>
                                 ${(result.listMetadata["lawTitle"]?first)!} 
                             </@s.Truncate>
-                        <#else>   
+                        <#elseif (result.listMetadata["t"])!?has_content>
                             <@s.Truncate length=90>
                                 ${(result.listMetadata["t"]?first)!} 
+                            </@s.Truncate>
+                        <#else>   
+                            <@s.Truncate length=90>
+                                ${(result.title)!}
                             </@s.Truncate>
                         </#if>
                         </a>    
