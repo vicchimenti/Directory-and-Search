@@ -71,9 +71,15 @@
                         title="${result.title!}" 
                         class="listing-item__title-link"
                     >
+                        <#if (result.listMetadata["lawTitle"])!?has_content>
+                            <@s.Truncate length=90>
+                                ${(result.listMetadata["lawTitle"]?first)!} 
+                            </@s.Truncate>
+                        <#else>   
                             <@s.Truncate length=90>
                                 ${(result.listMetadata["t"]?first)!} 
                             </@s.Truncate>
+                        </#if>
                         </a>    
                     </h3>  
                 </div>
