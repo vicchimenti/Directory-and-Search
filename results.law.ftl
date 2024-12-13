@@ -99,46 +99,6 @@
             <#-- Display the time which this result has last been visited by the user -->
             <@sessions.LastVisitedLink result=result/> 
 
-            <#-- Footer -->                    
-            <#--  <div class="listing-item__footer">
-                <div class="listing-item__footer-block listing-item__footer-block">
-                    <#if (result.listMetadata["type"])!?has_content && (result.listMetadata["department"])!?has_content>
-                        <p>
-                            ${(result.listMetadata["type"]?first)!} | ${(result.listMetadata["department"]?first)!}
-                        </p>
-                    <#elseif (result.listMetadata["type"])!?has_content>
-                        <p>
-                            ${(result.listMetadata["type"]?first)!}
-                        </p>
-                    </#if>
-                </div>
-            </div>     -->
-            <#--              
-                <div class="listing-item__footer">
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Time</title>
-                            <use href="#time">
-                            </use>
-                        </svg>
-                        10:30 AM - 1:30 PM
-                    </div>
-                    <a href="mailto:it@department.edu" class="listing-item__footer-block listing-item__footer-block--highlight">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Contact email</title>
-                            <use href="#email"></use>
-                            </svg>
-                            it@department.edu 
-                    </a>
-                    <a href="tel:650.725.4747" class="listing-item__footer-block listing-item__footer-block--highlight">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Contact phone</title>
-                            <use href="#phone"></use>
-                        </svg>
-                        650.725.4747 
-                    </a>
-                </div>                                
-            -->
         </div>
     </article>
 </#macro>
