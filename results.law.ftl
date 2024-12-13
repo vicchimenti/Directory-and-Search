@@ -73,7 +73,7 @@
                     >
                             <@s.Truncate length=90><@s.boldicize>
                                 ${(result.listMetadata["t"]?first)!} 
-                            <@s.boldicize></@s.Truncate>
+                            </@s.boldicize></@s.Truncate>
                         </a>    
                     </h3>  
                 </div>
