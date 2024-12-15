@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 
-// Funnelback fetch search input function
+// Funnelback fetch search page input function
 async function fetchFunnelbackSearchPageQuery(url, method, searchQuery) {
 
    try {
