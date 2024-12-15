@@ -240,197 +240,197 @@ async function fetchFunnelbackSpelling(url, method) {
 
 
 // handle tab listeners
-async function handleTab(e) {
-  e.preventDefault();
+// async function handleTab(e) {
+//   e.preventDefault();
 
-  const fetchTab = e.target.closest('.tab-list__nav a');
-  const tabHref = fetchTab.getAttribute('href');
-  console.log("Relative href:", tabHref);
+//   const fetchTab = e.target.closest('.tab-list__nav a');
+//   const tabHref = fetchTab.getAttribute('href');
+//   console.log("Relative href:", tabHref);
 
-  // Fetch and process data using the relative link
-  let getTabResponse = null;
-  if (tabHref) {
-    try {
-      getTabResponse = await fetchFunnelbackResults(tabHref, 'GET');
-    } catch (error) {
-      console.error("Error fetching tab data:", error);
-      getTabResponse = "Error loading tab results.";
-    }
-  }
+//   // Fetch and process data using the relative link
+//   let getTabResponse = null;
+//   if (tabHref) {
+//     try {
+//       getTabResponse = await fetchFunnelbackResults(tabHref, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching tab data:", error);
+//       getTabResponse = "Error loading tab results.";
+//     }
+//   }
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getTabResponse || "No tab results found."}
-    </div>
-  `;
-}
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getTabResponse || "No tab results found."}
+//     </div>
+//   `;
+// }
 
 
 
 
 // Function to handle anchor clicks
-async function handleFacetAnchor(e) {
-  e.preventDefault();
+// async function handleFacetAnchor(e) {
+//   e.preventDefault();
 
-  const facetAnchor = e.target.closest('.facet-group__list a');
-  const facetHref = facetAnchor.getAttribute('href');
-  console.log("Relative href:", facetHref);
+//   const facetAnchor = e.target.closest('.facet-group__list a');
+//   const facetHref = facetAnchor.getAttribute('href');
+//   console.log("Relative href:", facetHref);
 
-  // Fetch and process data using the relative link
-  let getFacetResponse = null;
-  if (facetHref) {
-    try {
-      getFacetResponse = await fetchFunnelbackResults(facetHref, 'GET');
-    } catch (error) {
-      console.error("Error fetching facet data:", error);
-      getFacetResponse = "Error loading facet results.";
-    }
-  }
+//   // Fetch and process data using the relative link
+//   let getFacetResponse = null;
+//   if (facetHref) {
+//     try {
+//       getFacetResponse = await fetchFunnelbackResults(facetHref, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching facet data:", error);
+//       getFacetResponse = "Error loading facet results.";
+//     }
+//   }
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getFacetResponse || "No facet results found."}
-    </div>
-  `;
-}
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getFacetResponse || "No facet results found."}
+//     </div>
+//   `;
+// }
 
 
 
 
 // handle search tool listeners
-async function handleSearchTools(e) {
-  e.preventDefault();
+// async function handleSearchTools(e) {
+//   e.preventDefault();
 
-  const fetchTools = e.target.closest('.search-tools__button-group a');
-  const toolHref = fetchTools.getAttribute('href');
-  console.log("Relative href:", toolHref);
+//   const fetchTools = e.target.closest('.search-tools__button-group a');
+//   const toolHref = fetchTools.getAttribute('href');
+//   console.log("Relative href:", toolHref);
 
-  // Fetch and process data using the relative link
-  let getToolResponse = null;
-  if (toolHref) {
-    try {
-      getToolResponse = await fetchFunnelbackTools(toolHref, 'GET');
-    } catch (error) {
-      console.error("Error fetching tab data:", error);
-      getToolResponse = "Error loading tool results.";
-    }
-  }
+//   // Fetch and process data using the relative link
+//   let getToolResponse = null;
+//   if (toolHref) {
+//     try {
+//       getToolResponse = await fetchFunnelbackTools(toolHref, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching tab data:", error);
+//       getToolResponse = "Error loading tool results.";
+//     }
+//   }
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getToolResponse || "No tool results found."}
-    </div>
-  `;
-}
-
-
-
-
-// handle facet cleaners
-async function handleClearFacet(e) {
-  e.preventDefault();
-
-  const fetchClear = e.target.closest('a.facet-group__clear');
-  const clearHref = fetchClear.getAttribute('href');
-  console.log("Relative href:", clearHref);
-
-  // Fetch and process data using the relative link
-  let getClearResponse = null;
-  if (clearHref) {
-    try {
-      getClearResponse = await fetchFunnelbackResults(clearHref, 'GET');
-    } catch (error) {
-      console.error("Error fetching clear data:", error);
-      getClearResponse = "Error loading clear results.";
-    }
-  }
-
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getClearResponse || "No clear results found."}
-    </div>
-  `;
-}
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getToolResponse || "No tool results found."}
+//     </div>
+//   `;
+// }
 
 
 
 
 // handle facet cleaners
-async function handlePagination(e) {
-  e.preventDefault();
+// async function handleClearFacet(e) {
+//   e.preventDefault();
 
-  // click could be on either a list item or directly on the anchor
-  const pagHref = 
-    e.target.getAttribute('href') ||
-    e.target.querySelector('a')?.getAttribute('href');
+//   const fetchClear = e.target.closest('a.facet-group__clear');
+//   const clearHref = fetchClear.getAttribute('href');
+//   console.log("Relative href:", clearHref);
 
-  // Fetch and process data using the relative link
-  let getPagResponse = null;
-  if (pagHref) {
-    try {
-      getPagResponse = await fetchFunnelbackResults(pagHref, 'GET');
-    } catch (error) {
-      console.error("Error fetching clear data:", error);
-      getPagResponse = "Error loading pagination results.";
-    }
-  }
+//   // Fetch and process data using the relative link
+//   let getClearResponse = null;
+//   if (clearHref) {
+//     try {
+//       getClearResponse = await fetchFunnelbackResults(clearHref, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching clear data:", error);
+//       getClearResponse = "Error loading clear results.";
+//     }
+//   }
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getPagResponse || "No pagination results found."}
-    </div>
-  `;
-}
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getClearResponse || "No clear results found."}
+//     </div>
+//   `;
+// }
+
+
+
+
+// handle facet cleaners
+// async function handlePagination(e) {
+//   e.preventDefault();
+
+//   // click could be on either a list item or directly on the anchor
+//   const pagHref = 
+//     e.target.getAttribute('href') ||
+//     e.target.querySelector('a')?.getAttribute('href');
+
+//   // Fetch and process data using the relative link
+//   let getPagResponse = null;
+//   if (pagHref) {
+//     try {
+//       getPagResponse = await fetchFunnelbackResults(pagHref, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching clear data:", error);
+//       getPagResponse = "Error loading pagination results.";
+//     }
+//   }
+
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getPagResponse || "No pagination results found."}
+//     </div>
+//   `;
+// }
 
 
 
 
 // handle spelling click
-async function handleSpellingClick(e, href) {
-  e.preventDefault();
+// async function handleSpellingClick(e, href) {
+//   e.preventDefault();
 
-  // Fetch and process data using the relative link
-  let getClickResponse = null;
-  if (href) {
-    try {
-      getClickResponse = await fetchFunnelbackSpelling(href, 'GET');
-    } catch (error) {
-      console.error("Error fetching clear data:", error);
-      getClickResponse = "Error click results.";
-    }
-  }
+//   // Fetch and process data using the relative link
+//   let getClickResponse = null;
+//   if (href) {
+//     try {
+//       getClickResponse = await fetchFunnelbackSpelling(href, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching clear data:", error);
+//       getClickResponse = "Error click results.";
+//     }
+//   }
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getClickResponse || "No click results found."}
-    </div>
-  `;
-}
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getClickResponse || "No click results found."}
+//     </div>
+//   `;
+// }
 
 
 
 
 // handle click
-async function handleClick(e, href) {
-  e.preventDefault();
+// async function handleClick(e, href) {
+//   e.preventDefault();
 
-  // Fetch and process data using the relative link
-  let getClickResponse = null;
-  if (href) {
-    try {
-      getClickResponse = await fetchFunnelbackResults(href, 'GET');
-    } catch (error) {
-      console.error("Error fetching clear data:", error);
-      getClickResponse = "Error click results.";
-    }
-  }
+//   // Fetch and process data using the relative link
+//   let getClickResponse = null;
+//   if (href) {
+//     try {
+//       getClickResponse = await fetchFunnelbackResults(href, 'GET');
+//     } catch (error) {
+//       console.error("Error fetching clear data:", error);
+//       getClickResponse = "Error click results.";
+//     }
+//   }
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">
-      ${getClickResponse || "No click results found."}
-    </div>
-  `;
-}
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">
+//       ${getClickResponse || "No click results found."}
+//     </div>
+//   `;
+// }
 
 
 
