@@ -1,5 +1,5 @@
 // capture search bar and globaldeclarations
-const searchBar = document.getElementById("search-button");
+// const searchBar = document.getElementById("search-button");
 const onPageSearch = document.getElementById("on-page-search-button");
 let userIpAddress = null;
 let userIp = null;
