@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 
-// Funnelback fetch search input function
+// Send Get Request with search bar input query
 async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
    try {
@@ -77,7 +77,6 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
     return `<p>Error fetching ${method} request. Please try again later.</p>`;
   }
 }
-
 
 
 
