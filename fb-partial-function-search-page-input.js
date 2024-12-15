@@ -501,18 +501,18 @@ document.body.addEventListener('click', (e) => {
 
 
 // Handle search bar submission
-searchBar.addEventListener('click', async (event) => {
-  event.preventDefault();
+// searchBar.addEventListener('click', async (event) => {
+//   event.preventDefault();
 
-  let searchQuery = document.getElementById('search-input').value;
-  let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  let getSearchBarResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
+//   let searchQuery = document.getElementById('search-input').value;
+//   let prodSearchBarUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+//   let getSearchBarResponse = await (fetchFunnelbackWithQuery(prodSearchBarUrl, 'GET', searchQuery));
 
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getSearchBarResponse}</div>
-  `;
-});
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">${getSearchBarResponse}</div>
+//   `;
+// });
 
 
 
