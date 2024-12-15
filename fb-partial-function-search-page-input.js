@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 
 // Funnelback fetch search input function
-async function fetchFunnelbackWithQuery(url, method, searchQuery) {
+async function fetchFunnelbackSearchPageQuery(url, method, searchQuery) {
 
    try {
     if (method === 'GET' && searchQuery) {
@@ -81,16 +81,13 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
 
 
-
-
-
 // Handle on page search bar submission
 onPageSearch.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('on-page-search-input').value;
   let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  let getOnPageResponse = await (fetchFunnelbackWithQuery(prodOnPageSearchUrl, 'GET', searchQuery));
+  let getOnPageResponse = await (fetchFunnelbackSearchPageQuery(prodOnPageSearchUrl, 'GET', searchQuery));
 
 
   document.getElementById('results').innerHTML = `
