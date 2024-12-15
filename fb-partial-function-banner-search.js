@@ -164,20 +164,3 @@ searchBar.addEventListener('click', async (event) => {
     <div class="funnelback-search-container">${getSearchBarResponse}</div>
   `;
 });
-
-
-
-
-// Handle on page search bar submission
-// onPageSearch.addEventListener('click', async (event) => {
-//   event.preventDefault();
-
-//   let searchQuery = document.getElementById('on-page-search-input').value;
-//   let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-//   let getOnPageResponse = await (fetchFunnelbackWithQuery(prodOnPageSearchUrl, 'GET', searchQuery));
-
-
-//   document.getElementById('results').innerHTML = `
-//     <div class="funnelback-search-container">${getOnPageResponse}</div>
-//   `;
-// });
