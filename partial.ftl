@@ -52,6 +52,7 @@
     The various namespaces (e.g. 'video', 'facebook') need to be on the main scope 
 -->
 <#import "results.news.ftl" as news />
+<#import "results.law.ftl" as law />
 <#import "results.programs.ftl" as programs />
 <#import "results.people.ftl" as people />
 <#import "results.video.ftl" as video />
