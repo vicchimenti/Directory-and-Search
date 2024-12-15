@@ -2,6 +2,7 @@
 const onPageSearch = document.getElementById("on-page-search-button");
 let userIpAddress = null;
 let userIp = null;
+console.log("onpageSearch: " + onPageSearch);
 
 
 
@@ -25,6 +26,7 @@ async function getUserIP() {
 document.addEventListener('DOMContentLoaded', async function() {
   userIp = await getUserIP();
   userIpAddress = JSON.stringify(userIp);
+  console.log("userIpAddress: " + userIpAddress);
 });
 
 
@@ -32,6 +34,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Funnelback fetch search page input function
 async function fetchFunnelbackSearchPageQuery(url, method, searchQuery) {
+
+  console.log("fetchFunnelbackSearchPageQuery");
 
    try {
     if (method === 'GET' && searchQuery) {
@@ -86,6 +90,7 @@ onPageSearch.addEventListener('click', async (event) => {
   event.preventDefault();
 
   let searchQuery = document.getElementById('on-page-search-input').value;
+  console.log("searchQuery: " + searchQuery);
   let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
   let getOnPageResponse = await (fetchFunnelbackSearchPageQuery(prodOnPageSearchUrl, 'GET', searchQuery));
 
