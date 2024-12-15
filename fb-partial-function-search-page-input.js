@@ -83,159 +83,159 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
 
 
 // Funnelback fetch tabs function
-async function fetchFunnelbackResults(url, method) {
+// async function fetchFunnelbackResults(url, method) {
 
-  let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+//   let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
-  try {
-    if (method === 'GET') {
-      prodTabUrl += `${url}`;
-    }
+//   try {
+//     if (method === 'GET') {
+//       prodTabUrl += `${url}`;
+//     }
 
-    let options = {
-      method,
-      headers: {
-        'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
-      },
-    };
+//     let options = {
+//       method,
+//       headers: {
+//         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+//         // 'X-Forwarded-For': userIp,
+//       },
+//     };
 
-    let response = await fetch(prodTabUrl, options);
-    if (!response.ok) throw new Error(`Error: ${response.status}`);
+//     let response = await fetch(prodTabUrl, options);
+//     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-    let stream = response.body.pipeThrough(new TextDecoderStream());
-    let reader = stream.getReader();
-    let text = "";
+//     let stream = response.body.pipeThrough(new TextDecoderStream());
+//     let reader = stream.getReader();
+//     let text = "";
 
-    try {
-      while (true) {
-        const { value, done } = await reader.read();
+//     try {
+//       while (true) {
+//         const { value, done } = await reader.read();
 
-        if (done) {
-          break;
-        }
-        text += value;
-      }
+//         if (done) {
+//           break;
+//         }
+//         text += value;
+//       }
 
-    } catch (error) {
-      console.error("Error reading stream:", error);
-    } finally {
-      reader.releaseLock();
-    }
+//     } catch (error) {
+//       console.error("Error reading stream:", error);
+//     } finally {
+//       reader.releaseLock();
+//     }
   
-    return text;
+//     return text;
 
-  } catch (error) {
-    console.error(`Error with ${method} request:`, error);
-    return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
-  }
-}
+//   } catch (error) {
+//     console.error(`Error with ${method} request:`, error);
+//     return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+//   }
+// }
 
 
 
 
 // Funnelback fetch search tools function
-async function fetchFunnelbackTools(url, method) {
+// async function fetchFunnelbackTools(url, method) {
 
-  let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+//   let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
 
-  try {
-    if (method === 'GET') {
-      prodToolsUrl += `${url}`;
-    }
+//   try {
+//     if (method === 'GET') {
+//       prodToolsUrl += `${url}`;
+//     }
 
-    let options = {
-      method,
-      headers: {
-        'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
-      },
-    };
+//     let options = {
+//       method,
+//       headers: {
+//         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+//         // 'X-Forwarded-For': userIp,
+//       },
+//     };
 
-    let response = await fetch(prodToolsUrl, options);
-    if (!response.ok) throw new Error(`Error: ${response.status}`);
+//     let response = await fetch(prodToolsUrl, options);
+//     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-    let stream = response.body.pipeThrough(new TextDecoderStream());
-    let reader = stream.getReader();
-    let text = "";
+//     let stream = response.body.pipeThrough(new TextDecoderStream());
+//     let reader = stream.getReader();
+//     let text = "";
 
-    try {
-      while (true) {
-        const { value, done } = await reader.read();
+//     try {
+//       while (true) {
+//         const { value, done } = await reader.read();
 
-        if (done) {
-          break;
-        }
-        text += value;
-      }
+//         if (done) {
+//           break;
+//         }
+//         text += value;
+//       }
 
-    } catch (error) {
-      console.error("Error reading stream:", error);
-    } finally {
-      reader.releaseLock();
-    }
+//     } catch (error) {
+//       console.error("Error reading stream:", error);
+//     } finally {
+//       reader.releaseLock();
+//     }
   
-    return text;
+//     return text;
 
-  } catch (error) {
-    console.error(`Error with ${method} request:`, error);
-    return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
-  }
-}
+//   } catch (error) {
+//     console.error(`Error with ${method} request:`, error);
+//     return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+//   }
+// }
 
 
 
 
 // Funnelback fetch search tools function
-async function fetchFunnelbackSpelling(url, method) {
+// async function fetchFunnelbackSpelling(url, method) {
 
-  let prodSpellingUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-  let partial = '&form=partial';
-  let query = url +=`${partial}`;
+//   let prodSpellingUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+//   let partial = '&form=partial';
+//   let query = url +=`${partial}`;
 
-  try {
-    if (method === 'GET') {
-      prodSpellingUrl += `${query}`;
-    }
+//   try {
+//     if (method === 'GET') {
+//       prodSpellingUrl += `${query}`;
+//     }
 
-    let options = {
-      method,
-      headers: {
-        'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
-      },
-    };
+//     let options = {
+//       method,
+//       headers: {
+//         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+//         // 'X-Forwarded-For': userIp,
+//       },
+//     };
 
-    let response = await fetch(prodSpellingUrl, options);
-    if (!response.ok) throw new Error(`Error: ${response.status}`);
+//     let response = await fetch(prodSpellingUrl, options);
+//     if (!response.ok) throw new Error(`Error: ${response.status}`);
 
-    let stream = response.body.pipeThrough(new TextDecoderStream());
-    let reader = stream.getReader();
-    let text = "";
+//     let stream = response.body.pipeThrough(new TextDecoderStream());
+//     let reader = stream.getReader();
+//     let text = "";
 
-    try {
-      while (true) {
-        const { value, done } = await reader.read();
+//     try {
+//       while (true) {
+//         const { value, done } = await reader.read();
 
-        if (done) {
-          break;
-        }
-        text += value;
-      }
+//         if (done) {
+//           break;
+//         }
+//         text += value;
+//       }
 
-    } catch (error) {
-      console.error("Error reading stream:", error);
-    } finally {
-      reader.releaseLock();
-    }
+//     } catch (error) {
+//       console.error("Error reading stream:", error);
+//     } finally {
+//       reader.releaseLock();
+//     }
   
-    return text;
+//     return text;
 
-  } catch (error) {
-    console.error(`Error with ${method} request:`, error);
-    return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
-  }
-}
+//   } catch (error) {
+//     console.error(`Error with ${method} request:`, error);
+//     return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+//   }
+// }
 
 
 
