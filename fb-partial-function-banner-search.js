@@ -169,15 +169,15 @@ searchBar.addEventListener('click', async (event) => {
 
 
 // Handle on page search bar submission
-onPageSearch.addEventListener('click', async (event) => {
-  event.preventDefault();
+// onPageSearch.addEventListener('click', async (event) => {
+//   event.preventDefault();
 
-  let searchQuery = document.getElementById('on-page-search-input').value;
-  let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-  let getOnPageResponse = await (fetchFunnelbackWithQuery(prodOnPageSearchUrl, 'GET', searchQuery));
+//   let searchQuery = document.getElementById('on-page-search-input').value;
+//   let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+//   let getOnPageResponse = await (fetchFunnelbackWithQuery(prodOnPageSearchUrl, 'GET', searchQuery));
 
 
-  document.getElementById('results').innerHTML = `
-    <div class="funnelback-search-container">${getOnPageResponse}</div>
-  `;
-});
+//   document.getElementById('results').innerHTML = `
+//     <div class="funnelback-search-container">${getOnPageResponse}</div>
+//   `;
+// });
