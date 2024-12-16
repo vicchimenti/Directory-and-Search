@@ -20,6 +20,11 @@ class EventManager {
           selector: '.tab-list__nav a', 
           handler: () => handleTab(e) 
         },
+        {
+            selector: '.search-tools__button-group a',
+            handler: () => handleSearchTools(e)
+        }
+
         // Add other handlers...
       ];
   
