@@ -78,6 +78,36 @@ async function handleSearchTools(e) {
 
 
 
+
+// handle facet cleaners
+async function handleClearFacet(e) {
+    e.preventDefault();
+  
+    const fetchClear = e.target.closest('a.facet-group__clear');
+    const clearHref = fetchClear.getAttribute('href');
+    console.log("Relative href:", clearHref);
+  
+    // Fetch and process data using the relative link
+    let getClearResponse = null;
+    if (clearHref) {
+      try {
+        getClearResponse = await fetchFunnelbackResults(clearHref, 'GET');
+      } catch (error) {
+        console.error("Error fetching clear data:", error);
+        getClearResponse = "Error loading clear results.";
+      }
+    }
+  
+    document.getElementById('results').innerHTML = `
+      <div class="funnelback-search-container">
+        ${getClearResponse || "No clear results found."}
+      </div>
+    `;
+  }
+
+
+
+  
 class EventManager {
     constructor(rootElement = document) {
       this.rootElement = rootElement;
