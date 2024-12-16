@@ -7,8 +7,11 @@
 // capture search bar and globaldeclarations
 const searchBar = document.getElementById("search-button");
 const onPageSearch = document.getElementById("on-page-search-button");
-let userIpAddress = null;
-let userIp = null;
+const anchor = document.getElementById('.facet-group__list a');
+const tabElement = e.target.closest('.tab-list__nav a');
+
+let partialUserIpAddress = null;
+let partialUserIp = null;
 
 
 
@@ -30,8 +33,8 @@ async function getUserIP() {
 
 // Fetch user's IP address
 document.addEventListener('DOMContentLoaded', async function() {
-  userIp = await getUserIP();
-  userIpAddress = JSON.stringify(userIp);
+  partialUserIp = await getUserIP();
+  partialUserIpAddress = JSON.stringify(partialUserIp);
 });
 
 
@@ -49,7 +52,7 @@ async function fetchFunnelbackWithQuery(url, method, searchQuery) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
+        // 'X-Forwarded-For': partialUserIp,
       },
     };
 
@@ -102,7 +105,7 @@ async function fetchFunnelbackResults(url, method) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
+        // 'X-Forwarded-For': partialUserIp,
       },
     };
 
@@ -154,7 +157,7 @@ async function fetchFunnelbackTools(url, method) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
+        // 'X-Forwarded-For': partialUserIp,
       },
     };
 
@@ -208,7 +211,7 @@ async function fetchFunnelbackSpelling(url, method) {
       method,
       headers: {
         'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-        // 'X-Forwarded-For': userIp,
+        // 'X-Forwarded-For': partialUserIp,
       },
     };
 
