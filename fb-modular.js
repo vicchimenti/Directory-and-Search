@@ -1,3 +1,55 @@
+// Funnelback fetch search tools function
+async function fetchFunnelbackTools(url, method) {
+
+    let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+  
+    try {
+      if (method === 'GET') {
+        prodToolsUrl += `${url}`;
+      }
+  
+      let options = {
+        method,
+        headers: {
+          'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+          // 'X-Forwarded-For': partialUserIp,
+        },
+      };
+  
+      let response = await fetch(prodToolsUrl, options);
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+  
+      let stream = response.body.pipeThrough(new TextDecoderStream());
+      let reader = stream.getReader();
+      let text = "";
+  
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+  
+          if (done) {
+            break;
+          }
+          text += value;
+        }
+  
+      } catch (error) {
+        console.error("Error reading stream:", error);
+      } finally {
+        reader.releaseLock();
+      }
+    
+      return text;
+  
+    } catch (error) {
+      console.error(`Error with ${method} request:`, error);
+      return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+    }
+  }
+
+
+
+
 // handle search tool listeners
 async function handleSearchTools(e) {
     e.preventDefault();
