@@ -1,3 +1,40 @@
+/***
+ * SU Funnelback Partial Script
+ * 
+ * Handles Tabs, Facets and Tools
+ */
+
+// capture dynamic assets and global declarations
+let partialUserIpAddress = null;
+let partialUserIp = null;
+
+
+
+
+// gather user ip method
+async function getUserIP() {
+  try {
+    let response = await fetch('https://api.ipify.org?format=json');
+    let data = await response.json();
+    return data.ip;
+  } catch (error) {
+      console.error('Error fetching IP address:', error);
+      return ''; // Default to empty if error occurs
+  }
+}
+
+
+
+
+// Fetch user's IP address
+document.addEventListener('DOMContentLoaded', async function() {
+  partialUserIp = await getUserIP();
+  partialUserIpAddress = JSON.stringify(partialUserIp);
+});
+
+
+
+
 // Funnelback fetch tabs function
 async function fetchFunnelbackResults(url, method) {
 
