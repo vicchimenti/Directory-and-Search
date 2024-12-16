@@ -23,7 +23,10 @@ class EventManager {
         {
             selector: '.search-tools__button-group a',
             handler: () => handleSearchTools(e)
-        }
+        },
+        {
+            selector: 'a.facet-group__clear',
+            handler: () => handleClearFacet(e)        }
 
         // Add other handlers...
       ];
@@ -40,3 +43,8 @@ class EventManager {
   
   // Usage
   const eventManager = new EventManager();
+
+  const clearFacets = e.target.closest('a.facet-group__clear');
+  if (clearFacets) {
+    handleClearFacet(e);
+  }
