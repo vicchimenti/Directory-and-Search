@@ -46,6 +46,7 @@ class ResultsSearchManager {
     }
 
     async performFunnelbackSearch(searchQuery) {
+        console.log("ResultsSearchManager: performFunnelbackSearch");
         const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         
         try {
