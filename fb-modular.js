@@ -256,53 +256,95 @@ async function handleClearFacet(e) {
 
 
 
-class EventManager {
-    constructor(rootElement = document) {
-        this.rootElement = rootElement;
-        this.handlers = [
-            { 
-                selector: '.facet-group__list a', 
-                handler: this.handleFacetAnchor 
-            },
-            { 
-                selector: '.tab-list__nav a', 
-                handler: this.handleTab 
-            },
-            {
-                selector: '.search-tools__button-group a',
-                handler: this.handleSearchTools
-            },
-            {
-                selector: 'a.facet-group__clear',
-                handler: this.handleClearFacet        
-            }
-        ];
-        this.setupListeners();
-    }
-  
-    setupListeners() {
-        this.rootElement.addEventListener('click', this.handleClick.bind(this));
-    }
-  
-    handleClick = (e) => {
-        const target = e.target;
-  
-        for (const { selector, handler } of this.handlers) {
-            const matchedElement = target.closest(selector);
-            if (matchedElement) {
-                e.preventDefault(); // Centralize prevention of default behavior
-                handler(e, matchedElement);
-                break;
-            }
-        }
-    }
+class SearchEventManager {
+  constructor() {
+      // Always try to set up the header search
+      this.setupHeaderSearch();
+      
+      // Only set up on-page search if we're on the results page
+      if (window.location.pathname.includes('search-test')) {
+          this.setupOnPageSearch();
+      }
+  }
 
-    // Bind actual handler methods
-    handleFacetAnchor = (e, element) => handleFacetAnchor(e);
-    handleTab = (e, element) => handleTab(e);
-    handleSearchTools = (e, element) => handleSearchTools(e);
-    handleClearFacet = (e, element) => handleClearFacet(e);
+  setupHeaderSearch() {
+      const searchBar = document.getElementById("search-button");
+      if (searchBar) {
+          searchBar.addEventListener('click', this.handleInitialSearch);
+      }
+  }
+
+  setupOnPageSearch() {
+      const onPageSearch = document.getElementById("on-page-search-button");
+      if (onPageSearch) {
+          onPageSearch.addEventListener('click', this.handleOnPageSearch);
+          
+          // Set up URL parameter handling for initial load
+          this.handleURLParameters();
+      }
+  }
+
+  async handleURLParameters() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSearchQuery = urlParams.get('query');
+
+      if (urlSearchQuery) {
+          const searchInputField = document.getElementById('on-page-search-input');
+          if (searchInputField) {
+              searchInputField.value = urlSearchQuery;
+          }
+          await performFunnelbackSearch(urlSearchQuery);
+      }
+  }
+
+  handleInitialSearch = async(event) => {
+      event.preventDefault();
+      const searchQuery = document.getElementById('search-input').value;
+      await fetchAndRedirectSearch(searchQuery);
+  }
+
+  handleOnPageSearch = async(event) => {
+      event.preventDefault();
+      const searchQuery = document.getElementById('on-page-search-input').value;
+      await performFunnelbackSearch(searchQuery);
+  }
 }
 
-// Usage remains the same
-const eventManager = new EventManager();
+class DynamicResultsManager {
+  constructor() {
+      // Only set up if we're on the results page
+      if (window.location.pathname.includes('search-test')) {
+          this.setupDynamicListeners();
+      }
+  }
+
+  setupDynamicListeners() {
+      const resultsContainer = document.getElementById('results');
+      if (resultsContainer) {
+          resultsContainer.addEventListener('click', this.handleDynamicClick);
+      }
+  }
+
+  handleDynamicClick = async(e) => {
+      const handlers = {
+          '.facet-group__list a': handleFacetAnchor,
+          '.tab-list__nav a': handleTab,
+          '.search-tools__button-group a': handleSearchTools,
+          'a.facet-group__clear': handleClearFacet
+      };
+
+      for (const [selector, handler] of Object.entries(handlers)) {
+          const matchedElement = e.target.closest(selector);
+          if (matchedElement) {
+              e.preventDefault();
+              await handler(e);
+              break;
+          }
+      }
+  }
+}
+
+// Initialize both managers regardless of page
+// They will self-determine if they should be active
+const searchManager = new SearchEventManager();
+const resultsManager = new DynamicResultsManager();
