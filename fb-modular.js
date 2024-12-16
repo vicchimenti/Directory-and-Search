@@ -103,6 +103,35 @@ async function fetchFunnelbackTools(url, method) {
 
 
 
+// Function to handle anchor clicks
+async function handleFacetAnchor(e) {
+    e.preventDefault();
+  
+    const facetAnchor = e.target.closest('.facet-group__list a');
+    const facetHref = facetAnchor.getAttribute('href');
+    console.log("Relative href:", facetHref);
+  
+    // Fetch and process data using the relative link
+    let getFacetResponse = null;
+    if (facetHref) {
+      try {
+        getFacetResponse = await fetchFunnelbackResults(facetHref, 'GET');
+      } catch (error) {
+        console.error("Error fetching facet data:", error);
+        getFacetResponse = "Error loading facet results.";
+      }
+    }
+  
+    document.getElementById('results').innerHTML = `
+      <div class="funnelback-search-container">
+        ${getFacetResponse || "No facet results found."}
+      </div>
+    `;
+}
+
+
+
+
 // handle tab listeners
 async function handleTab(e) {
     e.preventDefault();
