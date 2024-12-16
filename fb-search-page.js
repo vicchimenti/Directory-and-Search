@@ -1,97 +1,99 @@
 class SearchResultsManager {
     constructor() {
+        console.log('Initializing SearchResultsManager');
+        this.resultsContainer = document.querySelector('.results');
+        this.searchInput = document.getElementById('on-page-search-input');
+        this.searchButton = document.getElementById('on-page-search-button');
+        
+        // Log what we found
+        console.log('Results container found:', !!this.resultsContainer);
+        console.log('Search input found:', !!this.searchInput);
+        console.log('Search button found:', !!this.searchButton);
+
+        if (!this.resultsContainer) {
+            console.error('Results container not found');
+            return;
+        }
+
         this.initializeIP();
         this.setupEventListeners();
         this.handleURLParameters();
     }
 
-    async initializeIP() {
-        try {
-            let response = await fetch('https://api.ipify.org?format=json');
-            let data = await response.json();
-            this.userIp = data.ip;
-        } catch (error) {
-            console.error('Error fetching IP address:', error);
-            this.userIp = '';
-        }
-    }
-
     setupEventListeners() {
+        console.log('Setting up event listeners');
         // Handle on-page search
-        const onPageSearch = document.getElementById("on-page-search-button");
-        if (onPageSearch) {
-            onPageSearch.addEventListener('click', this.handleOnPageSearch.bind(this));
+        if (this.searchButton) {
+            this.searchButton.addEventListener('click', this.handleOnPageSearch.bind(this));
+            console.log('Search button listener attached');
         }
 
-        // Handle dynamic elements using event delegation
+        // Handle form submission
+        const form = this.searchInput?.closest('form');
+        if (form) {
+            form.addEventListener('submit', this.handleOnPageSearch.bind(this));
+            console.log('Form submit listener attached');
+        }
+
+        // Handle dynamic elements
         document.addEventListener('click', this.handleDynamicClicks.bind(this));
-    }
-
-    async handleURLParameters() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlSearchQuery = urlParams.get('query');
-
-        if (urlSearchQuery) {
-            const searchInputField = document.getElementById('on-page-search-input');
-            if (searchInputField) {
-                searchInputField.value = urlSearchQuery;
-            }
-            await this.performFunnelbackSearch(urlSearchQuery);
-        }
-    }
-
-    handleDynamicClicks = async(e) => {
-        const handlers = {
-            '.facet-group__list a': this.handleFacetAnchor.bind(this),
-            '.tab-list__nav a': this.handleTab.bind(this),
-            '.search-tools__button-group a': this.handleSearchTools.bind(this),
-            'a.facet-group__clear': this.handleClearFacet.bind(this)
-        };
-
-        for (const [selector, handler] of Object.entries(handlers)) {
-            const matchedElement = e.target.closest(selector);
-            if (matchedElement) {
-                e.preventDefault();
-                await handler(e, matchedElement);
-                break;
-            }
-        }
+        console.log('Dynamic clicks listener attached');
     }
 
     async handleOnPageSearch(e) {
         e.preventDefault();
-        const searchQuery = document.getElementById('on-page-search-input').value;
-        await this.performFunnelbackSearch(searchQuery);
+        console.log('Search triggered');
+
+        if (!this.searchInput) {
+            console.error('Search input element not found');
+            return;
+        }
+
+        const searchQuery = this.searchInput.value;
+        console.log('Search query:', searchQuery);
+
+        if (searchQuery?.trim()) {
+            await this.performFunnelbackSearch(searchQuery);
+        } else {
+            console.error('Empty search query');
+        }
     }
 
     async performFunnelbackSearch(searchQuery) {
         const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         try {
             const url = `${prodUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
-            const response = await this.fetchFunnelbackContent(url);
-            this.updateResults(response);
+            console.log('Fetching URL:', url);
+            
+            const response = await fetch(url);
+            console.log('Response status:', response.status);
+            
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
+            const html = await response.text();
+            console.log('Response received, length:', html.length);
+            
+            if (this.resultsContainer) {
+                this.resultsContainer.innerHTML = `
+                    <div class="funnelback-search-container">
+                        ${html}
+                    </div>
+                `;
+                console.log('Results updated');
+            } else {
+                console.error('Results container not found when updating');
+            }
+
         } catch (error) {
             console.error('Search error:', error);
-            this.showError('Error performing search');
+            if (this.resultsContainer) {
+                this.resultsContainer.innerHTML = `
+                    <div class="error-message">
+                        <p>Error performing search. Please try again.</p>
+                    </div>
+                `;
+            }
         }
-    }
-
-    async fetchFunnelbackContent(url) {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.text();
-    }
-
-    updateResults(html) {
-        document.querySelector('.funnelback-search__body').innerHTML = html;
-    }
-
-    showError(message) {
-        document.querySelector('.funnelback-search__body').innerHTML = `
-            <div class="error-message">
-                <p>${message}</p>
-            </div>
-        `;
     }
 
     // Handler methods for dynamic elements
@@ -99,7 +101,13 @@ class SearchResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackContent(href);
-            this.updateResults(response);
+            if (response && this.resultsContainer) {
+                this.resultsContainer.innerHTML = `
+                    <div class="funnelback-search-container">
+                        ${response}
+                    </div>
+                `;
+            }
         }
     }
 
@@ -107,7 +115,13 @@ class SearchResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackContent(href);
-            this.updateResults(response);
+            if (response && this.resultsContainer) {
+                this.resultsContainer.innerHTML = `
+                    <div class="funnelback-search-container">
+                        ${response}
+                    </div>
+                `;
+            }
         }
     }
 
@@ -115,7 +129,13 @@ class SearchResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackContent(href);
-            this.updateResults(response);
+            if (response && this.resultsContainer) {
+                this.resultsContainer.innerHTML = `
+                    <div class="funnelback-search-container">
+                        ${response}
+                    </div>
+                `;
+            }
         }
     }
 
@@ -123,12 +143,30 @@ class SearchResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackContent(href);
-            this.updateResults(response);
+            if (response && this.resultsContainer) {
+                this.resultsContainer.innerHTML = `
+                    <div class="funnelback-search-container">
+                        ${response}
+                    </div>
+                `;
+            }
+        }
+    }
+
+    async fetchFunnelbackContent(url) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.text();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            throw error;
         }
     }
 }
 
-// Initialize the manager
+// Initialize with logging
 document.addEventListener('DOMContentLoaded', () => {
-    const searchManager = new SearchResultsManager();
+    console.log('DOM Content Loaded, creating SearchResultsManager');
+    window.searchManager = new SearchResultsManager();
 });
