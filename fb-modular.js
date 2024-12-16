@@ -13,12 +13,12 @@ class EventManager {
   
       const handlers = [
         { 
-          selector: '.facet-group__list a', 
-          handler: () => handleFacetAnchor(e) 
+            selector: '.facet-group__list a', 
+            handler: () => handleFacetAnchor(e) 
         },
         { 
-          selector: '.tab-list__nav a', 
-          handler: () => handleTab(e) 
+            selector: '.tab-list__nav a', 
+            handler: () => handleTab(e) 
         },
         {
             selector: '.search-tools__button-group a',
