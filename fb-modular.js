@@ -1,3 +1,56 @@
+// Funnelback fetch tabs function
+async function fetchFunnelbackResults(url, method) {
+
+    let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+  
+    try {
+      if (method === 'GET') {
+        prodTabUrl += `${url}`;
+      }
+  
+      let options = {
+        method,
+        headers: {
+          'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+          // 'X-Forwarded-For': partialUserIp,
+        },
+      };
+  
+      let response = await fetch(prodTabUrl, options);
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+  
+      let stream = response.body.pipeThrough(new TextDecoderStream());
+      let reader = stream.getReader();
+      let text = "";
+  
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+  
+          if (done) {
+            break;
+          }
+          text += value;
+        }
+  
+      } catch (error) {
+        console.error("Error reading stream:", error);
+      } finally {
+        reader.releaseLock();
+      }
+    
+      return text;
+  
+    } catch (error) {
+      console.error(`Error with ${method} request:`, error);
+      return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+    }
+  }
+  
+
+
+
+
 // Funnelback fetch search tools function
 async function fetchFunnelbackTools(url, method) {
 
@@ -107,7 +160,7 @@ async function handleClearFacet(e) {
 
 
 
-  
+
 class EventManager {
     constructor(rootElement = document) {
       this.rootElement = rootElement;
