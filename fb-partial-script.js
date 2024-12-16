@@ -1,3 +1,9 @@
+/***
+ * SU Funnelback Partial Script
+ * 
+ * Handles Tabs, Facets and Tools
+ */
+
 // capture search bar and globaldeclarations
 const searchBar = document.getElementById("search-button");
 const onPageSearch = document.getElementById("on-page-search-button");
