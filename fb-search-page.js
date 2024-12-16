@@ -1,7 +1,7 @@
 class SearchResultsManager {
     constructor() {
         console.log('Initializing SearchResultsManager');
-        this.resultsContainer = document.querySelector('.results');
+        this.resultsContainer = document.getElementById('results');
         this.searchInput = document.getElementById('on-page-search-input');
         this.searchButton = document.getElementById('on-page-search-button');
         
@@ -15,7 +15,7 @@ class SearchResultsManager {
             return;
         }
 
-        this.initializeIP();
+        // this.initializeIP();
         this.setupEventListeners();
         this.handleURLParameters();
     }
