@@ -167,7 +167,8 @@
  * 
  * Handles Tabs, Facets and Tools
  */
-
+console.log("DynamicResultsManager");
+alert("DynamicResultsManager");
 // dynamic-results.js
 class DynamicResultsManager {
     constructor() {
