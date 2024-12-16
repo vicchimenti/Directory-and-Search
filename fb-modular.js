@@ -98,7 +98,36 @@ async function fetchFunnelbackTools(url, method) {
       console.error(`Error with ${method} request:`, error);
       return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
     }
-  }
+}
+
+
+
+
+// handle tab listeners
+async function handleTab(e) {
+    e.preventDefault();
+  
+    const fetchTab = e.target.closest('.tab-list__nav a');
+    const tabHref = fetchTab.getAttribute('href');
+    console.log("Relative href:", tabHref);
+  
+    // Fetch and process data using the relative link
+    let getTabResponse = null;
+    if (tabHref) {
+      try {
+        getTabResponse = await fetchFunnelbackResults(tabHref, 'GET');
+      } catch (error) {
+        console.error("Error fetching tab data:", error);
+        getTabResponse = "Error loading tab results.";
+      }
+    }
+  
+    document.getElementById('results').innerHTML = `
+      <div class="funnelback-search-container">
+        ${getTabResponse || "No tab results found."}
+      </div>
+    `;
+}
 
 
 
@@ -156,7 +185,7 @@ async function handleClearFacet(e) {
         ${getClearResponse || "No clear results found."}
       </div>
     `;
-  }
+}
 
 
 
