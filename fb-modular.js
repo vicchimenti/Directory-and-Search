@@ -27,10 +27,6 @@ class EventManager {
         {
             selector: 'a.facet-group__clear',
             handler: () => handleClearFacet(e)        
-        },
-        {
-            selector: 'a.facet-group__clear',
-            handler: () => handleClearFacet(e)        
         }
 
         // Add other handlers...
