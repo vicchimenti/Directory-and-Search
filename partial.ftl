@@ -189,6 +189,7 @@ class DynamicResultsManager {
   }
 
   setupDynamicListeners() {
+    console.log("DynamicResultsManager: setupDynamicListeners");
       const resultsContainer = document.getElementById('results');
       if (resultsContainer) {
           resultsContainer.addEventListener('click', this.handleDynamicClick);
@@ -196,6 +197,7 @@ class DynamicResultsManager {
   }
 
   handleDynamicClick = async(e) => {
+    console.log("DynamicResultsManager: handleDynamicClick");
       const handlers = {
           '.facet-group__list a': this.handleFacetAnchor,
           '.tab-list__nav a': this.handleTab,
@@ -214,6 +216,7 @@ class DynamicResultsManager {
   }
 
   async fetchFunnelbackResults(url, method) {
+    console.log("DynamicResultsManager: fetchFunnelbackResults");
       const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
       try {
           const response = await fetch(prodUrl + url);
@@ -237,6 +240,7 @@ class DynamicResultsManager {
   }
 
   async handleTab(e, element) {
+    console.log("DynamicResultsManager: handleTab");
       const href = element.getAttribute('href');
       if (href) {
           const response = await this.fetchFunnelbackResults(href, 'GET');
