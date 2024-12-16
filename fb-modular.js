@@ -5,103 +5,78 @@
  */
 
 // dynamic-results.js
-class DynamicResultsManager {
-  constructor() {
-      if (window.location.pathname.includes('search-test')) {
-          this.initializeIP();
-          this.setupDynamicListeners();
-      }
-  }
+// Run immediately without waiting for document ready
+console.log("Initializing Funnelback handlers");
 
-  async initializeIP() {
-      try {
-          let response = await fetch('https://api.ipify.org?format=json');
-          let data = await response.json();
-          this.userIp = data.ip;
-      } catch (error) {
-          console.error('Error fetching IP address:', error);
-          this.userIp = '';
-      }
-  }
+// Attach the click handler directly to the document
+document.addEventListener('click', async function(e) {
+    console.log("Click detected");
 
-  setupDynamicListeners() {
-      const resultsContainer = document.getElementById('results');
-      if (resultsContainer) {
-          resultsContainer.addEventListener('click', this.handleDynamicClick);
-      }
-  }
+    // Check for facet clicks
+    const facetAnchor = e.target.closest('.facet-group__list a');
+    if (facetAnchor) {
+        e.preventDefault();
+        console.log("Facet clicked:", facetAnchor.href);
+        
+        try {
+            const response = await fetch(facetAnchor.href);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            const html = await response.text();
+            document.querySelector('.funnelback-search__body').innerHTML = html;
+        } catch (error) {
+            console.error("Error fetching facet results:", error);
+        }
+        return;
+    }
 
-  handleDynamicClick = async(e) => {
-      const handlers = {
-          '.facet-group__list a': this.handleFacetAnchor,
-          '.tab-list__nav a': this.handleTab,
-          '.search-tools__button-group a': this.handleSearchTools,
-          'a.facet-group__clear': this.handleClearFacet
-      };
+    // Check for tab clicks
+    const tabElement = e.target.closest('.tab-list__nav a');
+    if (tabElement) {
+        e.preventDefault();
+        console.log("Tab clicked:", tabElement.href);
+        
+        try {
+            const response = await fetch(tabElement.href);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            const html = await response.text();
+            document.querySelector('.funnelback-search__body').innerHTML = html;
+        } catch (error) {
+            console.error("Error fetching tab results:", error);
+        }
+        return;
+    }
 
-      for (const [selector, handler] of Object.entries(handlers)) {
-          const matchedElement = e.target.closest(selector);
-          if (matchedElement) {
-              e.preventDefault();
-              await handler.call(this, e, matchedElement);
-              break;
-          }
-      }
-  }
+    // Check for search tools clicks
+    const searchTools = e.target.closest('.search-tools__button-group a');
+    if (searchTools) {
+        e.preventDefault();
+        console.log("Search tool clicked:", searchTools.href);
+        
+        try {
+            const response = await fetch(searchTools.href);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            const html = await response.text();
+            document.querySelector('.funnelback-search__body').innerHTML = html;
+        } catch (error) {
+            console.error("Error fetching search tools results:", error);
+        }
+        return;
+    }
 
-  async fetchFunnelbackResults(url, method) {
-      const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-      try {
-          const response = await fetch(prodUrl + url);
-          if (!response.ok) throw new Error(`Error: ${response.status}`);
-          return await response.text();
-      } catch (error) {
-          console.error(`Error with ${method} request:`, error);
-          return `<p>Error fetching results. Please try again later.</p>`;
-      }
-  }
-
-  // Handler methods
-  async handleFacetAnchor(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">${response}</div>
-          `;
-      }
-  }
-
-  async handleTab(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">${response}</div>
-          `;
-      }
-  }
-
-  async handleSearchTools(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">${response}</div>
-          `;
-      }
-  }
-
-  async handleClearFacet(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">${response}</div>
-          `;
-      }
-  }
-}
-
-// Initialize dynamic results
-const dynamicResults = new DynamicResultsManager();
+    // Check for clear facet clicks
+    const clearFacets = e.target.closest('a.facet-group__clear');
+    if (clearFacets) {
+        e.preventDefault();
+        console.log("Clear facet clicked:", clearFacets.href);
+        
+        try {
+            const response = await fetch(clearFacets.href);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            const html = await response.text();
+            document.querySelector('.funnelback-search__body').innerHTML = html;
+        } catch (error) {
+            console.error("Error fetching clear facet results:", error);
+        }
+        return;
+    }
+});
