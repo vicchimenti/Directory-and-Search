@@ -1,3 +1,31 @@
+// handle search tool listeners
+async function handleSearchTools(e) {
+    e.preventDefault();
+
+    const fetchTools = e.target.closest('.search-tools__button-group a');
+    const toolHref = fetchTools.getAttribute('href');
+    console.log("Relative href:", toolHref);
+
+    // Fetch and process data using the relative link
+    let getToolResponse = null;
+    if (toolHref) {
+        try {
+        getToolResponse = await fetchFunnelbackTools(toolHref, 'GET');
+        } catch (error) {
+        console.error("Error fetching tab data:", error);
+        getToolResponse = "Error loading tool results.";
+        }
+    }
+
+    document.getElementById('results').innerHTML = `
+        <div class="funnelback-search-container">
+        ${getToolResponse || "No tool results found."}
+        </div>
+    `;
+}
+
+
+
 class EventManager {
     constructor(rootElement = document) {
       this.rootElement = rootElement;
