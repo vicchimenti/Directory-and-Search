@@ -44,7 +44,3 @@ class EventManager {
   // Usage
   const eventManager = new EventManager();
 
-  const clearFacets = e.target.closest('a.facet-group__clear');
-  if (clearFacets) {
-    handleClearFacet(e);
-  }
