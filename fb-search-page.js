@@ -92,7 +92,7 @@ async function performFunnelbackSearch(searchQuery) {
     let prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
     // Show loading indicator
-    document.getElementById('results').innerHTML = '<div class="loading">Searching...</div>';
+    // document.getElementById('results').innerHTML = '<div class="loading">Searching...</div>';
 
     try {
         let getOnPageResponse = await fetchFunnelbackSearchPageQuery(prodOnPageSearchUrl, 'GET', searchQuery);
