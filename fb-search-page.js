@@ -1,11 +1,8 @@
-// results-search.js
-class ResultsSearchManager {
+class SearchResultsManager {
     constructor() {
-        if (window.location.pathname.includes('search-test')) {
-            this.initializeIP();
-            this.setupResultsSearch();
-            this.handleURLParameters();
-        }
+        this.initializeIP();
+        this.setupEventListeners();
+        this.handleURLParameters();
     }
 
     async initializeIP() {
@@ -19,11 +16,15 @@ class ResultsSearchManager {
         }
     }
 
-    setupResultsSearch() {
+    setupEventListeners() {
+        // Handle on-page search
         const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
-            onPageSearch.addEventListener('click', this.handleResultsSearch);
+            onPageSearch.addEventListener('click', this.handleOnPageSearch.bind(this));
         }
+
+        // Handle dynamic elements using event delegation
+        document.addEventListener('click', this.handleDynamicClicks.bind(this));
     }
 
     async handleURLParameters() {
@@ -39,35 +40,95 @@ class ResultsSearchManager {
         }
     }
 
-    handleResultsSearch = async(event) => {
-        event.preventDefault();
+    handleDynamicClicks = async(e) => {
+        const handlers = {
+            '.facet-group__list a': this.handleFacetAnchor.bind(this),
+            '.tab-list__nav a': this.handleTab.bind(this),
+            '.search-tools__button-group a': this.handleSearchTools.bind(this),
+            'a.facet-group__clear': this.handleClearFacet.bind(this)
+        };
+
+        for (const [selector, handler] of Object.entries(handlers)) {
+            const matchedElement = e.target.closest(selector);
+            if (matchedElement) {
+                e.preventDefault();
+                await handler(e, matchedElement);
+                break;
+            }
+        }
+    }
+
+    async handleOnPageSearch(e) {
+        e.preventDefault();
         const searchQuery = document.getElementById('on-page-search-input').value;
         await this.performFunnelbackSearch(searchQuery);
     }
 
     async performFunnelbackSearch(searchQuery) {
-        console.log("ResultsSearchManager: performFunnelbackSearch");
-        const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-        
+        const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         try {
-            const url = `${prodOnPageSearchUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            
-            const text = await response.text();
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">${text}</div>
-            `;
+            const url = `${prodUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
+            const response = await this.fetchFunnelbackContent(url);
+            this.updateResults(response);
         } catch (error) {
             console.error('Search error:', error);
-            document.getElementById('results').innerHTML = `
-                <div class="error-message">
-                    <p>Sorry, we couldn't complete your search. ${error.message}</p>
-                </div>
-            `;
+            this.showError('Error performing search');
+        }
+    }
+
+    async fetchFunnelbackContent(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.text();
+    }
+
+    updateResults(html) {
+        document.querySelector('.funnelback-search__body').innerHTML = html;
+    }
+
+    showError(message) {
+        document.querySelector('.funnelback-search__body').innerHTML = `
+            <div class="error-message">
+                <p>${message}</p>
+            </div>
+        `;
+    }
+
+    // Handler methods for dynamic elements
+    async handleFacetAnchor(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackContent(href);
+            this.updateResults(response);
+        }
+    }
+
+    async handleTab(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackContent(href);
+            this.updateResults(response);
+        }
+    }
+
+    async handleSearchTools(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackContent(href);
+            this.updateResults(response);
+        }
+    }
+
+    async handleClearFacet(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackContent(href);
+            this.updateResults(response);
         }
     }
 }
 
-// Initialize results search
-const resultsSearch = new ResultsSearchManager();
+// Initialize the manager
+document.addEventListener('DOMContentLoaded', () => {
+    const searchManager = new SearchResultsManager();
+});
