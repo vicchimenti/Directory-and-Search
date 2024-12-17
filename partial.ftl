@@ -195,8 +195,17 @@
                 const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
                 const passedUrl = (url) ? url : "empty-value";
                 console.log("passedUrl: " + passedUrl);
+
+                let options = {
+                    method,
+                    headers: {
+                    'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+                    // 'X-Forwarded-For': userIp,
+                    },
+                };
+
                 try {
-                    const response = await fetch(prodUrl + passedUrl);
+                    const response = await fetch(prodUrl + passedUrl, options);
                     if (!response.ok) throw new Error(`Error: ${response.status}`);
                     return await response.text();
                 } catch (error) {
@@ -254,13 +263,6 @@
 
         // Initialize
         const dynamicResults = new DynamicResultsManager();
-
-        // Initialize after jQuery is loaded (since your template uses jQuery)
-        // $(document).ready(() => {
-        //     const dynamicResults = new DynamicResultsManager();
-        //     console.log("dynamicResults fired");
-        //     alert("dynamicResults fired");
-        // });
 
     </script>
 
