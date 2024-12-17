@@ -102,8 +102,8 @@ class DynamicResultsManager {
             '.tab-list__nav a': this.handleTab,
             '.search-tools__button-group a': this.handleSearchTools,
             'a.facet-group__clear': this.handleClearFacet,
-            '.facet-breadcrumb__link' : this.handleClick,
-            '.facet-breadcrumb__item' : this.handleClick
+            '.facet-breadcrumb__link' : this.handleClearFacet,
+            '.facet-breadcrumb__item' : this.handleClearFacet
         };
 
         for (const [selector, handler] of Object.entries(handlers)) {
