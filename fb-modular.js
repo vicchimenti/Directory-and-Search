@@ -50,8 +50,10 @@ class DynamicResultsManager {
     async fetchFunnelbackResults(url, method) {
         console.log("DynamicResultsManager: fetchFunnelbackResults");
         const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+        const passedUrl = (url) ? url : "empty-value";
+        console.log("passedUrl: " + passedUrl);
         try {
-            const response = await fetch(prodUrl + url);
+            const response = await fetch(prodUrl + passedUrl);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             return await response.text();
         } catch (error) {
