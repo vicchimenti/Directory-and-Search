@@ -113,6 +113,8 @@ class DynamicResultsManager {
         }
     }
 
+
+    // result fetchers
     async fetchFunnelbackResults(url, method) {
         console.log("DynamicResultsManager: fetchFunnelbackResults");
         const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
@@ -123,10 +125,10 @@ class DynamicResultsManager {
         let options = {
             method,
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept': 'text/html',
                 'Content-Type': 'text/html; charset=utf-8'
-            }
-            // credentials: 'same-origin'
+            },
+            credentials: 'include'  // Include cookies for session handling
         };
     
         try {
@@ -135,7 +137,14 @@ class DynamicResultsManager {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const htmlText = await response.text();
-            return htmlText;
+            
+            // Create a temporary container to parse the HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            
+            // Extract just the search results content
+            const resultsContent = doc.querySelector('.funnelback-search__body');
+            return resultsContent ? resultsContent.innerHTML : '<p>No results found</p>';
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching results. Please try again later.</p>`;
@@ -152,10 +161,10 @@ class DynamicResultsManager {
         let options = {
             method,
             headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept': 'text/html',
                 'Content-Type': 'text/html; charset=utf-8'
-            }
-            // credentials: 'same-origin'
+            },
+            credentials: 'include'  // Include cookies for session handling
         };
     
         try {
@@ -164,7 +173,14 @@ class DynamicResultsManager {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const htmlText = await response.text();
-            return htmlText;
+            
+            // Create a temporary container to parse the HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            
+            // Extract just the search results content
+            const resultsContent = doc.querySelector('.funnelback-search__body');
+            return resultsContent ? resultsContent.innerHTML : '<p>No results found</p>';
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching results. Please try again later.</p>`;
