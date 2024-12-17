@@ -133,7 +133,7 @@ class DynamicResultsManager {
         };
     
         try {
-            const response = await fetch(requestUrl, options);
+            const response = await fetch(requestUrl);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -169,7 +169,7 @@ class DynamicResultsManager {
         };
     
         try {
-            const response = await fetch(requestToolUrl, options);
+            const response = await fetch(requestToolUrl);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
