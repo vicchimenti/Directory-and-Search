@@ -162,8 +162,8 @@
 
 
 <#--  SU Dynamic Results Manager  -->
-<script>
 
+<script>
     class DynamicResultsManager {
         constructor() {
             this.observerConfig = {
@@ -413,6 +413,20 @@
 
     // Initialize
     const dynamicResults = new DynamicResultsManager();
-
-
 </script>
+
+
+<#-- 
+    Enable session functonality which includes cart and click 
+    and query history 
+-->
+<#if question.collection.configuration.valueAsBoolean("ui.modern.session")>
+    <@sessions.Templates />
+    
+    <script nomodule src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+    
+    <#-- We have replaced the products session code with an extended version for Stencils -->
+    <script defer src="https://${httpHost!}/s/resources/${question.collection.id}/${question.profile}/js/funnelback.session-cart-0.1.js"></script>
+    <script defer src="https://${httpHost!}/s/resources/${question.collection.id}/${question.profile}/js/funnelback.session-history-0.1.js"></script>
+    <@sessions.Configuration />
+</#if>

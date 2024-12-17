@@ -1,3 +1,4 @@
+// dynamic results manager
 class DynamicResultsManager {
     constructor() {
         this.observerConfig = {
