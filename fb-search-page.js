@@ -77,25 +77,4 @@ class ResultsSearchManager {
 }
 
 // Initialize results search
-// const resultsSearch = new ResultsSearchManager();
-
-// Function to initialize ResultsSearchManager
-function initializeResultsSearch() {
-    const resultsSearch = new ResultsSearchManager();
-    console.log(resultsSearch);
-  }
-  
-  // Set up the MutationObserver to watch for changes in the body or a specific container
-  const observer = new MutationObserver((mutationsList, observer) => {
-    // Check if the dynamic content has loaded (e.g., a specific element appears)
-    const dynamicContent = document.querySelector('#results .funnelback-search-container'); // Or any specific element you're waiting for
-  
-    if (dynamicContent) {
-      initializeResultsSearch();
-      observer.disconnect(); // Disconnect observer once the function has been triggered
-    }
-  });
-  
-  // Observer configuration: watch for added nodes and subtree changes
-  observer.observe(document.body, { childList: true, subtree: true });
-  
+const resultsSearch = new ResultsSearchManager();
