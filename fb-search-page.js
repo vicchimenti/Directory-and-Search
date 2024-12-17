@@ -63,7 +63,7 @@ class ResultsSearchManager {
             
             const text = await response.text();
             document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">${text}</div>
+                <div id="funnelback-search-container-response" class="funnelback-search-container">${text}</div>
             `;
         } catch (error) {
             console.error('Search error:', error);
