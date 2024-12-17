@@ -216,25 +216,26 @@ class DynamicResultsManager {
 
 
     // click handlers
-    async handleClick(e, element) {
-        console.log("DynamicResultsManager: handleClick");
+    
+    // async handleClick(e, element) {
+    //     console.log("DynamicResultsManager: handleClick");
 
-        const anchorTarget = e.target.closest(element);
-        const relativeHref = anchorTarget.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
-        console.log("Relative href:", relativeHref);
+    //     const anchorTarget = e.target.closest(element);
+    //     const relativeHref = anchorTarget.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
+    //     console.log("Relative href:", relativeHref);
 
-        const href = element.getAttribute('href');
-        console.log("direct href:", href);
+    //     const href = element.getAttribute('href');
+    //     console.log("direct href:", href);
 
-        if (relativeHref) {
-            const response = await this.fetchFunnelbackResults(relativeHref, 'GET');
-            document.getElementById('results').innerHTML = `
-            <div class="funnelback-search-container">
-              ${response || "No tab results found."}
-            </div>
-          `;
-        }
-    }
+    //     if (relativeHref) {
+    //         const response = await this.fetchFunnelbackResults(relativeHref, 'GET');
+    //         document.getElementById('results').innerHTML = `
+    //         <div class="funnelback-search-container">
+    //           ${response || "No tab results found."}
+    //         </div>
+    //       `;
+    //     }
+    // }
 
     async handleFacetAnchor(e, element) {
         const facetAnchor = e.target.closest('.facet-group__list a');
