@@ -65,7 +65,7 @@ class DynamicResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.querySelector('.funnelback-search__body').innerHTML = `
+            document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">${response}</div>
             `;
         }
@@ -76,7 +76,7 @@ class DynamicResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.querySelector('.funnelback-search__body').innerHTML = `
+            document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">${response}</div>
             `;
         }
@@ -86,7 +86,7 @@ class DynamicResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.querySelector('.funnelback-search__body').innerHTML = `
+            document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">${response}</div>
             `;
         }
@@ -96,7 +96,7 @@ class DynamicResultsManager {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.querySelector('.funnelback-search__body').innerHTML = `
+            document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">${response}</div>
             `;
         }
