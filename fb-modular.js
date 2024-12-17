@@ -125,8 +125,8 @@ class DynamicResultsManager {
             headers: {
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Content-Type': 'text/html; charset=utf-8'
-            },
-            credentials: 'same-origin'
+            }
+            // credentials: 'same-origin'
         };
     
         try {
@@ -154,8 +154,8 @@ class DynamicResultsManager {
             headers: {
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Content-Type': 'text/html; charset=utf-8'
-            },
-            credentials: 'same-origin'
+            }
+            // credentials: 'same-origin'
         };
     
         try {
