@@ -170,46 +170,53 @@ class DynamicResultsManager {
             return `<p>Error fetching results. Please try again later.</p>`;
         }
     }
+
+
+    // click handlers
     async handleFacetAnchor(e, element) {
         const facetAnchor = e.target.closest('.facet-group__list a');
         const facetHref = facetAnchor.getAttribute('href');
         console.log("Relative facetHref:", facetHref);
         if (facetHref) {
             const response = await this.fetchFunnelbackResults(facetHref, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">${response}</div>
-            `;
+            const resultsContainer = document.querySelector('.funnelback-search__body');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = response;
+            }
         }
     }
-
+    
     async handleTab(e, element) {
         console.log("DynamicResultsManager: handleTab");
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">${response}</div>
-            `;
+            const resultsContainer = document.querySelector('.funnelback-search__body');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = response;
+            }
         }
     }
-
+    
     async handleSearchTools(e, element) {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">${response}</div>
-            `;
+            const resultsContainer = document.querySelector('.funnelback-search__body');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = response;
+            }
         }
     }
-
+    
     async handleClearFacet(e, element) {
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">${response}</div>
-            `;
+            const resultsContainer = document.querySelector('.funnelback-search__body');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = response;
+            }
         }
     }
 
