@@ -35,7 +35,7 @@ class DynamicResultsManager {
     }
 
     startObserving() {
-        const resultsContainer = document.getElementById('funnelback-search-container-response');
+        const resultsContainer = document.getElementById('results');
         if (resultsContainer) {
             this.observer.observe(resultsContainer, this.observerConfig);
             console.log('Observer started watching results container');
@@ -47,7 +47,7 @@ class DynamicResultsManager {
 
     waitForResultsContainer() {
         const bodyObserver = new MutationObserver((mutations, obs) => {
-            const resultsContainer = document.getElementById('funnelback-search-container-response');
+            const resultsContainer = document.getElementById('results');
             if (resultsContainer) {
                 obs.disconnect();
                 this.observer.observe(resultsContainer, this.observerConfig);
