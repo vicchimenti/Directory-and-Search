@@ -116,7 +116,7 @@ class DynamicResultsManager {
 
 
     // result fetchers
-    async  fetchFunnelbackResults(url, method) {
+    async fetchFunnelbackResults(url, method) {
 
         let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
       
@@ -162,41 +162,53 @@ class DynamicResultsManager {
           console.error(`Error with ${method} request:`, error);
           return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
         }
-      }
+    }
 
-    async  fetchFunnelbackTools(url, method) {
-        console.log("DynamicResultsManager: fetchFunnelbackTools");
-        const prodToolUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-        const passedToolUrl = (url) ? url : "empty-value";
-        console.log("passedUrl: " + passedToolUrl);
-        const requestToolUrl = prodToolUrl + passedToolUrl;
+    async fetchFunnelbackTools(url, method) {
+
+        let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+    
+        try {
+        if (method === 'GET') {
+            prodToolsUrl += `${url}`;
+        }
     
         let options = {
             method,
             headers: {
-                'Accept': 'text/html',
-                'Content-Type': 'text/html; charset=utf-8'
+            'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+            // 'X-Forwarded-For': userIp,
             },
-            credentials: 'include'  // Include cookies for session handling
         };
     
+        let response = await fetch(prodToolsUrl, options);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+    
+        let stream = response.body.pipeThrough(new TextDecoderStream());
+        let reader = stream.getReader();
+        let text = "";
+    
         try {
-            const response = await fetch(requestToolUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            while (true) {
+            const { value, done } = await reader.read();
+    
+            if (done) {
+                break;
             }
-            const htmlText = await response.text();
-            
-            // Create a temporary container to parse the HTML
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            
-            // Extract just the search results content
-            const resultsContent = doc.querySelector('.funnelback-search__body');
-            return resultsContent ? resultsContent.innerHTML : '<p>No results found</p>';
+            text += value;
+            }
+    
         } catch (error) {
-            console.error(`Error with ${method} request:`, error);
-            return `<p>Error fetching results. Please try again later.</p>`;
+            console.error("Error reading stream:", error);
+        } finally {
+            reader.releaseLock();
+        }
+        
+        return text;
+    
+        } catch (error) {
+        console.error(`Error with ${method} request:`, error);
+        return `<p>Error fetching ${method} tools request. Please try again later.</p>`;
         }
     }
 
