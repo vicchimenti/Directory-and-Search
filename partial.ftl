@@ -142,72 +142,117 @@
 </div>
 
 <script>
-(function() {
-    alert("function");
-    function initializeFunnelbackHandlers() {
-        alert("Initializing Funnelback handlers");
-        console.log("Initializing Funnelback handlers");
-        alert("Initializing Funnelback handlers");
-        
-        // Helper function to update content
-        async function updateContent(url, targetElement) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`Error: ${response.status}`);
-                const html = await response.text();
-                targetElement.innerHTML = html;
-            } catch (error) {
-                console.error("Error fetching results:", error);
-                targetElement.innerHTML = '<p>Error loading results. Please try again.</p>';
+
+class DynamicResultsManager {
+    constructor() {
+        if (window.location.pathname.includes('search-test')) {
+            this.initializeIP();
+            // Wait for DOM to be ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => this.setupDynamicListeners());
+            } else {
+                this.setupDynamicListeners();
             }
         }
+    }
 
-        // Main click handler
-        function handleClicks(e) {
-            console.log("Click detected", e.target);
-            
-            const resultContainer = document.querySelector('.funnelback-search__body');
-            if (!resultContainer) {
-                console.error("Results container not found");
-                return;
-            }
+    async initializeIP() {
+        try {
+            let response = await fetch('https://api.ipify.org?format=json');
+            let data = await response.json();
+            this.userIp = data.ip;
+        } catch (error) {
+            console.error('Error fetching IP address:', error);
+            this.userIp = '';
+        }
+    }
 
-            const handlers = {
-                '.facet-group__list a': true,
-                '.tab-list__nav a': true,
-                '.search-tools__button-group a': true,
-                'a.facet-group__clear': true
-            };
+    setupDynamicListeners() {
+        console.log("DynamicResultsManager: setupDynamicListeners");
+        // Use document as the listener since content is dynamic
+        document.addEventListener('click', this.handleDynamicClick);
+    }
 
-            for (const selector in handlers) {
-                const element = e.target.closest(selector);
-                if (element) {
-                    e.preventDefault();
-                    console.log(`${selector} clicked:`, element.href);
-                    updateContent(element.href, resultContainer);
-                    break;
-                }
+    handleDynamicClick = async(e) => {
+        console.log("DynamicResultsManager: handleDynamicClick");
+        const handlers = {
+            '.facet-group__list a': this.handleFacetAnchor,
+            '.tab-list__nav a': this.handleTab,
+            '.search-tools__button-group a': this.handleSearchTools,
+            'a.facet-group__clear': this.handleClearFacet
+        };
+
+        for (const [selector, handler] of Object.entries(handlers)) {
+            const matchedElement = e.target.closest(selector);
+            if (matchedElement) {
+                e.preventDefault();
+                await handler.call(this, e, matchedElement);
+                break;
             }
         }
-
-        // Attach event listener
-        document.addEventListener('click', handleClicks);
-        console.log("Event listener attached");
     }
 
-    // Try multiple ways to ensure initialization
-    if (document.readyState === 'complete') {
-        console.log("Document already complete");
-        initializeFunnelbackHandlers();
-    } else {
-        console.log("Waiting for document to be ready");
-        document.addEventListener('DOMContentLoaded', initializeFunnelbackHandlers);
-        window.addEventListener('load', initializeFunnelbackHandlers);
+    async fetchFunnelbackResults(url, method) {
+        console.log("DynamicResultsManager: fetchFunnelbackResults");
+        const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+        try {
+            const response = await fetch(prodUrl + url);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            return await response.text();
+        } catch (error) {
+            console.error(`Error with ${method} request:`, error);
+            return `<p>Error fetching results. Please try again later.</p>`;
+        }
     }
 
-    // Also try with jQuery since it's available
-    $(document).ready(initializeFunnelbackHandlers);
-})();
+    // Handler methods
+    async handleFacetAnchor(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">${response}</div>
+            `;
+        }
+    }
+
+    async handleTab(e, element) {
+        console.log("DynamicResultsManager: handleTab");
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">${response}</div>
+            `;
+        }
+    }
+
+    async handleSearchTools(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">${response}</div>
+            `;
+        }
+    }
+
+    async handleClearFacet(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">${response}</div>
+            `;
+        }
+    }
+}
+
+// Initialize after jQuery is loaded (since your template uses jQuery)
+$(document).ready(() => {
+    const dynamicResults = new DynamicResultsManager();
+});
+
 </script>
 
 <#-- Third parties -->
