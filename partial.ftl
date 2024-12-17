@@ -143,8 +143,11 @@
 
 <script>
 (function() {
+    alert("function");
     function initializeFunnelbackHandlers() {
+        alert("Initializing Funnelback handlers");
         console.log("Initializing Funnelback handlers");
+        alert("Initializing Funnelback handlers");
         
         // Helper function to update content
         async function updateContent(url, targetElement) {
