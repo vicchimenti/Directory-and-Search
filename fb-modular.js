@@ -116,43 +116,55 @@ class DynamicResultsManager {
 
 
     // result fetchers
-    async fetchFunnelbackResults(url, method) {
-        console.log("DynamicResultsManager: fetchFunnelbackResults");
-        const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-        const passedUrl = (url) ? url : "empty-value";
-        console.log("passedUrl: " + passedUrl);
-        const requestUrl = prodUrl + passedUrl;
-    
-        let options = {
+    async  fetchFunnelbackResults(url, method) {
+
+        let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+      
+        try {
+          if (method === 'GET') {
+            prodTabUrl += `${url}`;
+          }
+      
+          let options = {
             method,
             headers: {
-                'Accept': 'text/html',
-                'Content-Type': 'text/html; charset=utf-8'
+              'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+              // 'X-Forwarded-For': userIp,
             },
-            credentials: 'include'  // Include cookies for session handling
-        };
-    
-        try {
-            const response = await fetch(requestUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+          };
+      
+          let response = await fetch(prodTabUrl, options);
+          if (!response.ok) throw new Error(`Error: ${response.status}`);
+      
+          let stream = response.body.pipeThrough(new TextDecoderStream());
+          let reader = stream.getReader();
+          let text = "";
+      
+          try {
+            while (true) {
+              const { value, done } = await reader.read();
+      
+              if (done) {
+                break;
+              }
+              text += value;
             }
-            const htmlText = await response.text();
-            
-            // Create a temporary container to parse the HTML
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            
-            // Extract just the search results content
-            const resultsContent = doc.querySelector('.funnelback-search__body');
-            return resultsContent ? resultsContent.innerHTML : '<p>No results found</p>';
+      
+          } catch (error) {
+            console.error("Error reading stream:", error);
+          } finally {
+            reader.releaseLock();
+          }
+        
+          return text;
+      
         } catch (error) {
-            console.error(`Error with ${method} request:`, error);
-            return `<p>Error fetching results. Please try again later.</p>`;
+          console.error(`Error with ${method} request:`, error);
+          return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
         }
-    }
-    
-    async fetchFunnelbackTools(url, method) {
+      }
+
+    async  fetchFunnelbackTools(url, method) {
         console.log("DynamicResultsManager: fetchFunnelbackTools");
         const prodToolUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
         const passedToolUrl = (url) ? url : "empty-value";
