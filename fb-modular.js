@@ -62,9 +62,13 @@ class DynamicResultsManager {
 
     // Handler methods
     async handleFacetAnchor(e, element) {
+        const facetAnchor = e.target.closest('.facet-group__list a');
+        const facetHref = facetAnchor.getAttribute('href');
+        console.log("Relative facetHref:", facetHref);
         const href = element.getAttribute('href');
-        if (href) {
-            const response = await this.fetchFunnelbackResults(href, 'GET');
+        console.log("Relative href:", facetHref);
+        if (facetHref) {
+            const response = await this.fetchFunnelbackResults(facetHref, 'GET');
             document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">${response}</div>
             `;
