@@ -72,6 +72,33 @@ class DynamicResultsManager {
         }
     }
 
+
+    
+    async fetchFunnelbackTools(url, method) {
+        console.log("DynamicResultsManager: fetchFunnelbackTools");
+        const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+        const passedUrl = (url) ? url : "empty-value";
+        console.log("passedUrl: " + passedUrl);
+        const requestUrl = prodUrl + passedUrl;
+
+        let options = {
+            method,
+            headers: {
+              'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+              // 'X-Forwarded-For': userIp,
+            },
+        };
+
+        try {
+            const response = await fetch(requestUrl, options);
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            return await response.text();
+        } catch (error) {
+            console.error(`Error with ${method} request:`, error);
+            return `<p>Error fetching results. Please try again later.</p>`;
+        }
+    }
+
     // Handler methods
     async handleFacetAnchor(e, element) {
         const facetAnchor = e.target.closest('.facet-group__list a');
