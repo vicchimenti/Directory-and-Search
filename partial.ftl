@@ -166,15 +166,80 @@
 
     class DynamicResultsManager {
         constructor() {
+            this.observerConfig = {
+                childList: true,
+                subtree: true
+            };
+            
             if (window.location.pathname.includes('search-test')) {
                 this.initializeIP();
+                this.initializeObserver();
+                
                 // Wait for DOM to be ready
                 if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', () => this.setupDynamicListeners());
+                    document.addEventListener('DOMContentLoaded', () => {
+                        this.setupDynamicListeners();
+                        this.startObserving();
+                    });
                 } else {
                     this.setupDynamicListeners();
+                    this.startObserving();
                 }
             }
+        }
+
+        initializeObserver() {
+            this.observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList') {
+                        // Re-attach event listeners to new content
+                        this.attachEventListenersToNewContent(mutation.addedNodes);
+                    }
+                });
+            });
+        }
+
+        startObserving() {
+            const resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                this.observer.observe(resultsContainer, this.observerConfig);
+                console.log('Observer started watching results container');
+            } else {
+                console.warn('Results container not found, waiting for it to appear');
+                this.waitForResultsContainer();
+            }
+        }
+
+        waitForResultsContainer() {
+            const bodyObserver = new MutationObserver((mutations, obs) => {
+                const resultsContainer = document.getElementById('results');
+                if (resultsContainer) {
+                    obs.disconnect();
+                    this.observer.observe(resultsContainer, this.observerConfig);
+                    console.log('Results container found and observer started');
+                }
+            });
+
+            bodyObserver.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+
+        attachEventListenersToNewContent(nodes) {
+            nodes.forEach(node => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    // Add specific selectors that need event handling
+                    const elements = node.querySelectorAll(
+                        '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear'
+                    );
+                    elements.forEach(element => {
+                        // Remove existing listener to prevent duplicates
+                        element.removeEventListener('click', this.handleDynamicClick);
+                        element.addEventListener('click', this.handleDynamicClick);
+                    });
+                }
+            });
         }
 
         async initializeIP() {
@@ -191,6 +256,7 @@
         setupDynamicListeners() {
             console.log("DynamicResultsManager: setupDynamicListeners");
             // Use document as the listener since content is dynamic
+            document.removeEventListener('click', this.handleDynamicClick);
             document.addEventListener('click', this.handleDynamicClick);
         }
 
@@ -223,8 +289,7 @@
             let options = {
                 method,
                 headers: {
-                'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-                // 'X-Forwarded-For': userIp,
+                    'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
                 },
             };
 
@@ -238,8 +303,6 @@
             }
         }
 
-
-        
         async fetchFunnelbackTools(url, method) {
             console.log("DynamicResultsManager: fetchFunnelbackTools");
             const prodToolUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
@@ -250,8 +313,7 @@
             let options = {
                 method,
                 headers: {
-                'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-                // 'X-Forwarded-For': userIp,
+                    'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
                 },
             };
 
@@ -265,13 +327,10 @@
             }
         }
 
-        // Handler methods
         async handleFacetAnchor(e, element) {
             const facetAnchor = e.target.closest('.facet-group__list a');
             const facetHref = facetAnchor.getAttribute('href');
             console.log("Relative facetHref:", facetHref);
-            const href = element.getAttribute('href');
-            console.log("Relative href:", facetHref);
             if (facetHref) {
                 const response = await this.fetchFunnelbackResults(facetHref, 'GET');
                 document.getElementById('results').innerHTML = `
@@ -309,6 +368,14 @@
                     <div class="funnelback-search-container">${response}</div>
                 `;
             }
+        }
+
+        // Cleanup method
+        destroy() {
+            if (this.observer) {
+                this.observer.disconnect();
+            }
+            document.removeEventListener('click', this.handleDynamicClick);
         }
     }
 
