@@ -77,7 +77,7 @@ class ResultsSearchManager {
 }
 
 // Initialize results search
-const resultsSearch = new ResultsSearchManager();
+// const resultsSearch = new ResultsSearchManager();
 
 // Function to initialize ResultsSearchManager
 function initializeResultsSearch() {
