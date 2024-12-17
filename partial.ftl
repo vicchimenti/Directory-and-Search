@@ -289,7 +289,7 @@
             let options = {
                 method,
                 headers: {
-                    'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
+                    'Content-Type': method === 'POST' ? 'text/plain' : 'text/html',
                 },
             };
 
