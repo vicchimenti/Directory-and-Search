@@ -285,48 +285,57 @@
             const passedUrl = (url) ? url : "empty-value";
             console.log("passedUrl: " + passedUrl);
             const requestUrl = prodUrl + passedUrl;
-
+        
             let options = {
                 method,
                 headers: {
-                    'Content-Type': method === 'POST' ? 'text/plain' : 'text/html',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Content-Type': 'text/html; charset=utf-8'
                 },
+                credentials: 'same-origin'
             };
-
+        
             try {
                 const response = await fetch(requestUrl, options);
-                if (!response.ok) throw new Error(`Error: ${response.status}`);
-                return await response.text();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const htmlText = await response.text();
+                return htmlText;
             } catch (error) {
                 console.error(`Error with ${method} request:`, error);
                 return `<p>Error fetching results. Please try again later.</p>`;
             }
         }
-
+        
         async fetchFunnelbackTools(url, method) {
             console.log("DynamicResultsManager: fetchFunnelbackTools");
             const prodToolUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
             const passedToolUrl = (url) ? url : "empty-value";
             console.log("passedUrl: " + passedToolUrl);
             const requestToolUrl = prodToolUrl + passedToolUrl;
-
+        
             let options = {
                 method,
                 headers: {
-                    'Content-Type': method === 'POST' ? 'text/plain' : 'text/html',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Content-Type': 'text/html; charset=utf-8'
                 },
+                credentials: 'same-origin'
             };
-
+        
             try {
                 const response = await fetch(requestToolUrl, options);
-                if (!response.ok) throw new Error(`Error: ${response.status}`);
-                return await response.text();
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const htmlText = await response.text();
+                return htmlText;
             } catch (error) {
                 console.error(`Error with ${method} request:`, error);
                 return `<p>Error fetching results. Please try again later.</p>`;
             }
         }
-
         async handleFacetAnchor(e, element) {
             const facetAnchor = e.target.closest('.facet-group__list a');
             const facetHref = facetAnchor.getAttribute('href');
