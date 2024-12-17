@@ -227,10 +227,6 @@ class DynamicResultsManager {
               ${response || "No tab results found."}
             </div>
           `;
-            // const resultsContainer = document.querySelector('.funnelback-search__body');
-            // if (resultsContainer) {
-            //     resultsContainer.innerHTML = response;
-            // }
         }
     }
     
