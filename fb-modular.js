@@ -70,7 +70,7 @@ class DynamicResultsManager {
                 );
                 elements.forEach(element => {
                     // Remove existing listener to prevent duplicates
-                    // element.removeEventListener('click', this.handleDynamicClick);
+                    element.removeEventListener('click', this.handleDynamicClick);
                     element.addEventListener('click', this.handleDynamicClick);
                 });
             }
@@ -91,7 +91,7 @@ class DynamicResultsManager {
     setupDynamicListeners() {
         console.log("DynamicResultsManager: setupDynamicListeners");
         // Use document as the listener since content is dynamic
-        // document.removeEventListener('click', this.handleDynamicClick);
+        document.removeEventListener('click', this.handleDynamicClick);
         document.addEventListener('click', this.handleDynamicClick);
     }
 
