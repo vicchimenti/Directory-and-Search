@@ -103,9 +103,12 @@ class DynamicResultsManager {
     }
 }
 
+// Initialize
+const dynamicResults = new DynamicResultsManager();
+
 // Initialize after jQuery is loaded (since your template uses jQuery)
-$(document).ready(() => {
-    const dynamicResults = new DynamicResultsManager();
-    console.log("dynamicResults fired");
-    alert("dynamicResults fired");
-});
+// $(document).ready(() => {
+//     const dynamicResults = new DynamicResultsManager();
+//     console.log("dynamicResults fired");
+//     alert("dynamicResults fired");
+// });
