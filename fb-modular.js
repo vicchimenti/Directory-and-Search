@@ -66,7 +66,7 @@ class DynamicResultsManager {
             if (node.nodeType === Node.ELEMENT_NODE) {
                 // Add specific selectors that need event handling
                 const elements = node.querySelectorAll(
-                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear, .facet-breadcrumb__link'
+                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear, .facet-breadcrumb__link, .facet-breadcrumb__item'
                 );
                 elements.forEach(element => {
                     // Remove existing listener to prevent duplicates
@@ -101,7 +101,9 @@ class DynamicResultsManager {
             '.facet-group__list a': this.handleFacetAnchor,
             '.tab-list__nav a': this.handleTab,
             '.search-tools__button-group a': this.handleSearchTools,
-            'a.facet-group__clear': this.handleClearFacet
+            'a.facet-group__clear': this.handleClearFacet,
+            '.facet-breadcrumb__link' : this.handleClick,
+            '.facet-breadcrumb__item' : this.handleClick
         };
 
         for (const [selector, handler] of Object.entries(handlers)) {
@@ -214,6 +216,26 @@ class DynamicResultsManager {
 
 
     // click handlers
+    async handleClick(e, element) {
+        console.log("DynamicResultsManager: handleClick");
+
+        const anchorTarget = e.target.closest(element);
+        const relativeHref = anchorTarget.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
+        console.log("Relative href:", relativeHref);
+
+        const href = element.getAttribute('href');
+        console.log("direct href:", href);
+
+        if (relativeHref) {
+            const response = await this.fetchFunnelbackResults(relativeHref, 'GET');
+            document.getElementById('results').innerHTML = `
+            <div class="funnelback-search-container">
+              ${response || "No tab results found."}
+            </div>
+          `;
+        }
+    }
+
     async handleFacetAnchor(e, element) {
         const facetAnchor = e.target.closest('.facet-group__list a');
         const facetHref = facetAnchor.getAttribute('href');
