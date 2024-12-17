@@ -52,6 +52,7 @@ class DynamicResultsManager {
         const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         const passedUrl = (url) ? url : "empty-value";
         console.log("passedUrl: " + passedUrl);
+        const requestUrl = prodUrl + passedUrl;
 
         let options = {
             method,
@@ -62,7 +63,7 @@ class DynamicResultsManager {
         };
 
         try {
-            const response = await fetch(prodUrl + passedUrl, options);
+            const response = await fetch(requestUrl, options);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             return await response.text();
         } catch (error) {
