@@ -214,16 +214,23 @@ class DynamicResultsManager {
             }
         }
     }
+
+
     
     async handleTab(e, element) {
         console.log("DynamicResultsManager: handleTab");
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
-            const resultsContainer = document.querySelector('.funnelback-search__body');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = response;
-            }
+            document.getElementById('results').innerHTML = `
+            <div class="funnelback-search-container">
+              ${response || "No tab results found."}
+            </div>
+          `;
+            // const resultsContainer = document.querySelector('.funnelback-search__body');
+            // if (resultsContainer) {
+            //     resultsContainer.innerHTML = response;
+            // }
         }
     }
     
