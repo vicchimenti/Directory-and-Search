@@ -66,7 +66,7 @@ class DynamicResultsManager {
             if (node.nodeType === Node.ELEMENT_NODE) {
                 // Add specific selectors that need event handling
                 const elements = node.querySelectorAll(
-                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear'
+                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear, .facet-breadcrumb__link'
                 );
                 elements.forEach(element => {
                     // Remove existing listener to prevent duplicates
@@ -244,7 +244,7 @@ class DynamicResultsManager {
     async handleSearchTools(e, element) {
         const href = element.getAttribute('href');
         if (href) {
-            const response = await this.fetchFunnelbackResults(href, 'GET');
+            const response = await this.fetchFunnelbackTools(href, 'GET');
             document.getElementById('results').innerHTML = `
             <div class="funnelback-search-container">
               ${response || "No tab results found."}
