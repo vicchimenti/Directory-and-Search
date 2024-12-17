@@ -76,10 +76,10 @@ class DynamicResultsManager {
     
     async fetchFunnelbackTools(url, method) {
         console.log("DynamicResultsManager: fetchFunnelbackTools");
-        const prodUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-        const passedUrl = (url) ? url : "empty-value";
-        console.log("passedUrl: " + passedUrl);
-        const requestUrl = prodUrl + passedUrl;
+        const prodToolUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+        const passedToolUrl = (url) ? url : "empty-value";
+        console.log("passedUrl: " + passedToolUrl);
+        const requestToolUrl = prodToolUrl + passedToolUrl;
 
         let options = {
             method,
@@ -90,7 +90,7 @@ class DynamicResultsManager {
         };
 
         try {
-            const response = await fetch(requestUrl, options);
+            const response = await fetch(requestToolUrl, options);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             return await response.text();
         } catch (error) {
