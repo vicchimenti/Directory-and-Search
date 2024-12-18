@@ -92,18 +92,6 @@
                             </@s.boldicize></@s.Truncate>
                         </a>    
                     </h3>
-                   
-                    <#--  <#if (result.listMetadata["d"]?first)!?has_content>
-                        <#--${result.listMetadata["d"]?first}-->
-                        <#assign dateString = result.listMetadata["d"]?first />
-                        
-                        <#-- Parse the date if dateString is not null -->
-                        <#if dateString?has_content>
-                            <#assign parsedDate = dateString?date("yyyy/MM/dd")>
-                            <#assign formattedDate = parsedDate?string("MMM dd yyyy")>
-                            <p class="listing-item__subtitle">${formattedDate?upper_case}</p>
-                        </#if>
-                    </#if>      -->
                 </div>
             </#if>
             
