@@ -134,6 +134,25 @@ class DynamicResultsManager {
         }
     }
 
+    handleToggle(e, element) {
+        const targetSelectors = element.getAttribute('data-target')?.split(' ') || [];
+        const collapsibleElements = targetSelectors
+            .map(selector => document.querySelectorAll(selector.replace('.', '.')))
+            .flat();
+        
+        const isExpanded = element.getAttribute('aria-expanded') === 'true';
+        element.setAttribute('aria-expanded', !isExpanded);
+        element.textContent = isExpanded ? 'Show Filters' : 'Hide Filters';
+        
+        collapsibleElements.forEach(target => {
+            if (isExpanded) {
+                target.classList.remove('show');
+            } else {
+                target.classList.add('show');
+            }
+        });
+    }
+
 
     // result fetchers
     async fetchFunnelbackResults(url, method) {
