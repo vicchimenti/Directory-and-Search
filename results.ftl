@@ -108,32 +108,6 @@
                         ${result.summary!?no_esc}
                     </#if>    
                 </div>
-
-                <#-- Metadata should as tags/pills -->        
-                <#--  <#if (result.listMetadata["author"])!?has_content>
-                    <ul aria-label="Result tags" class="listing-item__tags">
-                        <#list result.listMetadata["author"] as author>
-                            <li class="listing-item__tag">${author}</li>
-                        </#list>
-                    </ul>
-                </#if>
-                <#if (result.listMetadata["topic"])!?has_content>
-                    <ul aria-label="Result tags" class="listing-item__tags">
-                        <#list result.listMetadata["topic"] as topic>
-                            <li class="listing-item__tag">${topic}</li>
-                        </#list>
-                    </ul>
-                </#if>
-                <#if (result.listMetadata["department"])!?has_content>
-                    <ul aria-label="Result tags" class="listing-item__tags">
-                        <#list result.listMetadata["department"] as department>
-                            <li class="listing-item__tag">${department}</li>
-                        </#list>
-                    </ul>
-                </#if>  -->
-
-                <#-- Call to Action (CTA) -->                        
-                <#--  <a href="${result.clickTrackingUrl!}" class="listing-item__action">VIEW MORE</a>   -->
             </div>          
 
             <#-- Display the time which this result has last been visited by the user -->
