@@ -159,22 +159,21 @@ class DynamicResultsManager {
 
     handleToggle = (() => {
         console.trace('Toggle event triggered');
-        let lastClickTime = 0;
-        const DEBOUNCE_TIME = 250; // milliseconds
+        let isProcessing = false;
     
         return (e, element) => {
-            
             try {
                 console.log('Toggle handler activated', element);
-                // Prevent double-firing by checking time since last click
-                const now = Date.now();
-                if (now - lastClickTime < DEBOUNCE_TIME) {
+    
+                // If we're currently processing a click, ignore this one
+                if (isProcessing) {
                     return;
                 }
-                lastClickTime = now;
+    
+                isProcessing = true;
     
                 if (!element) return;
-    
+                
                 const targetSelector = element.getAttribute('data-target');
                 if (!targetSelector) return;
     
@@ -184,11 +183,9 @@ class DynamicResultsManager {
                 const isExpanded = element.getAttribute('aria-expanded') === 'true';
                 const newState = !isExpanded;
                 
-                // Update button state
                 element.setAttribute('aria-expanded', String(newState));
                 element.textContent = newState ? 'Hide Filters' : 'Show Filters';
     
-                // Update collapsible elements
                 collapsibleElements.forEach(target => {
                     if (target?.classList) {
                         if (!newState) {
@@ -199,8 +196,14 @@ class DynamicResultsManager {
                     }
                 });
     
+                // Reset the processing flag after a brief delay
+                setTimeout(() => {
+                    isProcessing = false;
+                }, 100);
+    
             } catch (error) {
                 console.warn('Error in handleToggle:', error);
+                isProcessing = false;
             }
         };
     })();
