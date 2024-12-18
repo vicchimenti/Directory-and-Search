@@ -50,15 +50,11 @@
 -->
 <#macro GenericView result>
     <!-- results::GenericView -->
-    <article class="listing-item listing-item--generic listing-item--background-grey10 listing-item--color-black" data-fb-result="${(result.indexUrl)!}">
+    <article class="listing-item listing-item--generic listing-item--background-grey10 listing-item--color-black dataListing genericData" data-fb-result="${(result.indexUrl)!}">
         <#if (result.listMetadata["image"]?first)!?has_content>
             <div class="listing-item__image-wrapper">
                 <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="${result.listMetadata["image"]?first}" data-deferred-src="${result.listMetadata["image"]?first}"> 
             </div>  
-        <#elseif ((question.getCurrentProfileConfig().get("stencils.showcase"))!"FALSE")?upper_case == "TRUE">
-            <div class="listing-item__image-wrapper">
-                <img class="listing-item__image" alt="Thumbnail for ${result.title!}" src="https://picsum.photos/300/300?sig=${(result.title)!''?url}">
-            </div>
         </#if>
         <div class="listing-item__content">
             <#-- Title -->
