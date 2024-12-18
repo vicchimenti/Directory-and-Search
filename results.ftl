@@ -85,18 +85,25 @@
             
             
             <#-- Body -->
-            <div class="listing-item__body">
+            <#switch result.fileType>
+                <#case "pdf">
+                    <span hidden class="hidden pdf"></span>
+                    <#break>
+                <#default>
+                <div class="listing-item__body">
                 <#-- Summary -->
-                <div class="listing-item__summary">
-                     <#if (result.listMetadata["c"])!?has_content>
-                        <@s.boldicize>
-                           ${result.listMetadata["c"]?first}
-                        </@s.boldicize>
-                    <#else>
-                        ${result.summary!?no_esc}
-                    </#if>    
-                </div>
-            </div>          
+                    <div class="listing-item__summary">
+                        <#if (result.listMetadata["c"])!?has_content>
+                            <@s.boldicize>
+                            ${result.listMetadata["c"]?first}
+                            </@s.boldicize>
+                        <#else>
+                            ${result.summary!?no_esc}
+                        </#if>    
+                    </div>
+                </div>    
+            </#switch>
+      
 
             <#-- Display the time which this result has last been visited by the user -->
             <@sessions.LastVisitedLink result=result/> 
