@@ -133,25 +133,30 @@ class DynamicResultsManager {
     }
 
     handleDynamicClick = async(e) => {
-        const handlers = {
-            '.facet-group__list a': this.handleFacetAnchor,
-            '.tab-list__nav a': this.handleTab,
-            '.search-tools__button-group a': this.handleSearchTools,
-            'a.facet-group__clear': this.handleClearFacet,
-            '.facet-breadcrumb__link': this.handleClearFacet,
-            '.facet-breadcrumb__item': this.handleClearFacet,
-            [this.toggleSelector]: this.handleToggle // Add toggle handler
-        };
+        try {
+            const handlers = {
+                '.facet-group__list a': this.handleFacetAnchor,
+                '.tab-list__nav a': this.handleTab,
+                '.search-tools__button-group a': this.handleSearchTools,
+                'a.facet-group__clear': this.handleClearFacet,
+                '.facet-breadcrumb__link': this.handleClearFacet,
+                '.facet-breadcrumb__item': this.handleClearFacet,
+                [this.toggleSelector]: this.handleToggle
+            };
 
-        for (const [selector, handler] of Object.entries(handlers)) {
-            const matchedElement = e.target.closest(selector);
-            if (matchedElement) {
-                e.preventDefault();
-                await handler.call(this, e, matchedElement);
-                break;
+            for (const [selector, handler] of Object.entries(handlers)) {
+                const matchedElement = e.target.closest(selector);
+                if (matchedElement) {
+                    e.preventDefault();
+                    await handler.call(this, e, matchedElement);
+                    break;
+                }
             }
+        } catch (error) {
+            console.warn('Error in handleDynamicClick:', error);
         }
     }
+
 
     handleToggle = (e, element) => {
         console.log('Toggle handler activated', element);
