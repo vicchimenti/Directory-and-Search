@@ -21,6 +21,7 @@ class DynamicResultsManager {
                 this.startObserving();
             }
         }
+        this.toggleSelector = '[data-toggle="collapse"]';
     }
 
     initializeObserver() {
@@ -64,15 +65,21 @@ class DynamicResultsManager {
     attachEventListenersToNewContent(nodes) {
         nodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-                // Add specific selectors that need event handling
+                // Add toggle button to the list of selectors
                 const elements = node.querySelectorAll(
-                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear, .facet-breadcrumb__link, .facet-breadcrumb__item'
+                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear, .facet-breadcrumb__link, .facet-breadcrumb__item, ' + this.toggleSelector
                 );
                 elements.forEach(element => {
                     // Remove existing listener to prevent duplicates
                     element.removeEventListener('click', this.handleDynamicClick);
                     element.addEventListener('click', this.handleDynamicClick);
                 });
+
+                // Initialize toggle button state if present
+                const toggleButton = node.querySelector(this.toggleSelector);
+                if (toggleButton) {
+                    this.initializeToggleState(toggleButton);
+                }
             }
         });
     }
