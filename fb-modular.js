@@ -148,6 +148,9 @@ class DynamicResultsManager {
                 const matchedElement = e.target.closest(selector);
                 if (matchedElement) {
                     e.preventDefault();
+                    console.log("DynamicResultsManager: handleDynamicClick");
+                    console.log("element", matchedElement);
+                    console.log("e", e);
                     await handler.call(this, e, matchedElement);
                     break;
                 }
