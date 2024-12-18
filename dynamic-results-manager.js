@@ -122,8 +122,7 @@ class DynamicResultsManager {
                 'a.related-links__link': this.handleClick,
                 '.query-blending__highlight': this.handleClick,
                 '.search-spelling-suggestions__link': this.handleSpellingClick,
-                'a.pagination__link': this.handleClick,
-                [this.toggleSelector]: this.handleToggle
+                'a.pagination__link': this.handleClick
             };
 
             for (const [selector, handler] of Object.entries(handlers)) {
