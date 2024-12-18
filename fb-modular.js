@@ -102,15 +102,26 @@ class DynamicResultsManager {
         document.addEventListener('click', this.handleDynamicClick);
     }
 
+    initializeToggleState(toggleButton) {
+        const targetSelectors = toggleButton.getAttribute('data-target')?.split(' ') || [];
+        const collapsibleElements = targetSelectors
+            .map(selector => document.querySelectorAll(selector.replace('.', '.')))
+            .flat();
+        
+        const initialState = collapsibleElements[0]?.classList.contains('show');
+        toggleButton.setAttribute('aria-expanded', initialState);
+        toggleButton.textContent = initialState ? 'Hide Filters' : 'Show Filters';
+    }
+
     handleDynamicClick = async(e) => {
-        console.log("DynamicResultsManager: handleDynamicClick");
         const handlers = {
             '.facet-group__list a': this.handleFacetAnchor,
             '.tab-list__nav a': this.handleTab,
             '.search-tools__button-group a': this.handleSearchTools,
             'a.facet-group__clear': this.handleClearFacet,
-            '.facet-breadcrumb__link' : this.handleClearFacet,
-            '.facet-breadcrumb__item' : this.handleClearFacet
+            '.facet-breadcrumb__link': this.handleClearFacet,
+            '.facet-breadcrumb__item': this.handleClearFacet,
+            [this.toggleSelector]: this.handleToggle // Add toggle handler
         };
 
         for (const [selector, handler] of Object.entries(handlers)) {
