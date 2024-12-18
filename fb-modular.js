@@ -153,25 +153,36 @@ class DynamicResultsManager {
         }
     }
 
-    handleToggle(e, element) {
+    handleToggle = (e, element) => {
         console.log('Toggle handler activated', element);
-        const targetSelectors = element.getAttribute('data-target')?.split(' ') || [];
-        const collapsibleElements = targetSelectors
-            .map(selector => document.querySelectorAll(selector.replace('.', '.')))
-            .flat();
-        
-        const isExpanded = element.getAttribute('aria-expanded') === 'true';
-        element.setAttribute('aria-expanded', !isExpanded);
-        element.textContent = isExpanded ? 'Show Filters' : 'Hide Filters';
-        
-        collapsibleElements.forEach(target => {
-            if (isExpanded) {
-                target.classList.remove('show');
-            } else {
-                target.classList.add('show');
-            }
-        });
+
+        try {
+            if (!element) return;
+
+            const targetSelector = element.getAttribute('data-target');
+            if (!targetSelector) return;
+
+            const collapsibleElements = document.querySelectorAll(targetSelector);
+            if (!collapsibleElements.length) return;
+
+            const isExpanded = element.getAttribute('aria-expanded') === 'true';
+            element.setAttribute('aria-expanded', String(!isExpanded));
+            element.textContent = isExpanded ? 'Show Filters' : 'Hide Filters';
+
+            collapsibleElements.forEach(target => {
+                if (target?.classList) {
+                    if (isExpanded) {
+                        target.classList.remove('show');
+                    } else {
+                        target.classList.add('show');
+                    }
+                }
+            });
+        } catch (error) {
+            console.warn('Error in handleToggle:', error);
+        }
     }
+
 
 
     // result fetchers
