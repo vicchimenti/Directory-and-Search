@@ -157,7 +157,6 @@ class DynamicResultsManager {
         }
     }
 
-
     handleToggle = (e, element) => {
         console.log('Toggle handler activated', element);
 
