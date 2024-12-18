@@ -64,37 +64,31 @@ class DynamicResultsManager {
 
     attachEventListenersToNewContent(nodes) {
         if (!nodes?.length) return;
-
+    
         nodes.forEach(node => {
             if (node?.nodeType === Node.ELEMENT_NODE) {
-                // Add specific selectors that need event handling
-                const selectors = [
+                // Initialize toggle state if present
+                const toggleButton = node.querySelector(this.toggleSelector);
+                if (toggleButton) {
+                    this.initializeToggleState(toggleButton);
+                }
+    
+                // Only attach listeners to non-toggle elements
+                const elements = node.querySelectorAll([
                     '.facet-group__list a',
                     '.tab-list__nav a', 
                     '.search-tools__button-group a',
                     'a.facet-group__clear',
                     '.facet-breadcrumb__link',
-                    '.facet-breadcrumb__item',
-                    this.toggleSelector
-                ].join(', ');
-
-                try {
-                    const elements = node.querySelectorAll(selectors);
-                    elements.forEach(element => {
-                        if (element) {
-                            element.removeEventListener('click', this.handleDynamicClick);
-                            element.addEventListener('click', this.handleDynamicClick);
-                        }
-                    });
-
-                    // Initialize toggle state if present
-                    const toggleButton = node.querySelector(this.toggleSelector);
-                    if (toggleButton) {
-                        this.initializeToggleState(toggleButton);
+                    '.facet-breadcrumb__item'
+                ].join(', '));
+    
+                elements.forEach(element => {
+                    if (element) {
+                        element.removeEventListener('click', this.handleDynamicClick);
+                        element.addEventListener('click', this.handleDynamicClick);
                     }
-                } catch (error) {
-                    console.warn('Error attaching event listeners:', error);
-                }
+                });
             }
         });
     }
