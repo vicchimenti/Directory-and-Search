@@ -315,10 +315,6 @@ class DynamicResultsManager {
         console.log("element", element);
         console.log("e", e);
 
-        // const anchorTarget = e.target.closest(element);
-        // const relativeHref = element.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
-        // console.log("Relative href:", relativeHref);
-
         const href = element.getAttribute('href');
         console.log("handleClick href:", href);
 
