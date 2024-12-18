@@ -73,6 +73,7 @@
                         data-live-url="${result.liveUrl}" 
                         title="${result.title!}" 
                         class="listing-item__title-link"
+                        target="_blank"
                     >
                             <@s.Truncate length=90><@s.boldicize>
                                 ${(result.listMetadata["t"]?first)!} 
