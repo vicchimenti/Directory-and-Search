@@ -67,13 +67,7 @@ class DynamicResultsManager {
     
         nodes.forEach(node => {
             if (node?.nodeType === Node.ELEMENT_NODE) {
-                // Initialize toggle state if present
-                // const toggleButton = node.querySelector(this.toggleSelector);
-                // if (toggleButton) {
-                //     this.initializeToggleState(toggleButton);
-                // }
-    
-                // Only attach listeners to non-toggle elements
+
                 const elements = node.querySelectorAll([
                     '.facet-group__list a',
                     '.tab-list__nav a', 
