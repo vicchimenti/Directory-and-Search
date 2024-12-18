@@ -110,7 +110,7 @@
                 </div>
 
                 <#-- Metadata should as tags/pills -->        
-                <#if (result.listMetadata["author"])!?has_content>
+                <#--  <#if (result.listMetadata["author"])!?has_content>
                     <ul aria-label="Result tags" class="listing-item__tags">
                         <#list result.listMetadata["author"] as author>
                             <li class="listing-item__tag">${author}</li>
@@ -130,7 +130,7 @@
                             <li class="listing-item__tag">${department}</li>
                         </#list>
                     </ul>
-                </#if>
+                </#if>  -->
 
                 <#-- Call to Action (CTA) -->                        
                 <#--  <a href="${result.clickTrackingUrl!}" class="listing-item__action">VIEW MORE</a>   -->
