@@ -81,7 +81,6 @@ class DynamicResultsManager {
                     'a.facet-group__clear',
                     '.facet-breadcrumb__link',
                     '.facet-breadcrumb__item',
-                    '.related-links__item a',
                     'a.related-links__link',
                     '.query-blending__highlight'
                 ].join(', '));
@@ -138,7 +137,6 @@ class DynamicResultsManager {
                 'a.facet-group__clear': this.handleClearFacet,
                 '.facet-breadcrumb__link': this.handleClearFacet,
                 '.facet-breadcrumb__item': this.handleClearFacet,
-                '.related-links__item a': this.handleClick,
                 'a.related-links__link': this.handleClick,
                 '.query-blending__highlight': this.handleClick,
                 [this.toggleSelector]: this.handleToggle
@@ -318,14 +316,14 @@ class DynamicResultsManager {
         console.log("e", e);
 
         // const anchorTarget = e.target.closest(element);
-        const relativeHref = element.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
-        console.log("Relative href:", relativeHref);
+        // const relativeHref = element.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
+        // console.log("Relative href:", relativeHref);
 
         const href = element.getAttribute('href');
-        console.log("direct href:", href);
+        console.log("handleClick href:", href);
 
-        if (relativeHref) {
-            const response = await this.fetchFunnelbackResults(relativeHref, 'GET');
+        if (href) {
+            const response = await this.fetchFunnelbackResults(href, 'GET');
             document.getElementById('results').innerHTML = `
             <div class="funnelback-search-container">
               ${response || "No tab results found."}
