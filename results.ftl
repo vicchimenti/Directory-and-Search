@@ -320,5 +320,3 @@
         </article>
     </script>
   </#macro>
-
-
