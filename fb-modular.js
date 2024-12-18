@@ -103,16 +103,19 @@ class DynamicResultsManager {
     }
 
     initializeToggleState(toggleButton) {
-        const targetSelectors = toggleButton.getAttribute('data-target')?.split(' ') || [];
-        const collapsibleElements = targetSelectors
-            .map(selector => document.querySelectorAll(selector.replace('.', '.')))
-            .flat();
-        
-        const initialState = collapsibleElements[0]?.classList.contains('show');
-        toggleButton.setAttribute('aria-expanded', initialState);
+        if (!toggleButton) return;
+
+        const targetSelector = toggleButton.getAttribute('data-target');
+        if (!targetSelector) return;
+
+        const collapsibleElements = document.querySelectorAll(targetSelector);
+        if (!collapsibleElements.length) return;
+
+        const initialState = collapsibleElements[0].classList.contains('show');
+        toggleButton.setAttribute('aria-expanded', String(initialState));
         toggleButton.textContent = initialState ? 'Hide Filters' : 'Show Filters';
     }
-
+    
     handleDynamicClick = async(e) => {
         const handlers = {
             '.facet-group__list a': this.handleFacetAnchor,
