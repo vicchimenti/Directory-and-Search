@@ -80,7 +80,10 @@ class DynamicResultsManager {
                     '.search-tools__button-group a',
                     'a.facet-group__clear',
                     '.facet-breadcrumb__link',
-                    '.facet-breadcrumb__item'
+                    '.facet-breadcrumb__item',
+                    '.related-links__item',
+                    '.related-links__link',
+                    '.query-blending__highlight'
                 ].join(', '));
     
                 elements.forEach(element => {
@@ -135,6 +138,9 @@ class DynamicResultsManager {
                 'a.facet-group__clear': this.handleClearFacet,
                 '.facet-breadcrumb__link': this.handleClearFacet,
                 '.facet-breadcrumb__item': this.handleClearFacet,
+                '.related-links__item': this.handleClick,
+                '.related-links__link': this.handleClick,
+                '.query-blending__highlight': this.handleClick,
                 [this.toggleSelector]: this.handleToggle
             };
 
@@ -305,9 +311,11 @@ class DynamicResultsManager {
     
     async handleClick(e, element) {
         console.log("DynamicResultsManager: handleClick");
+        console.log("element", element);
+        console.log("e", e);
 
-        const anchorTarget = e.target.closest(element);
-        const relativeHref = anchorTarget.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
+        // const anchorTarget = e.target.closest(element);
+        const relativeHref = element.getAttribute('href') || e.target.querySelector('a')?.getAttribute('href');
         console.log("Relative href:", relativeHref);
 
         const href = element.getAttribute('href');
@@ -339,6 +347,9 @@ class DynamicResultsManager {
     
     async handleTab(e, element) {
         console.log("DynamicResultsManager: handleTab");
+        console.log("element", element);
+        console.log("e", e);
+
         const href = element.getAttribute('href');
         if (href) {
             const response = await this.fetchFunnelbackResults(href, 'GET');
