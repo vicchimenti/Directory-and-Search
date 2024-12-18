@@ -163,8 +163,9 @@ class DynamicResultsManager {
         const DEBOUNCE_TIME = 250; // milliseconds
     
         return (e, element) => {
-            console.log("element: " + element)
+            
             try {
+                console.log('Toggle handler activated', element);
                 // Prevent double-firing by checking time since last click
                 const now = Date.now();
                 if (now - lastClickTime < DEBOUNCE_TIME) {
