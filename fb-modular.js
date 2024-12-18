@@ -380,7 +380,6 @@ class DynamicResultsManager {
     }
 
     async handleSpellingClick(e, element) {
-        // e.preventDefault();
 
         const href = element.getAttribute('href');
 
@@ -388,27 +387,10 @@ class DynamicResultsManager {
             const response = await this.fetchFunnelbackSpelling(href, 'GET');
             document.getElementById('results').innerHTML = `
             <div class="funnelback-search-container">
-              ${response || "No tab results found."}
+              ${response || "No spelling results found."}
             </div>
           `;
         }
-      
-        // Fetch and process data using the relative link
-        // let getClickResponse = null;
-        // if (href) {
-        //   try {
-        //     getClickResponse = await fetchFunnelbackSpelling(href, 'GET');
-        //   } catch (error) {
-        //     console.error("Error fetching clear data:", error);
-        //     getClickResponse = "Error click results.";
-        //   }
-        // }
-      
-        // document.getElementById('results').innerHTML = `
-        //   <div class="funnelback-search-container">
-        //     ${getClickResponse || "No click results found."}
-        //   </div>
-        // `;
       }
 
     async handleFacetAnchor(e, element) {
