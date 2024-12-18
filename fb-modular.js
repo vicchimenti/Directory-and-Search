@@ -84,7 +84,6 @@ class DynamicResultsManager {
                     'a.related-links__link',
                     '.query-blending__highlight',
                     '.search-spelling-suggestions__link',
-                    '.pagination__item a',
                     'a.pagination__link'
                 ].join(', '));
     
@@ -143,7 +142,6 @@ class DynamicResultsManager {
                 'a.related-links__link': this.handleClick,
                 '.query-blending__highlight': this.handleClick,
                 '.search-spelling-suggestions__link': this.handleSpellingClick,
-                '.pagination__item a': this.handleClick,
                 'a.pagination__link': this.handleClick,
                 [this.toggleSelector]: this.handleToggle
             };
