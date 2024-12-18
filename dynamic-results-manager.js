@@ -110,20 +110,6 @@ class DynamicResultsManager {
         document.addEventListener('click', this.handleDynamicClick);
     }
 
-    // initializeToggleState(toggleButton) {
-    //     if (!toggleButton) return;
-
-    //     const targetSelector = toggleButton.getAttribute('data-target');
-    //     if (!targetSelector) return;
-
-    //     const collapsibleElements = document.querySelectorAll(targetSelector);
-    //     if (!collapsibleElements.length) return;
-
-    //     const initialState = collapsibleElements[0].classList.contains('show');
-    //     toggleButton.setAttribute('aria-expanded', String(initialState));
-    //     toggleButton.textContent = initialState ? 'Hide Filters' : 'Show Filters';
-    // }
-
     handleDynamicClick = async(e) => {
         try {
             const handlers = {
