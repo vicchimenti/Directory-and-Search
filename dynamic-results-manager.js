@@ -141,58 +141,8 @@ class DynamicResultsManager {
         }
     }
 
-    // handleToggle = (() => {
-    //     let isProcessing = false;
-    
-    //     return (e, element) => {
-    //         try {
-    //             console.log('Toggle handler activated', element);
-    
-    //             if (isProcessing) return;
-    //             isProcessing = true;
-    
-    //             if (!element) return;
-                
-    //             const targetSelector = element.getAttribute('data-target');
-    //             console.log('Target selector:', targetSelector);
-    
-    //             const collapsibleElements = document.querySelectorAll(targetSelector);
-    //             console.log('Collapsible elements found:', collapsibleElements.length, collapsibleElements);
-    
-    //             if (!collapsibleElements.length) return;
-    
-    //             const isExpanded = element.getAttribute('aria-expanded') === 'true';
-    //             console.log('Current expanded state:', isExpanded);
-    
-    //             const newState = !isExpanded;
-    //             element.setAttribute('aria-expanded', String(newState));
-    //             element.textContent = newState ? 'Hide Filters' : 'Show Filters';
-    
-    //             collapsibleElements.forEach(target => {
-    //                 console.log('Before toggle - Element classes:', target.classList.toString());
-    //                 if (target?.classList) {
-    //                     if (!newState) {
-    //                         target.classList.remove('show');
-    //                     } else {
-    //                         target.classList.add('show');
-    //                     }
-    //                 }
-    //                 console.log('After toggle - Element classes:', target.classList.toString());
-    //             });
-    
-    //             setTimeout(() => {
-    //                 isProcessing = false;
-    //             }, 100);
-    
-    //         } catch (error) {
-    //             console.warn('Error in handleToggle:', error);
-    //             isProcessing = false;
-    //         }
-    //     };
-    // })();
 
-
-
+    
     // result fetchers
     async fetchFunnelbackResults(url, method) {
 
