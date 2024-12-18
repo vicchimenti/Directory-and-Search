@@ -158,10 +158,12 @@ class DynamicResultsManager {
     }
 
     handleToggle = (() => {
+        console.trace('Toggle event triggered');
         let lastClickTime = 0;
         const DEBOUNCE_TIME = 250; // milliseconds
     
         return (e, element) => {
+            console.log("element: " + element)
             try {
                 // Prevent double-firing by checking time since last click
                 const now = Date.now();
