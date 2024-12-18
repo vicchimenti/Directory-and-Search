@@ -68,10 +68,10 @@ class DynamicResultsManager {
         nodes.forEach(node => {
             if (node?.nodeType === Node.ELEMENT_NODE) {
                 // Initialize toggle state if present
-                const toggleButton = node.querySelector(this.toggleSelector);
-                if (toggleButton) {
-                    this.initializeToggleState(toggleButton);
-                }
+                // const toggleButton = node.querySelector(this.toggleSelector);
+                // if (toggleButton) {
+                //     this.initializeToggleState(toggleButton);
+                // }
     
                 // Only attach listeners to non-toggle elements
                 const elements = node.querySelectorAll([
@@ -116,19 +116,19 @@ class DynamicResultsManager {
         document.addEventListener('click', this.handleDynamicClick);
     }
 
-    initializeToggleState(toggleButton) {
-        if (!toggleButton) return;
+    // initializeToggleState(toggleButton) {
+    //     if (!toggleButton) return;
 
-        const targetSelector = toggleButton.getAttribute('data-target');
-        if (!targetSelector) return;
+    //     const targetSelector = toggleButton.getAttribute('data-target');
+    //     if (!targetSelector) return;
 
-        const collapsibleElements = document.querySelectorAll(targetSelector);
-        if (!collapsibleElements.length) return;
+    //     const collapsibleElements = document.querySelectorAll(targetSelector);
+    //     if (!collapsibleElements.length) return;
 
-        const initialState = collapsibleElements[0].classList.contains('show');
-        toggleButton.setAttribute('aria-expanded', String(initialState));
-        toggleButton.textContent = initialState ? 'Hide Filters' : 'Show Filters';
-    }
+    //     const initialState = collapsibleElements[0].classList.contains('show');
+    //     toggleButton.setAttribute('aria-expanded', String(initialState));
+    //     toggleButton.textContent = initialState ? 'Hide Filters' : 'Show Filters';
+    // }
 
     handleDynamicClick = async(e) => {
         try {
@@ -162,55 +162,55 @@ class DynamicResultsManager {
         }
     }
 
-    handleToggle = (() => {
-        let isProcessing = false;
+    // handleToggle = (() => {
+    //     let isProcessing = false;
     
-        return (e, element) => {
-            try {
-                console.log('Toggle handler activated', element);
+    //     return (e, element) => {
+    //         try {
+    //             console.log('Toggle handler activated', element);
     
-                if (isProcessing) return;
-                isProcessing = true;
+    //             if (isProcessing) return;
+    //             isProcessing = true;
     
-                if (!element) return;
+    //             if (!element) return;
                 
-                const targetSelector = element.getAttribute('data-target');
-                console.log('Target selector:', targetSelector);
+    //             const targetSelector = element.getAttribute('data-target');
+    //             console.log('Target selector:', targetSelector);
     
-                const collapsibleElements = document.querySelectorAll(targetSelector);
-                console.log('Collapsible elements found:', collapsibleElements.length, collapsibleElements);
+    //             const collapsibleElements = document.querySelectorAll(targetSelector);
+    //             console.log('Collapsible elements found:', collapsibleElements.length, collapsibleElements);
     
-                if (!collapsibleElements.length) return;
+    //             if (!collapsibleElements.length) return;
     
-                const isExpanded = element.getAttribute('aria-expanded') === 'true';
-                console.log('Current expanded state:', isExpanded);
+    //             const isExpanded = element.getAttribute('aria-expanded') === 'true';
+    //             console.log('Current expanded state:', isExpanded);
     
-                const newState = !isExpanded;
-                element.setAttribute('aria-expanded', String(newState));
-                element.textContent = newState ? 'Hide Filters' : 'Show Filters';
+    //             const newState = !isExpanded;
+    //             element.setAttribute('aria-expanded', String(newState));
+    //             element.textContent = newState ? 'Hide Filters' : 'Show Filters';
     
-                collapsibleElements.forEach(target => {
-                    console.log('Before toggle - Element classes:', target.classList.toString());
-                    if (target?.classList) {
-                        if (!newState) {
-                            target.classList.remove('show');
-                        } else {
-                            target.classList.add('show');
-                        }
-                    }
-                    console.log('After toggle - Element classes:', target.classList.toString());
-                });
+    //             collapsibleElements.forEach(target => {
+    //                 console.log('Before toggle - Element classes:', target.classList.toString());
+    //                 if (target?.classList) {
+    //                     if (!newState) {
+    //                         target.classList.remove('show');
+    //                     } else {
+    //                         target.classList.add('show');
+    //                     }
+    //                 }
+    //                 console.log('After toggle - Element classes:', target.classList.toString());
+    //             });
     
-                setTimeout(() => {
-                    isProcessing = false;
-                }, 100);
+    //             setTimeout(() => {
+    //                 isProcessing = false;
+    //             }, 100);
     
-            } catch (error) {
-                console.warn('Error in handleToggle:', error);
-                isProcessing = false;
-            }
-        };
-    })();
+    //         } catch (error) {
+    //             console.warn('Error in handleToggle:', error);
+    //             isProcessing = false;
+    //         }
+    //     };
+    // })();
 
 
 
