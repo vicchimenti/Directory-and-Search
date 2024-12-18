@@ -135,6 +135,7 @@ class DynamicResultsManager {
     }
 
     handleToggle(e, element) {
+        console.log('Toggle handler activated', element);
         const targetSelectors = element.getAttribute('data-target')?.split(' ') || [];
         const collapsibleElements = targetSelectors
             .map(selector => document.querySelectorAll(selector.replace('.', '.')))
