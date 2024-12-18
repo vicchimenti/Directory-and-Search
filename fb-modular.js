@@ -152,35 +152,34 @@ class DynamicResultsManager {
     }
 
     handleToggle = (() => {
-        console.trace('Toggle event triggered');
         let isProcessing = false;
     
         return (e, element) => {
             try {
                 console.log('Toggle handler activated', element);
     
-                // If we're currently processing a click, ignore this one
-                if (isProcessing) {
-                    return;
-                }
-    
+                if (isProcessing) return;
                 isProcessing = true;
     
                 if (!element) return;
                 
                 const targetSelector = element.getAttribute('data-target');
-                if (!targetSelector) return;
+                console.log('Target selector:', targetSelector);
     
                 const collapsibleElements = document.querySelectorAll(targetSelector);
+                console.log('Collapsible elements found:', collapsibleElements.length, collapsibleElements);
+    
                 if (!collapsibleElements.length) return;
     
                 const isExpanded = element.getAttribute('aria-expanded') === 'true';
+                console.log('Current expanded state:', isExpanded);
+    
                 const newState = !isExpanded;
-                
                 element.setAttribute('aria-expanded', String(newState));
                 element.textContent = newState ? 'Hide Filters' : 'Show Filters';
     
                 collapsibleElements.forEach(target => {
+                    console.log('Before toggle - Element classes:', target.classList.toString());
                     if (target?.classList) {
                         if (!newState) {
                             target.classList.remove('show');
@@ -188,9 +187,9 @@ class DynamicResultsManager {
                             target.classList.add('show');
                         }
                     }
+                    console.log('After toggle - Element classes:', target.classList.toString());
                 });
     
-                // Reset the processing flag after a brief delay
                 setTimeout(() => {
                     isProcessing = false;
                 }, 100);
