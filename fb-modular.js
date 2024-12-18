@@ -63,26 +63,42 @@ class DynamicResultsManager {
     }
 
     attachEventListenersToNewContent(nodes) {
-        nodes.forEach(node => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                // Add toggle button to the list of selectors
-                const elements = node.querySelectorAll(
-                    '.facet-group__list a, .tab-list__nav a, .search-tools__button-group a, a.facet-group__clear, .facet-breadcrumb__link, .facet-breadcrumb__item, ' + this.toggleSelector
-                );
-                elements.forEach(element => {
-                    // Remove existing listener to prevent duplicates
-                    element.removeEventListener('click', this.handleDynamicClick);
-                    element.addEventListener('click', this.handleDynamicClick);
-                });
+        if (!nodes?.length) return;
 
-                // Initialize toggle button state if present
-                const toggleButton = node.querySelector(this.toggleSelector);
-                if (toggleButton) {
-                    this.initializeToggleState(toggleButton);
+        nodes.forEach(node => {
+            if (node?.nodeType === Node.ELEMENT_NODE) {
+                // Add specific selectors that need event handling
+                const selectors = [
+                    '.facet-group__list a',
+                    '.tab-list__nav a', 
+                    '.search-tools__button-group a',
+                    'a.facet-group__clear',
+                    '.facet-breadcrumb__link',
+                    '.facet-breadcrumb__item',
+                    this.toggleSelector
+                ].join(', ');
+
+                try {
+                    const elements = node.querySelectorAll(selectors);
+                    elements.forEach(element => {
+                        if (element) {
+                            element.removeEventListener('click', this.handleDynamicClick);
+                            element.addEventListener('click', this.handleDynamicClick);
+                        }
+                    });
+
+                    // Initialize toggle state if present
+                    const toggleButton = node.querySelector(this.toggleSelector);
+                    if (toggleButton) {
+                        this.initializeToggleState(toggleButton);
+                    }
+                } catch (error) {
+                    console.warn('Error attaching event listeners:', error);
                 }
             }
         });
     }
+
 
     async initializeIP() {
         try {
@@ -115,7 +131,7 @@ class DynamicResultsManager {
         toggleButton.setAttribute('aria-expanded', String(initialState));
         toggleButton.textContent = initialState ? 'Hide Filters' : 'Show Filters';
     }
-    
+
     handleDynamicClick = async(e) => {
         const handlers = {
             '.facet-group__list a': this.handleFacetAnchor,
