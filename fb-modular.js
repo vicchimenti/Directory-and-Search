@@ -157,35 +157,50 @@ class DynamicResultsManager {
         }
     }
 
-    handleToggle = (e, element) => {
-        console.log('Toggle handler activated', element);
-
-        try {
-            if (!element) return;
-
-            const targetSelector = element.getAttribute('data-target');
-            if (!targetSelector) return;
-
-            const collapsibleElements = document.querySelectorAll(targetSelector);
-            if (!collapsibleElements.length) return;
-
-            const isExpanded = element.getAttribute('aria-expanded') === 'true';
-            element.setAttribute('aria-expanded', String(!isExpanded));
-            element.textContent = isExpanded ? 'Show Filters' : 'Hide Filters';
-
-            collapsibleElements.forEach(target => {
-                if (target?.classList) {
-                    if (isExpanded) {
-                        target.classList.remove('show');
-                    } else {
-                        target.classList.add('show');
-                    }
+    handleToggle = (() => {
+        let lastClickTime = 0;
+        const DEBOUNCE_TIME = 250; // milliseconds
+    
+        return (e, element) => {
+            try {
+                // Prevent double-firing by checking time since last click
+                const now = Date.now();
+                if (now - lastClickTime < DEBOUNCE_TIME) {
+                    return;
                 }
-            });
-        } catch (error) {
-            console.warn('Error in handleToggle:', error);
-        }
-    }
+                lastClickTime = now;
+    
+                if (!element) return;
+    
+                const targetSelector = element.getAttribute('data-target');
+                if (!targetSelector) return;
+    
+                const collapsibleElements = document.querySelectorAll(targetSelector);
+                if (!collapsibleElements.length) return;
+    
+                const isExpanded = element.getAttribute('aria-expanded') === 'true';
+                const newState = !isExpanded;
+                
+                // Update button state
+                element.setAttribute('aria-expanded', String(newState));
+                element.textContent = newState ? 'Hide Filters' : 'Show Filters';
+    
+                // Update collapsible elements
+                collapsibleElements.forEach(target => {
+                    if (target?.classList) {
+                        if (!newState) {
+                            target.classList.remove('show');
+                        } else {
+                            target.classList.add('show');
+                        }
+                    }
+                });
+    
+            } catch (error) {
+                console.warn('Error in handleToggle:', error);
+            }
+        };
+    })();
 
 
 
