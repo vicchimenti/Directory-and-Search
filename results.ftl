@@ -65,19 +65,6 @@
                         <#case "pdf">
                             <i class="far fa-file-pdf" aria-hidden="true"></i>
                             <#break>
-                        <#case "doc">
-                        <#case "docx">
-                        <#case "rtf">
-                            <i class="far fa-file-word" aria-hidden="true"></i>
-                            <#break>
-                        <#case "xls">
-                        <#case "xlsx">
-                            <i class="far fa-file-excel" aria-hidden="true"></i>
-                            <#break>
-                        <#case "ppt">
-                        <#case "pptx">
-                            <i class="far fa-file-powerpoint" aria-hidden="true"></i>
-                            <#break>
                     </#switch>
 
                     <h3 class="listing-item__title h4 funderline">
