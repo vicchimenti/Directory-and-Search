@@ -81,8 +81,8 @@ class DynamicResultsManager {
                     'a.facet-group__clear',
                     '.facet-breadcrumb__link',
                     '.facet-breadcrumb__item',
-                    '.related-links__item',
-                    '.related-links__link',
+                    '.related-links__item a',
+                    'a.related-links__link',
                     '.query-blending__highlight'
                 ].join(', '));
     
@@ -138,8 +138,8 @@ class DynamicResultsManager {
                 'a.facet-group__clear': this.handleClearFacet,
                 '.facet-breadcrumb__link': this.handleClearFacet,
                 '.facet-breadcrumb__item': this.handleClearFacet,
-                '.related-links__item': this.handleClick,
-                '.related-links__link': this.handleClick,
+                '.related-links__item a': this.handleClick,
+                'a.related-links__link': this.handleClick,
                 '.query-blending__highlight': this.handleClick,
                 [this.toggleSelector]: this.handleToggle
             };
