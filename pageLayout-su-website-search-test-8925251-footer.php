@@ -10,6 +10,7 @@
 </div>
 <!-- .page -->
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<!-- jquery.min.js -->
 <script src="<t4 type='media' id='8723392' formatter='path/*' />" defer></script>
 <!-- flats.min.js -->
 <script src="<t4 type='media' id='6907524' formatter='path/*' />" defer></script>
