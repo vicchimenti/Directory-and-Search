@@ -22,11 +22,11 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="<t4 type='media' id='9056000' formatter='path/*' />" defer></script>
+        <script src="<t4 type='media' id='9056000' formatter='path/*' />"></script>
         <!-- header-search-manager.js -->
-        <script src="<t4 type='media' id='9055999' formatter='path/*' />" defer></script>
+        <script src="<t4 type='media' id='9055999' formatter='path/*' />"></script>
         <!-- results-search-manager.js -->
-        <script src="<t4 type='media' id='9017309' formatter='path/*' />" defer></script>
+        <script src="<t4 type='media' id='9017309' formatter='path/*' />"></script>
         <!-- dynamic-results-manager.js -->
 
         <t4 type="navigation" name="Return Gallery JS" id="956" />
