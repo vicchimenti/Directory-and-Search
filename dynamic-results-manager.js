@@ -21,7 +21,6 @@ class DynamicResultsManager {
                 this.startObserving();
             }
         }
-        this.toggleSelector = '[data-toggle="collapse"]';
     }
 
     initializeObserver() {
