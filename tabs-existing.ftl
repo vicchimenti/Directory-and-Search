@@ -39,9 +39,9 @@
                                 href="${value.toggleUrl}"
                             > 
                                 <#-- Display the icon if it is configured -->
-                                <#--  <#if question.getCurrentProfileConfig().get("stencils.tabs.icons${value.label}")??>
-                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icons${value.label}")}"></span>
-                                </#if>                              -->
+                                <#if question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")??>
+                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")}"></span>
+                                </#if>                            
 
                                 ${value.label}                            
                                 &nbsp; <#--  Prevent the count from being glued to the value  -->
@@ -57,9 +57,9 @@
                                 data-tab-group-control="${base.getCssID(value.label)+value_index}"
                             > 
                                 <#-- Display the icon if it is configured -->
-                                <#--  <#if question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")??>
+                                <#if question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")??>
                                     <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")}"></span>
-                                </#if>                              -->
+                                </#if>                            
 
                                 ${value.label}                            
                                 &nbsp; <#--  Prevent the count from being glued to the value  -->
@@ -263,3 +263,4 @@
         </#if>
     </@fb.ExtraResults>
 </#macro>
+
