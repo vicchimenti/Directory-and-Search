@@ -59,50 +59,6 @@
                 </div>                    
             </div>
         </div>
-
-        <#--  <div class="tabs tabs--center">
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
-            <div class="tab__list collapse show multi-collapse" role="tablist">
-                <div class="tab-list__nav" data-tab-group-element="tab-list-nav">  -->
-                    <#-- 
-                        Show all the tabs as individual buttons. 
-                        Note: Even though storybook uses buttons, we want to use anchors here 
-                        so that request are submitted when click which will display the new results.
-                    -->
-                    <#--  <#list facet.allValues as value>
-
-                        <#if value.count gt 0>
-                            <a class="tab__button <#if value.selected>tab__button--active</#if>" 
-                                id="${base.getCssID(value.label)+value_index}" 
-                                role="tab" 
-                                aria-selected="${(value.selected)!?string('true','false')}"
-                                aria-controls="0-tab" 
-                                tabindex="0" 
-                                data-tab-group-control="${base.getCssID(value.label)+value_index}"
-                                href="${value.toggleUrl}"
-                            > 
-
-                                <span class="tabs__count">(${value.count})</span>                             
-                            </a>
-                        <#else>
-                            <span class="tab__button <#if value.selected>tab__button--active</#if> tab__button--disabled" 
-                                id="${base.getCssID(value.label)+value_index}" 
-                                role="tab" 
-                                aria-selected="${(value.selected)!?string('true','false')}"
-                                aria-controls="0-tab" 
-                                tabindex="0" 
-                                data-tab-group-control="${base.getCssID(value.label)+value_index}"
-                            > 
-
-                                <span class="tabs__count">(${value.count})</span>                             
-                            </span>
-                        </#if>
-                    </#list>                                        
-
-                    </div>                    
-                </div>
-            </div>
-        </div>  -->
      </#list>
 </#macro>
 
