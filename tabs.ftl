@@ -19,7 +19,7 @@
 
     <#list facets![] as facet>
         <div class="tabs tabs--center">
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
+            <button class="btn btn-primary" type="button" aria-expanded="true" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
             <div class="tab__list collapse show multi-collapse" role="tablist">
                 <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
                     <#-- 
