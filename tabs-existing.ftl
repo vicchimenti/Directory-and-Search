@@ -263,4 +263,3 @@
         </#if>
     </@fb.ExtraResults>
 </#macro>
-
