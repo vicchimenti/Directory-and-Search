@@ -19,7 +19,7 @@
 
     <#list facets![] as facet>
         <div class="tabs tabs--center">
-            <button class="btn btn-primary" type="button" aria-expanded="true" aria-controls="filterPanel">Hide Filters</button>
+            <button class="btn btn-primary" type="button" aria-expanded="true" aria-controls="filterPanel">Filters</button>
             <div class="tab__list" id="filterPanel" role="tablist" aria-hidden="false">
                 <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
                     <#-- 
