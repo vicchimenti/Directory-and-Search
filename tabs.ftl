@@ -72,6 +72,7 @@
                     <#-- 
                         Display the show more button which will be visible whent he viewport 
                         is smaller than the available space to show all the tabs.
+                        
                     
                     <div 
                         class="overflow-menu__wrapper" 
@@ -93,7 +94,7 @@
                             </svg>
                         </button>
                         <div class="overflow-menu" data-tab-group-element="overflow-menu-container"></div>
-                    -->    
+   
                     </div>                    
                 </div>
             </div>
