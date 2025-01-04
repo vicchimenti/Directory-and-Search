@@ -19,7 +19,8 @@
 
     <#list facets![] as facet>
         <div class="tabs tabs--center">
-            <div class="tab__list" role="tablist">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
+            <div class="tab__list collapse show multi-collapse" role="tablist">
                 <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
                     <#-- 
                         Show all the tabs as individual buttons. 
@@ -71,7 +72,7 @@
                     <#-- 
                         Display the show more button which will be visible whent he viewport 
                         is smaller than the available space to show all the tabs.
-                    -->
+                    
                     <div 
                         class="overflow-menu__wrapper" 
                         data-tab-group-element="overflow-menu-wrapper"
@@ -92,6 +93,7 @@
                             </svg>
                         </button>
                         <div class="overflow-menu" data-tab-group-element="overflow-menu-container"></div>
+                    -->    
                     </div>                    
                 </div>
             </div>
@@ -263,4 +265,3 @@
         </#if>
     </@fb.ExtraResults>
 </#macro>
-
