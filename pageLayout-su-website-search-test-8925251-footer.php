@@ -37,6 +37,8 @@
         <!-- results-search-manager.js -->
         <script src="<t4 type='media' id='9017309' formatter='path/*' />" defer></script>
         <!-- dynamic-results-manager.js -->
+        <script src="<t4 type='media' id='9017309' formatter='path/*' />" defer></script>
+        <!-- fb-global.js -->
 
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
