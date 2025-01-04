@@ -349,3 +349,6 @@ export default function _init(shouldAnimate) {
 }
 
 _init();
+
+// Initialize
+const fbGlobal = new Collapse();
