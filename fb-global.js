@@ -298,7 +298,7 @@ class Collapse {
 /**
  * The default collapse function to be initialised in storybook or webpack
  */
-export default function _init(shouldAnimate) {
+function _init(shouldAnimate) {
     // Check that the collapse exists
     const collapseExists = !!document.querySelector('.collapse__button');
 
