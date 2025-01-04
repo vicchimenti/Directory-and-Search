@@ -348,7 +348,8 @@ function _init(shouldAnimate) {
     }
 }
 
-_init();
-
 // Initialize
 const fbGlobal = new Collapse();
+
+_init();
+
