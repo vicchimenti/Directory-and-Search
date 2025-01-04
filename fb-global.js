@@ -2,7 +2,7 @@
  * The default module class for all the things that need to collapse / open
  * @class
  */
-export class Collapse {
+class Collapse {
     constructor() {
         // Bind the methods called by event listeners
         this.toggleOpenState = this.toggleOpenState.bind(this);
