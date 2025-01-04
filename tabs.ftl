@@ -19,8 +19,8 @@
 
     <#list facets![] as facet>
         <div class="tabs tabs--center">
-            <button class="btn btn-primary" type="button" aria-expanded="true" aria-controls="filterPanel">Filters</button>
-            <div class="tab__list" id="filterPanel" role="tablist" aria-hidden="false">
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
+            <div class="tab__list collapse show multi-collapse" role="tablist">
                 <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
                     <#-- 
                         Show all the tabs as individual buttons. 
@@ -55,8 +55,35 @@
                                 <span class="tabs__count">(${value.count})</span>                             
                             </span>
                         </#if>
-                    </#list> 
-                </div>                    
+                    </#list>                                        
+
+                    <#-- 
+                        Display the show more button which will be visible whent he viewport 
+                        is smaller than the available space to show all the tabs.
+                    
+                    <div 
+                        class="overflow-menu__wrapper" 
+                        data-tab-group-element="overflow-menu-wrapper"
+                        data-component="button-overflow"
+                        data-container=".tabs"
+                        data-items="[data-tab-group-control]"
+                        data-items-container="[data-tab-group-element='tab-list-nav']"
+                    >
+                        <button 
+                            class="overflow-menu__button" 
+                            type="button" 
+                            data-tab-group-element="overflow-menu-button" 
+                            aria-labelledby="View more"
+                        >
+                            <span class="sr-only">show more tabs</span>
+                            <svg class="overflow-menu__icon">
+                                <use href="#overflow-menu"></use>
+                            </svg>
+                        </button>
+                        <div class="overflow-menu" data-tab-group-element="overflow-menu-container"></div>
+                    -->    
+                    </div>                    
+                </div>
             </div>
         </div>
      </#list>
