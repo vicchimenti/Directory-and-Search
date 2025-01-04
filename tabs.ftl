@@ -39,13 +39,7 @@
                                 data-tab-group-control="${base.getCssID(value.label)+value_index}"
                                 href="${value.toggleUrl}"
                             > 
-                                <#-- Display the icon if it is configured -->
-                                <#--  <#if question.getCurrentProfileConfig().get("stencils.tabs.icons${value.label}")??>
-                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icons${value.label}")}"></span>
-                                </#if>                              -->
 
-                                ${value.label}                            
-                                &nbsp; <#--  Prevent the count from being glued to the value  -->
                                 <span class="tabs__count">(${value.count})</span>                             
                             </a>
                         <#else>
@@ -57,13 +51,7 @@
                                 tabindex="0" 
                                 data-tab-group-control="${base.getCssID(value.label)+value_index}"
                             > 
-                                <#-- Display the icon if it is configured -->
-                                <#--  <#if question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")??>
-                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")}"></span>
-                                </#if>                              -->
 
-                                ${value.label}                            
-                                &nbsp; <#--  Prevent the count from being glued to the value  -->
                                 <span class="tabs__count">(${value.count})</span>                             
                             </span>
                         </#if>
