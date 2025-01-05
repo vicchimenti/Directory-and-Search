@@ -4,6 +4,9 @@
  */
 class Collapse {
     constructor() {
+
+        console.log('Collapse class instantiated');
+
         // Existing constructor bindings
         this.toggleOpenState = this.toggleOpenState.bind(this);
         this.openElement = this.openElement.bind(this);
@@ -20,6 +23,8 @@ class Collapse {
     }
 
     setupObserver() {
+
+        console.log('Setting up collapse scope observer...');
         const resultsElement = document.getElementById('results');
         
         if (!resultsElement) {
@@ -27,16 +32,35 @@ class Collapse {
             return;
         }
 
+        console.log('Found results element:', resultsElement);
+
+
         this.observer = new MutationObserver((mutations) => {
+
+            console.log('Mutation detected:', mutations.length, 'changes');
+
             mutations.forEach((mutation) => {
+
+                console.log('Mutation type:', mutation.type);
+                console.log('Added nodes:', mutation.addedNodes.length);
+                console.log('Removed nodes:', mutation.removedNodes.length);
+
                 if (mutation.type === 'childList') {
+
+
                     // Look for new collapse buttons that haven't been initialized
                     const newCollapseButtons = document.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
-                    
+                    console.log('Found new collapse buttons:', newCollapseButtons.length);
+
+
                     newCollapseButtons.forEach(button => {
                         if (!button.collapse) {
+                            console.log('Initializing new collapse button');
+
                             button.setAttribute('data-collapse-initialized', 'true');
                             this.initializeCollapse(button);
+                        } else {
+                            console.log('Button already has collapse instance');
                         }
                     });
                 }
@@ -51,17 +75,27 @@ class Collapse {
 
         // Start observing
         this.observer.observe(resultsElement, config);
+        console.log('Observer started watching results element');
+
     }
 
     initializeCollapse(collapseButton) {
+        console.log('Initializing collapse for button:', collapseButton);
+
         const collapseContent = collapseButton.nextElementSibling;
         
         if (!collapseContent || !collapseContent.classList.contains('collapse__content')) {
             return;
         }
 
+        console.log('Found collapse content:', collapseContent);
+
+
         // Setup collapse instance
         collapseButton.collapse = new Collapse();
+
+        console.log('Adding click event listener to button');
+
         
         // Add the event listener to the button
         collapseButton.addEventListener('click', collapseButton.collapse.toggleOpenState);
@@ -70,6 +104,9 @@ class Collapse {
         
         // Flag to check if we are opening on page load
         const openByDefault = collapseContent.classList.contains('collapse__content--open');
+
+        console.log('Open by default:', openByDefault);
+
 
         // Set the collapse button
         collapse.collapseButton = collapseButton;
@@ -92,8 +129,13 @@ class Collapse {
         // Set if the item should transition or just toggle state
         collapse.shouldAnimate = true;
 
+        console.log('Setting initial state');
+
         // Initialize state
         openByDefault ? collapse.openElement() : collapse.closeElement();
+
+        console.log('Collapse initialization complete');
+
     }
 
     /**
@@ -220,27 +262,38 @@ class Collapse {
      * @method
      */
     toggleOpenState() {
+
+        console.log('Toggle open state called, current state:', this.isOpen);
+
         // Check if the modal is closed
         if (!this.isOpen) {
             // If the collapse should not animate between states
             if (!this.collapseShouldAnimate) {
+                console.log('Opening without animation');
+
                 // If it is currently closed open it
                 this.openElement();
             }
 
             // If the collapse should animate between states
             if (this.collapseShouldAnimate) {
+                console.log('Opening with animation');
+
                 this.transitionItemOpen();
             }
         } else {
             // If the collapse should not animate between states
             if (!this.collapseShouldAnimate) {
+                console.log('Closing without animation');
+
                 // If it is currently open, close it
                 this.closeElement();
             }
 
             // If the collapse should animate between states
             if (this.collapseShouldAnimate) {
+                console.log('Closing with animation');
+
                 this.transitionItemClosed();
             }
         }
