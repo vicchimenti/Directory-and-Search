@@ -40,23 +40,39 @@ class Collapse {
                     
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE) {
-                            // Log the node being checked
+                            // Log the node being checked and its HTML
                             console.log('Checking node:', node);
-
+                            console.log('Node HTML:', node.outerHTML);
+                            
+                            // Log all buttons found in document for debugging
+                            const allButtons = document.querySelectorAll('.collapse__button');
+                            console.log('Total collapse buttons in document:', allButtons.length);
+                            
                             // First, check if this node itself is a collapse button
-                            if (node.classList && node.classList.contains('collapse__button')) {
-                                if (!node.hasAttribute('data-collapse-initialized')) {
-                                    console.log('Initializing direct collapse button:', node);
-                                    this.initializeCollapse(node);
+                            if (node.classList) {
+                                console.log('Node classes:', node.classList);
+                                if (node.classList.contains('collapse__button')) {
+                                    if (!node.hasAttribute('data-collapse-initialized')) {
+                                        console.log('Initializing direct collapse button:', node);
+                                        this.initializeCollapse(node);
+                                    }
                                 }
                             }
 
-                            // Then check its children
-                            const buttons = node.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
-                            if (buttons.length > 0) {
-                                console.log('Found', buttons.length, 'uninitiated collapse buttons in children');
-                                buttons.forEach(button => {
-                                    console.log('Initializing nested collapse button:', button);
+                            // Then check its children with more detailed logging
+                            console.log('Checking for .collapse__button in children of:', node.tagName);
+                            const buttons = node.querySelectorAll('.collapse__button');
+                            console.log('Found buttons (before initialization check):', buttons.length);
+                            
+                            const uninitializedButtons = node.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
+                            console.log('Found uninitialized buttons:', uninitializedButtons.length);
+                            
+                            if (uninitializedButtons.length > 0) {
+                                console.log('Button details:');
+                                uninitializedButtons.forEach(button => {
+                                    console.log('- Button HTML:', button.outerHTML);
+                                    console.log('- Button classes:', button.classList);
+                                    console.log('- Button initialized:', button.hasAttribute('data-collapse-initialized'));
                                     this.initializeCollapse(button);
                                 });
                             }
