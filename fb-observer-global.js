@@ -94,32 +94,30 @@ class Collapse {
 
     initializeCollapse(collapseButton) {
         console.log('Initializing collapse for button:', collapseButton);
-
         const collapseContent = collapseButton.nextElementSibling;
         
         if (!collapseContent || !collapseContent.classList.contains('collapse__content')) {
+            console.warn('No valid collapse content found for button:', collapseButton);
             return;
         }
-
+        
         console.log('Found collapse content:', collapseContent);
-
 
         // Setup collapse instance
         collapseButton.collapse = new Collapse();
-
-        console.log('Adding click event listener to button');
-
         
+        console.log('Adding click event listener to button');
         // Add the event listener to the button
-        collapseButton.addEventListener('click', collapseButton.collapse.toggleOpenState);
+        collapseButton.addEventListener('click', (e) => {
+            console.log('Collapse button clicked:', e);
+            collapseButton.collapse.toggleOpenState();
+        });
 
         const { collapse } = collapseButton;
         
         // Flag to check if we are opening on page load
         const openByDefault = collapseContent.classList.contains('collapse__content--open');
-
         console.log('Open by default:', openByDefault);
-
 
         // Set the collapse button
         collapse.collapseButton = collapseButton;
@@ -142,13 +140,10 @@ class Collapse {
         // Set if the item should transition or just toggle state
         collapse.shouldAnimate = true;
 
-        console.log('Setting initial state');
-
         // Initialize state
+        console.log('Setting initial state');
         openByDefault ? collapse.openElement() : collapse.closeElement();
-
         console.log('Collapse initialization complete');
-
     }
 
     /**
