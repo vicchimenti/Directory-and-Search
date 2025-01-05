@@ -32,12 +32,23 @@ class Collapse {
             return;
         }
 
+        // First, add toggle buttons to existing tab groups
+        this.addToggleButtonsToTabGroups();
+
         this.observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE) {
-                            // Look for facet group controls
+                            // Add toggle buttons to any new tab groups
+                            const tabGroups = node.querySelectorAll('.tabs--center');
+                            tabGroups.forEach(tabGroup => {
+                                if (!tabGroup.hasAttribute('data-toggle-initialized')) {
+                                    this.addToggleButtonToTabGroup(tabGroup);
+                                }
+                            });
+
+                            // Existing button checks...
                             const facetButtons = node.querySelectorAll('[data-component="facet-group-control"]');
                             console.log('[Collapse] Found facet buttons:', facetButtons.length);
                             
@@ -110,6 +121,67 @@ class Collapse {
         existingShowMoreButtons.forEach(button => {
             this.initializeShowMore(button);
         });
+    }
+
+    addToggleButtonsToTabGroups() {
+        const tabGroups = document.querySelectorAll('.tabs--center');
+        tabGroups.forEach(tabGroup => {
+            this.addToggleButtonToTabGroup(tabGroup);
+        });
+    }
+
+    addToggleButtonToTabGroup(tabGroup) {
+        if (tabGroup.hasAttribute('data-toggle-initialized')) {
+            return;
+        }
+
+        console.log('[Collapse] Adding toggle button to tab group');
+
+        // Create toggle button
+        const toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.className = 'tab-group__toggle';
+        toggleButton.setAttribute('aria-expanded', 'true');
+        
+        // Add icons for open/closed states
+        toggleButton.innerHTML = `
+            <svg class="tab-group__icon tab-group__icon--closed">
+                <use href="#add"></use>
+            </svg>
+            <svg class="tab-group__icon tab-group__icon--open">
+                <use href="#subtract"></use>
+            </svg>
+            <span class="sr-only">Toggle tab group visibility</span>
+        `;
+
+        // Find the tab list nav
+        const tabListNav = tabGroup.querySelector('[data-tab-group-element="tab-list-nav"]');
+        if (!tabListNav) {
+            console.warn('[Collapse] No tab list nav found in tab group');
+            return;
+        }
+
+        // Insert toggle button before the tab list nav
+        tabListNav.parentNode.insertBefore(toggleButton, tabListNav);
+
+        // Add click handler
+        toggleButton.addEventListener('click', () => {
+            const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+            
+            toggleButton.setAttribute('aria-expanded', (!isExpanded).toString());
+            toggleButton.classList.toggle('tab-group__toggle--collapsed');
+            
+            if (isExpanded) {
+                tabListNav.style.display = 'none';
+                tabListNav.setAttribute('aria-hidden', 'true');
+            } else {
+                tabListNav.style.display = '';
+                tabListNav.setAttribute('aria-hidden', 'false');
+            }
+        });
+
+        // Mark as initialized
+        tabGroup.setAttribute('data-toggle-initialized', 'true');
     }
 
     initializeShowMore(button) {
