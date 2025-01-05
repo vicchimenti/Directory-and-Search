@@ -422,4 +422,5 @@ class Collapse {
 }
 
 // Initialize
+console.log('[Collapse] Creating global instance');
 const fbGlobal = new Collapse();
