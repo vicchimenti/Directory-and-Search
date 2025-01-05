@@ -4,7 +4,7 @@
  */
 class Collapse {
     constructor() {
-        console.log('Collapse class instantiated');
+        console.log('[Collapse] Class instantiated');
         
         // Existing constructor bindings
         this.toggleOpenState = this.toggleOpenState.bind(this);
@@ -22,60 +22,40 @@ class Collapse {
     }
 
     setupObserver() {
-        console.log('Setting up observer...');
-        const resultsElement = document.getElementById('results');
+        console.log('[Collapse] Setting up observer...');
         
-        if (!resultsElement) {
-            console.warn('Results element not found, observer not initialized');
+        // Watch the entire document for facet additions
+        const targetNode = document.body;
+        
+        if (!targetNode) {
+            console.warn('[Collapse] Document body not found, observer not initialized');
             return;
         }
-        
-        console.log('Found results element:', resultsElement);
 
         this.observer = new MutationObserver((mutations) => {
-            console.log('Mutation detected:', mutations.length, 'changes');
             mutations.forEach((mutation) => {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    console.log('Processing', mutation.addedNodes.length, 'added nodes');
-                    
+                if (mutation.type === 'childList') {
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE) {
-                            // Log the node being checked and its HTML
-                            console.log('Checking node:', node);
-                            console.log('Node HTML:', node.outerHTML);
+                            // Look for facet group controls
+                            const facetButtons = node.querySelectorAll('[data-component="facet-group-control"]');
+                            console.log('[Collapse] Found facet buttons:', facetButtons.length);
                             
-                            // Log all buttons found in document for debugging
-                            const allButtons = document.querySelectorAll('.collapse__button');
-                            console.log('Total collapse buttons in document:', allButtons.length);
-                            
-                            // First, check if this node itself is a collapse button
-                            if (node.classList) {
-                                console.log('Node classes:', node.classList);
-                                if (node.classList.contains('collapse__button')) {
-                                    if (!node.hasAttribute('data-collapse-initialized')) {
-                                        console.log('Initializing direct collapse button:', node);
-                                        this.initializeCollapse(node);
-                                    }
-                                }
-                            }
-
-                            // Then check its children with more detailed logging
-                            console.log('Checking for .collapse__button in children of:', node.tagName);
-                            const buttons = node.querySelectorAll('.collapse__button');
-                            console.log('Found buttons (before initialization check):', buttons.length);
-                            
-                            const uninitializedButtons = node.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
-                            console.log('Found uninitialized buttons:', uninitializedButtons.length);
-                            
-                            if (uninitializedButtons.length > 0) {
-                                console.log('Button details:');
-                                uninitializedButtons.forEach(button => {
-                                    console.log('- Button HTML:', button.outerHTML);
-                                    console.log('- Button classes:', button.classList);
-                                    console.log('- Button initialized:', button.hasAttribute('data-collapse-initialized'));
+                            facetButtons.forEach(button => {
+                                if (!button.hasAttribute('data-collapse-initialized')) {
                                     this.initializeCollapse(button);
-                                });
-                            }
+                                }
+                            });
+                            
+                            // Also look for the collapse-all button
+                            const collapseAllButtons = node.querySelectorAll('[data-component="collapse-all"]');
+                            console.log('[Collapse] Found collapse-all buttons:', collapseAllButtons.length);
+                            
+                            collapseAllButtons.forEach(button => {
+                                if (!button.hasAttribute('data-collapse-initialized')) {
+                                    this.initializeCollapse(button);
+                                }
+                            });
                         }
                     });
                 }
@@ -89,63 +69,72 @@ class Collapse {
         };
 
         // Start observing
-        this.observer.observe(resultsElement, config);
-        console.log('Observer started watching results element');
+        this.observer.observe(targetNode, config);
+        console.log('[Collapse] Observer started');
+        
+        // Check for existing buttons
+        this.initializeExistingButtons();
+    }
+    
+    initializeExistingButtons() {
+        // Initialize any existing facet buttons
+        const existingFacetButtons = document.querySelectorAll('[data-component="facet-group-control"]:not([data-collapse-initialized])');
+        console.log('[Collapse] Found existing facet buttons:', existingFacetButtons.length);
+        
+        existingFacetButtons.forEach(button => {
+            this.initializeCollapse(button);
+        });
+        
+        // Initialize any existing collapse-all buttons
+        const existingCollapseAllButtons = document.querySelectorAll('[data-component="collapse-all"]:not([data-collapse-initialized])');
+        console.log('[Collapse] Found existing collapse-all buttons:', existingCollapseAllButtons.length);
+        
+        existingCollapseAllButtons.forEach(button => {
+            this.initializeCollapse(button);
+        });
     }
 
-    initializeCollapse(collapseButton) {
-        console.log('Initializing collapse for button:', collapseButton);
+    initializeCollapse(button) {
+        console.log('[Collapse] Initializing button:', button);
         
-        // Mark as initialized first to prevent duplicate initialization
-        collapseButton.setAttribute('data-collapse-initialized', 'true');
+        // Mark as initialized
+        button.setAttribute('data-collapse-initialized', 'true');
         
-        const collapseContent = collapseButton.nextElementSibling;
+        // Find the associated content based on data-component
+        let content;
+        if (button.getAttribute('data-component') === 'collapse-all') {
+            content = button.closest('.facet').querySelector('[data-component="facet-group-content"]');
+        } else {
+            content = button.nextElementSibling;
+        }
         
-        if (!collapseContent || !collapseContent.classList.contains('collapse__content')) {
-            console.warn('No valid collapse content found for button:', collapseButton);
+        if (!content) {
+            console.warn('[Collapse] No content found for button:', button);
             return;
         }
         
-        console.log('Found collapse content:', collapseContent);
-
         // Setup collapse instance
-        collapseButton.collapse = new Collapse();
+        button.collapse = new Collapse();
         
-        console.log('Adding click event listener to button');
-        // Add the event listener to the button
-        collapseButton.addEventListener('click', collapseButton.collapse.toggleOpenState);
+        console.log('[Collapse] Adding click event listener');
+        button.addEventListener('click', button.collapse.toggleOpenState);
 
-        const { collapse } = collapseButton;
+        const { collapse } = button;
         
-        // Flag to check if we are opening on page load
-        const openByDefault = collapseContent.classList.contains('collapse__content--open');
-        console.log('Open by default:', openByDefault);
-
-        // Set the collapse button
-        collapse.collapseButton = collapseButton;
-
-        // Set the collapse content
-        collapse.collapseContent = collapseContent;
-
-        // Set the collapse button open class
-        collapse.buttonActiveClass = 'collapse__button--open';
-
-        // Set the collapse content open class
-        collapse.contentOpenClass = 'collapse__content--open';
-
-        // Set the collapse expanding class string
-        collapse.contentExpandingClass = 'collapse__content--expanding';
-
-        // Set the collapse collapsing class string
-        collapse.contentCollapsingClass = 'collapse__content--collapsing';
-
-        // Set if the item should transition or just toggle state
+        // Check if open by default
+        const openByDefault = button.classList.contains('facet-group__title--open');
+        
+        // Set up the collapse properties
+        collapse.collapseButton = button;
+        collapse.collapseContent = content;
+        collapse.buttonActiveClass = 'facet-group__title--open';
+        collapse.contentOpenClass = 'facet-group__list--open';
+        collapse.contentExpandingClass = 'facet-group__list--expanding';
+        collapse.contentCollapsingClass = 'facet-group__list--collapsing';
         collapse.shouldAnimate = true;
 
         // Initialize state
-        console.log('Setting initial state');
         openByDefault ? collapse.openElement() : collapse.closeElement();
-        console.log('Collapse initialization complete');
     }
 
     /**
