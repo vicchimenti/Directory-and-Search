@@ -132,12 +132,14 @@ class Collapse {
         // Add icons for open/closed states
         toggleButton.innerHTML = `
             <svg class="tab-group__icon tab-group__icon--closed">
-                <use href="#add">Show Filters</use>
+                <use href="#add"></use>
             </svg>
             <svg class="tab-group__icon tab-group__icon--open">
-                <use href="#subtract">Hide Filters</use>
+                <use href="#subtract"></use>
             </svg>
-            <span class="sr-only">Toggle tab group visibility</span>
+            <span class="tab-group__text tab-group__text--show">Show Filters</span>
+            <span class="tab-group__text tab-group__text--hide">Hide Filters</span>
+            <span class="sr-only">Toggle filters visibility</span>
         `;
 
         // Find the tab list nav
