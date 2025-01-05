@@ -9064,6 +9064,23 @@ audio,canvas,iframe,img,svg,video {
     display: block;
 }
 
+/* Show/Hide text based on expanded state */
+.tab-group__text--show {
+    display: none;
+}
+
+.tab-group__text--hide {
+    display: inline;
+}
+
+.tab-group__toggle[aria-expanded="false"] .tab-group__text--show {
+    display: inline;
+}
+
+.tab-group__toggle[aria-expanded="false"] .tab-group__text--hide {
+    display: none;
+}
+
 img {
     max-width: 100%
 }
