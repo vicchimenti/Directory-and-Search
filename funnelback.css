@@ -16331,7 +16331,7 @@ html {
     margin:0;
 }
 .listing-item--people .listing-item__tag:before {
-    content:",";
+    content:" | ";
 }
 .listing-item--people .listing-item__tag:first-child:before {
     content:none;
