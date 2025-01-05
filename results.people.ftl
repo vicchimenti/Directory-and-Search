@@ -58,21 +58,21 @@
             <#-- Title -->
             <#if (result.title)!?has_content>
                 <div class="listing-item__header">
-                    <a 
+
+                    <h3 class="listing-item__title h4 funderline">
+                        <a 
                         href="${result.clickTrackingUrl!}" 
                         data-live-url="${result.liveUrl}" 
                         title="${(result.listMetadata["peopleFirstName"]?first)!} ${(result.listMetadata["peopleLastName"]?first)!}"
                         class="listing-item__title-link"
                         target="_blank"
                     >
-                        <h3 class="listing-item__title h4 funderline">
-                            <@s.boldicize>
-                                <@s.Truncate length=90>
-                                  ${(result.listMetadata["t"]?first)!}
-                                </@s.Truncate>
-                            </@s.boldicize>
-                        </h3>
-                    </a>
+                            <@s.Truncate length=90>
+                                ${(result.listMetadata["t"]?first)!}
+                            </@s.Truncate>
+                        </a>    
+                    </h3>
+
 
                     <#--  Subtitle -->
                     <#if (result.listMetadata["peoplePosition"]?first)!?has_content>
