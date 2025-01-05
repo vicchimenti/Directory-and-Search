@@ -4,9 +4,8 @@
  */
 class Collapse {
     constructor() {
-
         console.log('Collapse class instantiated');
-
+        
         // Existing constructor bindings
         this.toggleOpenState = this.toggleOpenState.bind(this);
         this.openElement = this.openElement.bind(this);
@@ -23,40 +22,55 @@ class Collapse {
     }
 
     setupObserver() {
-
-        console.log('Setting up collapse scope observer...');
+        console.log('Setting up observer...');
         const resultsElement = document.getElementById('results');
         
         if (!resultsElement) {
             console.warn('Results element not found, observer not initialized');
             return;
         }
-
+        
         console.log('Found results element:', resultsElement);
 
-
         this.observer = new MutationObserver((mutations) => {
-
             console.log('Mutation detected:', mutations.length, 'changes');
-
+            
             mutations.forEach((mutation) => {
-
                 console.log('Mutation type:', mutation.type);
                 console.log('Added nodes:', mutation.addedNodes.length);
                 console.log('Removed nodes:', mutation.removedNodes.length);
-
+                
                 if (mutation.type === 'childList') {
-
-
-                    // Look for new collapse buttons that haven't been initialized
-                    const newCollapseButtons = document.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
-                    console.log('Found new collapse buttons:', newCollapseButtons.length);
-
-
+                    // Check each added node for collapse buttons
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            console.log('Checking added node:', node);
+                            
+                            // Check if the node itself is a collapse button
+                            if (node.classList && node.classList.contains('collapse__button')) {
+                                console.log('Found collapse button in direct node:', node);
+                                if (!node.hasAttribute('data-collapse-initialized')) {
+                                    this.initializeCollapse(node);
+                                }
+                            }
+                            
+                            // Check children of the added node for collapse buttons
+                            const buttonsInNode = node.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
+                            console.log('Found buttons in node children:', buttonsInNode.length);
+                            
+                            buttonsInNode.forEach(button => {
+                                console.log('Processing nested button:', button);
+                                if (!button.hasAttribute('data-collapse-initialized')) {
+                                    this.initializeCollapse(button);
+                                }
+                            });
+                        }
+                    });
+                    
                     newCollapseButtons.forEach(button => {
+                        console.log('Processing button:', button);
                         if (!button.collapse) {
                             console.log('Initializing new collapse button');
-
                             button.setAttribute('data-collapse-initialized', 'true');
                             this.initializeCollapse(button);
                         } else {
@@ -76,7 +90,6 @@ class Collapse {
         // Start observing
         this.observer.observe(resultsElement, config);
         console.log('Observer started watching results element');
-
     }
 
     initializeCollapse(collapseButton) {
