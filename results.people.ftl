@@ -90,14 +90,14 @@
             
             <#-- Body -->
             <div class="listing-item__body">
-                <#--  <#if (result.listMetadata["c"])!?has_content>  -->
+                <#if (result.listMetadata["c"])!?has_content>
                     <#-- Summary -->
-                    <#--  <div class="listing-item__summary">
+                    <div class="listing-item__summary">
                         <@s.boldicize>
                             ${result.listMetadata["c"]?first}
                         </@s.boldicize>
                     </div>
-                </#if>    -->
+                </#if>  
 
 
                 <#-- Metadata should as tags/pills -->        
