@@ -4,7 +4,6 @@
  */
 class Collapse {
     constructor() {
-        console.log('[Collapse] Class instantiated');
         
         // Existing constructor bindings
         this.toggleOpenState = this.toggleOpenState.bind(this);
@@ -22,8 +21,7 @@ class Collapse {
     }
 
     setupObserver() {
-        console.log('[Collapse] Setting up observer...');
-        
+          
         // Watch the entire document for facet additions
         const targetNode = document.body;
         
@@ -91,39 +89,34 @@ class Collapse {
 
         // Start observing
         this.observer.observe(targetNode, config);
-        console.log('[Collapse] Observer started');
         
         // Check for existing buttons
         this.initializeExistingButtons();
     }
     
     initializeExistingButtons() {
+
         // Initialize any existing facet buttons
-        const existingFacetButtons = document.querySelectorAll('[data-component="facet-group-control"]:not([data-collapse-initialized])');
-        console.log('[Collapse] Found existing facet buttons:', existingFacetButtons.length);
-        
+        const existingFacetButtons = document.querySelectorAll('[data-component="facet-group-control"]:not([data-collapse-initialized])');   
         existingFacetButtons.forEach(button => {
             this.initializeCollapse(button);
         });
         
         // Initialize any existing collapse-all buttons
-        const existingCollapseAllButtons = document.querySelectorAll('[data-component="collapse-all"]:not([data-collapse-initialized])');
-        console.log('[Collapse] Found existing collapse-all buttons:', existingCollapseAllButtons.length);
-        
+        const existingCollapseAllButtons = document.querySelectorAll('[data-component="collapse-all"]:not([data-collapse-initialized])');        
         existingCollapseAllButtons.forEach(button => {
             this.initializeCollapse(button);
         });
 
         // Initialize any existing show more buttons
-        const existingShowMoreButtons = document.querySelectorAll('[data-component="facet-group-show-more-button"]:not([data-collapse-initialized])');
-        console.log('[Collapse] Found existing show more buttons:', existingShowMoreButtons.length);
-        
+        const existingShowMoreButtons = document.querySelectorAll('[data-component="facet-group-show-more-button"]:not([data-collapse-initialized])'); 
         existingShowMoreButtons.forEach(button => {
             this.initializeShowMore(button);
         });
     }
 
     addToggleButtonsToTabGroups() {
+
         const tabGroups = document.querySelectorAll('.tabs--center');
         tabGroups.forEach(tabGroup => {
             this.addToggleButtonToTabGroup(tabGroup);
@@ -131,11 +124,10 @@ class Collapse {
     }
 
     addToggleButtonToTabGroup(tabGroup) {
+
         if (tabGroup.hasAttribute('data-toggle-initialized')) {
             return;
         }
-
-        console.log('[Collapse] Adding toggle button to tab group');
 
         // Create toggle button
         const toggleButton = document.createElement('button');
@@ -146,10 +138,10 @@ class Collapse {
         // Add icons for open/closed states
         toggleButton.innerHTML = `
             <svg class="tab-group__icon tab-group__icon--closed">
-                <use href="#add"></use>
+                <use href="#add">Show Filters</use>
             </svg>
             <svg class="tab-group__icon tab-group__icon--open">
-                <use href="#subtract"></use>
+                <use href="#subtract">Hide Filters</use>
             </svg>
             <span class="sr-only">Toggle tab group visibility</span>
         `;
@@ -185,7 +177,6 @@ class Collapse {
     }
 
     initializeShowMore(button) {
-        console.log('[Collapse] Initializing show more button:', button);
         
         // Mark as initialized
         button.setAttribute('data-collapse-initialized', 'true');
@@ -198,7 +189,6 @@ class Collapse {
         }
 
         button.addEventListener('click', () => {
-            console.log('[Collapse] Show more button clicked');
             
             // Find all hidden items
             const hiddenItems = facetGroup.querySelectorAll('.facet-group__list-item--hidden');
@@ -214,7 +204,6 @@ class Collapse {
     }
 
     initializeCollapse(button) {
-        console.log('[Collapse] Initializing button:', button);
         
         // Mark as initialized
         button.setAttribute('data-collapse-initialized', 'true');
@@ -233,11 +222,8 @@ class Collapse {
         }
         
         // Setup collapse instance
-        button.collapse = new Collapse();
-        
-        console.log('[Collapse] Adding click event listener');
+        button.collapse = new Collapse();        
         button.addEventListener('click', button.collapse.toggleOpenState);
-
         const { collapse } = button;
         
         // Check if open by default
@@ -380,32 +366,28 @@ class Collapse {
      * @method
      */
     toggleOpenState() {
-        console.log('Toggle open state called, current state:', this.isOpen);
+
         // Check if the modal is closed
         if (!this.isOpen) {
             // If the collapse should not animate between states
             if (!this.collapseShouldAnimate) {
-                console.log('Opening without animation');
                 // If it is currently closed open it
                 this.openElement();
             }
 
             // If the collapse should animate between states
             if (this.collapseShouldAnimate) {
-                console.log('Opening with animation');
                 this.transitionItemOpen();
             }
         } else {
             // If the collapse should not animate between states
             if (!this.collapseShouldAnimate) {
-                console.log('Closing without animation');
                 // If it is currently open, close it
                 this.closeElement();
             }
 
             // If the collapse should animate between states
             if (this.collapseShouldAnimate) {
-                console.log('Closing with animation');
                 this.transitionItemClosed();
             }
         }
@@ -416,6 +398,7 @@ class Collapse {
      * @method
      */
     transitionItemOpen() {
+
         const content = this.collapseContentElement;
         let called = false;
         this.transitionRunning = true;
@@ -541,5 +524,4 @@ class Collapse {
 }
 
 // Initialize
-console.log('[Collapse] Creating global instance');
 const fbGlobal = new Collapse();
