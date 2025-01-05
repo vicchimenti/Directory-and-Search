@@ -56,6 +56,16 @@ class Collapse {
                                     this.initializeCollapse(button);
                                 }
                             });
+
+                            // Look for show more buttons
+                            const showMoreButtons = node.querySelectorAll('[data-component="facet-group-show-more-button"]');
+                            console.log('[Collapse] Found show more buttons:', showMoreButtons.length);
+                            
+                            showMoreButtons.forEach(button => {
+                                if (!button.hasAttribute('data-collapse-initialized')) {
+                                    this.initializeShowMore(button);
+                                }
+                            });
                         }
                     });
                 }
@@ -91,6 +101,43 @@ class Collapse {
         
         existingCollapseAllButtons.forEach(button => {
             this.initializeCollapse(button);
+        });
+
+        // Initialize any existing show more buttons
+        const existingShowMoreButtons = document.querySelectorAll('[data-component="facet-group-show-more-button"]:not([data-collapse-initialized])');
+        console.log('[Collapse] Found existing show more buttons:', existingShowMoreButtons.length);
+        
+        existingShowMoreButtons.forEach(button => {
+            this.initializeShowMore(button);
+        });
+    }
+
+    initializeShowMore(button) {
+        console.log('[Collapse] Initializing show more button:', button);
+        
+        // Mark as initialized
+        button.setAttribute('data-collapse-initialized', 'true');
+        
+        // Find all hidden items in the parent facet group
+        const facetGroup = button.closest('.facet-group__list');
+        if (!facetGroup) {
+            console.warn('[Collapse] No parent facet group found for show more button');
+            return;
+        }
+
+        button.addEventListener('click', () => {
+            console.log('[Collapse] Show more button clicked');
+            
+            // Find all hidden items
+            const hiddenItems = facetGroup.querySelectorAll('.facet-group__list-item--hidden');
+            
+            // Toggle visibility of hidden items
+            hiddenItems.forEach(item => {
+                item.classList.remove('facet-group__list-item--hidden');
+            });
+            
+            // Hide the show more button after revealing items
+            button.style.display = 'none';
         });
     }
 
