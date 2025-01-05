@@ -19,15 +19,6 @@
 
     <#list facets![] as facet>
         <div class="tabs tabs--center">
-            <#--  <button type="button" class="btn btn-primary tab-group__toggle" aria-expanded="true">
-                <svg class="tab-group__icon tab-group__icon--closed">
-                    <use href="#add"></use>
-                </svg>
-                <svg class="tab-group__icon tab-group__icon--open">
-                    <use href="#subtract"></use>
-                </svg>
-                <span class="sr-only">Toggle tab group visibility</span>
-            </button>  -->
             <div class="tab__list" role="tablist">
                 <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
                     <#-- 
