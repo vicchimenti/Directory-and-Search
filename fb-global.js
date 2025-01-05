@@ -1,3 +1,46 @@
+// Enhanced Collapse Class with MutationObserver
+
+// First, create the observer setup
+const observeResults = () => {
+    const resultsElement = document.getElementById('results');
+    
+    if (!resultsElement) {
+        console.warn('Results element not found, waiting for it to be added');
+        return;
+    }
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                // Check if new collapse elements were added
+                const collapseExists = !!document.querySelector('.collapse__button');
+                if (collapseExists) {
+                    _init();
+                }
+            }
+        });
+    });
+
+    // Configuration for the observer
+    const config = {
+        childList: true,
+        subtree: true
+    };
+
+    // Start observing
+    observer.observe(resultsElement, config);
+};
+
+// Add observer initialization to your existing code
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the observer
+    observeResults();
+    
+    // Run initial _init
+    _init();
+});
+
+
 /**
  * The default module class for all the things that need to collapse / open
  * @class
@@ -350,6 +393,3 @@ function _init(shouldAnimate) {
 
 // Initialize
 const fbGlobal = new Collapse();
-
-_init();
-
