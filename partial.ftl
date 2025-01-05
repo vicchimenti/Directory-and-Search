@@ -141,4 +141,4 @@
     </div>
 </div>
 <#-- Stencil specific code such as the quickview and dropdowns -->
-<script type="text/javascript" src="https://${httpHost!}/s/resources/${question.collection.id}/${question.profile}/themes/stencils/js/main.js"></script>
+<#--  <script type="text/javascript" src="https://${httpHost!}/s/resources/${question.collection.id}/${question.profile}/themes/stencils/js/main.js"></script>  -->
