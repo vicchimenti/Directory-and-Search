@@ -47,9 +47,7 @@ class Collapse {
                             });
 
                             // Existing button checks...
-                            const facetButtons = node.querySelectorAll('[data-component="facet-group-control"]');
-                            console.log('[Collapse] Found facet buttons:', facetButtons.length);
-                            
+                            const facetButtons = node.querySelectorAll('[data-component="facet-group-control"]');                            
                             facetButtons.forEach(button => {
                                 if (!button.hasAttribute('data-collapse-initialized')) {
                                     this.initializeCollapse(button);
@@ -57,9 +55,7 @@ class Collapse {
                             });
                             
                             // Also look for the collapse-all button
-                            const collapseAllButtons = node.querySelectorAll('[data-component="collapse-all"]');
-                            console.log('[Collapse] Found collapse-all buttons:', collapseAllButtons.length);
-                            
+                            const collapseAllButtons = node.querySelectorAll('[data-component="collapse-all"]');                            
                             collapseAllButtons.forEach(button => {
                                 if (!button.hasAttribute('data-collapse-initialized')) {
                                     this.initializeCollapse(button);
@@ -67,9 +63,7 @@ class Collapse {
                             });
 
                             // Look for show more buttons
-                            const showMoreButtons = node.querySelectorAll('[data-component="facet-group-show-more-button"]');
-                            console.log('[Collapse] Found show more buttons:', showMoreButtons.length);
-                            
+                            const showMoreButtons = node.querySelectorAll('[data-component="facet-group-show-more-button"]');                           
                             showMoreButtons.forEach(button => {
                                 if (!button.hasAttribute('data-collapse-initialized')) {
                                     this.initializeShowMore(button);
