@@ -270,15 +270,12 @@ class Collapse {
      * @method
      */
     toggleOpenState() {
-
         console.log('Toggle open state called, current state:', this.isOpen);
-
         // Check if the modal is closed
         if (!this.isOpen) {
             // If the collapse should not animate between states
             if (!this.collapseShouldAnimate) {
                 console.log('Opening without animation');
-
                 // If it is currently closed open it
                 this.openElement();
             }
@@ -286,14 +283,12 @@ class Collapse {
             // If the collapse should animate between states
             if (this.collapseShouldAnimate) {
                 console.log('Opening with animation');
-
                 this.transitionItemOpen();
             }
         } else {
             // If the collapse should not animate between states
             if (!this.collapseShouldAnimate) {
                 console.log('Closing without animation');
-
                 // If it is currently open, close it
                 this.closeElement();
             }
@@ -301,7 +296,6 @@ class Collapse {
             // If the collapse should animate between states
             if (this.collapseShouldAnimate) {
                 console.log('Closing with animation');
-
                 this.transitionItemClosed();
             }
         }
