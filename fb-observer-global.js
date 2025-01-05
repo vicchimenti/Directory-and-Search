@@ -1,3 +1,7 @@
+/**
+ * The default module class for all the things that need to collapse / open
+ * @class
+ */
 class Collapse {
     constructor() {
         // Existing constructor bindings
