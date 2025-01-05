@@ -9039,6 +9039,24 @@ audio,canvas,iframe,img,svg,video {
     vertical-align: middle
 }
 
+/* Hide the closed icon by default when expanded */
+.tab-group__toggle[aria-expanded="true"] .tab-group__icon--closed {
+    display: none;
+}
+
+/* Hide the open icon by default when collapsed */
+.tab-group__toggle[aria-expanded="false"] .tab-group__icon--closed {
+    display: block;
+}
+
+.tab-group__toggle[aria-expanded="false"] .tab-group__icon--open {
+    display: none;
+}
+
+.tab-group__toggle[aria-expanded="true"] .tab-group__icon--open {
+    display: block;
+}
+
 img {
     max-width: 100%
 }
