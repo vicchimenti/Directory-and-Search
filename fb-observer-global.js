@@ -34,47 +34,32 @@ class Collapse {
 
         this.observer = new MutationObserver((mutations) => {
             console.log('Mutation detected:', mutations.length, 'changes');
-            
             mutations.forEach((mutation) => {
-                console.log('Mutation type:', mutation.type);
-                console.log('Added nodes:', mutation.addedNodes.length);
-                console.log('Removed nodes:', mutation.removedNodes.length);
-                
-                if (mutation.type === 'childList') {
-                    // Check each added node for collapse buttons
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    console.log('Processing', mutation.addedNodes.length, 'added nodes');
+                    
                     mutation.addedNodes.forEach(node => {
                         if (node.nodeType === Node.ELEMENT_NODE) {
-                            console.log('Checking added node:', node);
-                            
-                            // Check if the node itself is a collapse button
+                            // Log the node being checked
+                            console.log('Checking node:', node);
+
+                            // First, check if this node itself is a collapse button
                             if (node.classList && node.classList.contains('collapse__button')) {
-                                console.log('Found collapse button in direct node:', node);
                                 if (!node.hasAttribute('data-collapse-initialized')) {
+                                    console.log('Initializing direct collapse button:', node);
                                     this.initializeCollapse(node);
                                 }
                             }
-                            
-                            // Check children of the added node for collapse buttons
-                            const buttonsInNode = node.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
-                            console.log('Found buttons in node children:', buttonsInNode.length);
-                            
-                            buttonsInNode.forEach(button => {
-                                console.log('Processing nested button:', button);
-                                if (!button.hasAttribute('data-collapse-initialized')) {
+
+                            // Then check its children
+                            const buttons = node.querySelectorAll('.collapse__button:not([data-collapse-initialized])');
+                            if (buttons.length > 0) {
+                                console.log('Found', buttons.length, 'uninitiated collapse buttons in children');
+                                buttons.forEach(button => {
+                                    console.log('Initializing nested collapse button:', button);
                                     this.initializeCollapse(button);
-                                }
-                            });
-                        }
-                    });
-                    
-                    newCollapseButtons.forEach(button => {
-                        console.log('Processing button:', button);
-                        if (!button.collapse) {
-                            console.log('Initializing new collapse button');
-                            button.setAttribute('data-collapse-initialized', 'true');
-                            this.initializeCollapse(button);
-                        } else {
-                            console.log('Button already has collapse instance');
+                                });
+                            }
                         }
                     });
                 }
@@ -94,6 +79,10 @@ class Collapse {
 
     initializeCollapse(collapseButton) {
         console.log('Initializing collapse for button:', collapseButton);
+        
+        // Mark as initialized first to prevent duplicate initialization
+        collapseButton.setAttribute('data-collapse-initialized', 'true');
+        
         const collapseContent = collapseButton.nextElementSibling;
         
         if (!collapseContent || !collapseContent.classList.contains('collapse__content')) {
@@ -108,10 +97,7 @@ class Collapse {
         
         console.log('Adding click event listener to button');
         // Add the event listener to the button
-        collapseButton.addEventListener('click', (e) => {
-            console.log('Collapse button clicked:', e);
-            collapseButton.collapse.toggleOpenState();
-        });
+        collapseButton.addEventListener('click', collapseButton.collapse.toggleOpenState);
 
         const { collapse } = collapseButton;
         
