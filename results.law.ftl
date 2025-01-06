@@ -51,11 +51,11 @@
 <#macro GenericView result>
     <!-- results::GenericView -->
     <article class="listing-item listing-item--generic listing-item--background-grey10 listing-item--color-black dataListing lawData" data-fb-result="${(result.indexUrl)!}">
-        <#if (result.listMetadata["image"]?first)!?has_content>
+        <#--  <#if (result.listMetadata["image"]?first)!?has_content>
             <div class="listing-item__image-wrapper">
                 <img class="deferred listing-item__image" alt="Thumbnail for ${result.title!}" src="${result.listMetadata["image"]?first}" data-deferred-src="${result.listMetadata["image"]?first}"> 
             </div>  
-        </#if>
+        </#if>  -->
         <div class="listing-item__content">
             <#-- Title -->
             <#if (result.title)!?has_content>
