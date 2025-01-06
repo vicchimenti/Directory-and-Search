@@ -105,27 +105,12 @@
 
             <#-- Footer -->                    
             <div class="listing-item__footer">
-                {{#if metaData.courseTerm}} 
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Credits</title>
-                            <use href="#time">
-                            </use>
-                        </svg>
-                        {{metaData.courseTerm}}
-                    </div>
-                {{/if}} 
-
-                {{#if metaData.courseCampus}} 
-                    <div class="listing-item__footer-block listing-item__footer-block">
-                        <svg class="svg-icon listing-item__icon">
-                            <title>Campus</title>
-                            <use href="#map"></use>
-                        </svg>
-                        {{metaData.courseCampus}}
-                    </div> 
-                {{/if}} 
-            </div>    
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <p>
+                        School of Law
+                    </p>
+                </div>
+            </div>
 
         </div>
     </article>
