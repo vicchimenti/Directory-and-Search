@@ -53,7 +53,7 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js" defer></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.session-cart-0.1.js" defer></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.session-history-0.1.js" defer></script>
-        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js"></script>
+        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js" defer></script>
         <!-- End Partial Scripts -->
 
     </body>
