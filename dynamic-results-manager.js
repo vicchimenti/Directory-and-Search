@@ -310,7 +310,7 @@ class DynamicResultsManager {
         `;
 
         // Smooth scroll to results
-        document.getElementById('results').scrollIntoView({ 
+        document.getElementById('on-page-search-input').scrollIntoView({ 
             behavior: 'smooth',
             block: 'start'
         });
