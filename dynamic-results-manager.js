@@ -300,41 +300,23 @@ class DynamicResultsManager {
       console.log("e", e);
       
       const href = element.getAttribute('href');
-      
       if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No tab results found."}
-              </div>
-          `;
-  
-          // Smooth scroll to results
-          document.getElementById('results').scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'start'
-          });
+
+        const response = await this.fetchFunnelbackResults(href, 'GET');
+        document.getElementById('results').innerHTML = `
+            <div class="funnelback-search-container">
+                ${response || "No tab results found."}
+            </div>
+        `;
+
+        // Smooth scroll to results
+        document.getElementById('results').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
       }
-  }
+    }
     
-    // async handleClick(e, element) {
-    //     console.log("DynamicResultsManager: handleClick");
-    //     console.log("element", element);
-    //     console.log("e", e);
-
-    //     const href = element.getAttribute('href');
-    //     console.log("handleClick href:", href);
-
-    //     if (href) {
-    //         const response = await this.fetchFunnelbackResults(href, 'GET');
-    //         document.getElementById('results').innerHTML = `
-    //         <div class="funnelback-search-container">
-    //           ${response || "No tab results found."}
-    //         </div>
-    //       `;
-    //     }
-    // }
-
     async handleSpellingClick(e, element) {
 
         const href = element.getAttribute('href');
