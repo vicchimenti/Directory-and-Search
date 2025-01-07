@@ -55,6 +55,20 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.session-history-0.1.js" defer></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js" defer></script>
         <!-- End Partial Scripts -->
+        <script defer>
+            (function($) {
+                $('input.on-page-sq-search').autocompletion({
+                datasets: {
+                    organic: {
+                    collection: 'seattleu~sp-search',
+                    profile   : '_default',
+                    program   : 'https://dxp-us-search.funnelback.squiz.cloud/s/suggest.json',
+                    }
+                },
+                length: 3
+                });
+            })(jQuery);
+        </script>
 
     </body>
 </html>
