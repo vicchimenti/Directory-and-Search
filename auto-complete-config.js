@@ -10,4 +10,4 @@
       },
       length: 3
     });
-  })(jQuery);
+})(jQuery);
