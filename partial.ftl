@@ -21,6 +21,8 @@
     Global Stencils imports
     The namespace will be available in all templates which are imported 
 -->
+<#import "auto_complete.concierge.ftl" as concierge />
+<#import "auto_complete.ftl" as auto_complete />
 <#import "base.ftl" as base />
 <#import "hero_banner.ftl" as hero_banner />
 <#import "search_tools.ftl" as search_tools />
