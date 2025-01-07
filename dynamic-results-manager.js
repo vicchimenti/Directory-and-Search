@@ -317,23 +317,23 @@ class DynamicResultsManager {
       }
   }
     
-    async handleClick(e, element) {
-        console.log("DynamicResultsManager: handleClick");
-        console.log("element", element);
-        console.log("e", e);
+    // async handleClick(e, element) {
+    //     console.log("DynamicResultsManager: handleClick");
+    //     console.log("element", element);
+    //     console.log("e", e);
 
-        const href = element.getAttribute('href');
-        console.log("handleClick href:", href);
+    //     const href = element.getAttribute('href');
+    //     console.log("handleClick href:", href);
 
-        if (href) {
-            const response = await this.fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-            <div class="funnelback-search-container">
-              ${response || "No tab results found."}
-            </div>
-          `;
-        }
-    }
+    //     if (href) {
+    //         const response = await this.fetchFunnelbackResults(href, 'GET');
+    //         document.getElementById('results').innerHTML = `
+    //         <div class="funnelback-search-container">
+    //           ${response || "No tab results found."}
+    //         </div>
+    //       `;
+    //     }
+    // }
 
     async handleSpellingClick(e, element) {
 
