@@ -38,24 +38,18 @@
                             </#if>
                             <div class="listing-item__content">
                                 <div class="listing-item__header">
-                                    <h3 class="module-curator__title">
+                                    <span class="listing-item__promoted-tag">promoted</span>
+                                    <h3 class="module-curator__title funderline">
                                         <a href="${exhibit.linkUrl!}" class="listing-item__title-link">
                                             ${exhibit.titleHtml!}
                                         </a>
                                     </h3>
                                     
-                                    <#-- Output the display url which gives context to the curator result -->
-                                    <#if exhibit.displayUrl?? && exhibit.displayUrl != "-">
-                                        <cite class="listing-item__subtitle listing-item__subtitle--highlight">
-                                            ${exhibit.displayUrl}
-                                        </cite>
-                                    </#if>
                                 </div>                                    
                                 <div class="listing-item__body">
                                     <#-- Output the description -->
                                     <#if exhibit.descriptionHtml??>
                                         <div class="listing-item__summary">
-                                            <span class="listing-item__promoted-tag">promoted</span>
                                             ${exhibit.descriptionHtml?no_esc}
                                         </div>
                                     </#if>                            
