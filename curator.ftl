@@ -43,7 +43,6 @@
                                         <a 
                                             href="${exhibit.linkUrl!}"
                                             class="listing-item__title-link"
-                                            data-live-url="${result.liveUrl}" 
                                             title="${exhibit.titleHtml!}" 
                                             target="_blank"
                                         >
