@@ -104,13 +104,13 @@
 
 
             <#-- Footer -->                    
-            <div class="listing-item__footer">
+            <#--  <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <p>
                         School of Law
                     </p>
                 </div>
-            </div>
+            </div>  -->
 
         </div>
     </article>
