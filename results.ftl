@@ -111,9 +111,9 @@
             <#-- Footer -->                    
             <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
-                    <#if (result.listMetadata["affiliation"])!?has_content && (result.listMetadata["college"])!?has_content>
+                    <#if (result.title)!?has_content>
                         <p>
-                            ${(result.listMetadata["affiliation"]?first)!} | ${(result.listMetadata["college"]?first)!}
+                            ${result.title!}
                         </p>
                     </#if>
                 </div>
