@@ -103,7 +103,16 @@
             <@sessions.LastVisitedLink result=result/>
 
 
-            <#-- Footer -->                    
+            <#-- Footer -->
+            <div class="listing-item__footer">
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <#if (result.title)!?has_content>
+                        <p>
+                            ${result.title!}
+                        </p>
+                    </#if>
+                </div>
+            </div>                    
             <#--  <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <p>
