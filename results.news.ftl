@@ -122,7 +122,16 @@
             <#-- Display the time which this result has last been visited by the user -->
             <@sessions.LastVisitedLink result=result/> 
 
-            <#-- Footer -->                    
+            <#-- Footer -->
+            <div class="listing-item__footer">
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <#if (result.title)!?has_content>
+                        <p>
+                            ${result.title!}
+                        </p>
+                    </#if>
+                </div>
+            </div>                   
             <#--  <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <#if (result.listMetadata["type"])!?has_content && (result.listMetadata["department"])!?has_content>
