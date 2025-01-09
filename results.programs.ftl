@@ -93,7 +93,7 @@
             <@sessions.LastVisitedLink result=result/> 
 
             <#-- Footer -->                    
-            <div class="listing-item__footer">
+            <#--  <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <#if (result.listMetadata["category"])!?has_content && (result.listMetadata["provider"])!?has_content>
                         <p>
@@ -109,7 +109,7 @@
                         </p>
                     </#if>
                 </div>
-            </div>                                        
+            </div>                                          -->
         </div>
     </article>    
 </#macro>
