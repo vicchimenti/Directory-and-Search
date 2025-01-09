@@ -132,7 +132,7 @@
                     </#if>
                 </div>
             </div>                     -->
-            <#--  <div class="listing-item__footer">
+            <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <#if (result.listMetadata["type"])!?has_content && (result.listMetadata["department"])!?has_content>
                         <p>
@@ -142,9 +142,13 @@
                         <p>
                             ${(result.listMetadata["type"]?first)!}
                         </p>
+                    <#elseif (result.title)!?has_content>
+                        <p>
+                            ${result.title!}
+                        </p>
                     </#if>
                 </div>
-            </div>                                              -->
+            </div>                                            
         </div>
     </article>    
 </#macro>
