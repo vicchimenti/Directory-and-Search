@@ -108,6 +108,17 @@
             <#-- Display the time which this result has last been visited by the user -->
             <@sessions.LastVisitedLink result=result/> 
 
+            <#-- Footer -->                    
+            <div class="listing-item__footer">
+                <div class="listing-item__footer-block listing-item__footer-block">
+                    <#if (result.listMetadata["affiliation"])!?has_content && (result.listMetadata["college"])!?has_content>
+                        <p>
+                            ${(result.listMetadata["affiliation"]?first)!} | ${(result.listMetadata["college"]?first)!}
+                        </p>
+                    </#if>
+                </div>
+            </div> 
+
         </div>
     </article>
 </#macro>
