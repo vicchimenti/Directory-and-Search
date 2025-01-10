@@ -112,10 +112,22 @@
             <div class="listing-item__footer">
                 <div class="listing-item__footer-block listing-item__footer-block">
                     <#if (result.title)!?has_content>
+                        <#assign titleArray = result.title?split("|")>
+                        <#if titleArray?size gte 3>
+                            <#-- Remove first element by getting a sublist starting from index 1 -->
+                            <#assign titleArray = titleArray[1..]>
+                        </#if>
+                        <#list titleArray as titlePart>
+                            <p>
+                                ${titlePart?trim}
+                            </p>
+                        </#list>
+                    </#if>
+                    <#--  <#if (result.title)!?has_content>
                         <p>
                             ${result.title!}
                         </p>
-                    </#if>
+                    </#if>  -->
                 </div>
             </div> 
 
