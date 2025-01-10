@@ -118,7 +118,9 @@
                             <#assign titleArray = titleArray[1..]>
                         </#if>
                         <#list titleArray as titlePart>
-                            ${titlePart?trim}<#if titlePart_has_next> | </#if>
+                            <p>
+                                ${titlePart?trim}<#if titlePart_has_next> | </#if>
+                            </p>
                         </#list>
                         <#--  <#list titleArray as titlePart>
                             <p>
