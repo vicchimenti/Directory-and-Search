@@ -122,11 +122,6 @@
                                 ${titlePart?trim}<#if titlePart_has_next> | </#if>
                             </p>
                         </#list>
-                        <#--  <#list titleArray as titlePart>
-                            <p>
-                                ${titlePart!}
-                            </p>
-                        </#list>  -->
                     </#if>
                 </div>
             </div> 
