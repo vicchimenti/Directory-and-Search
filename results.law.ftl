@@ -70,17 +70,18 @@
                     >
                         <#if (result.listMetadata["lawTitle"])!?has_content>
                             <@s.Truncate length=90>
-                                ${(result.listMetadata["lawTitle"]?first)!} 
+                                ${(result.listMetadata["lawTitle"]?first)!} | School of Law
                             </@s.Truncate>
                         <#elseif (result.listMetadata["t"])!?has_content>
                             <@s.Truncate length=90>
-                                ${(result.listMetadata["t"]?first)!} 
+                                ${(result.listMetadata["t"]?first)!} | School of Law 
                             </@s.Truncate>
                         <#else>   
                             <@s.Truncate length=90>
-                                ${(result.title)!}
+                                ${(result.title)!} | School of Law
                             </@s.Truncate>
                         </#if>
+                        
                         </a>    
                     </h3>  
                 </div>
