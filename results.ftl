@@ -117,11 +117,11 @@
                             <#-- Remove first element by getting a sublist starting from index 1 -->
                             <#assign titleArray = titleArray[1..]>
                         </#if>
-                        <#list titleArray as titlePart>
-                            <p>
-                                ${titlePart?trim}<#if titlePart_has_next> | </#if>
-                            </p>
-                        </#list>
+                        <p>
+                            <#list titleArray as titlePart>
+                                ${titlePart?trim}<#if titlePart_has_next> | </#if>   
+                            </#list>
+                        </p>
                     </#if>
                 </div>
             </div> 
