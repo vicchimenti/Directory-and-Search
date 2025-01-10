@@ -118,10 +118,13 @@
                             <#assign titleArray = titleArray[1..]>
                         </#if>
                         <#list titleArray as titlePart>
+                            ${titlePart?trim}<#if titlePart_has_next> | </#if>
+                        </#list>
+                        <#--  <#list titleArray as titlePart>
                             <p>
                                 ${titlePart!}
                             </p>
-                        </#list>
+                        </#list>  -->
                     </#if>
                     <#--  <#if (result.title)!?has_content>
                         <p>
