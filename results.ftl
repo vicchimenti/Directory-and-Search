@@ -128,11 +128,6 @@
                             </p>
                         </#list>  -->
                     </#if>
-                    <#--  <#if (result.title)!?has_content>
-                        <p>
-                            ${result.title!}
-                        </p>
-                    </#if>  -->
                 </div>
             </div> 
 
