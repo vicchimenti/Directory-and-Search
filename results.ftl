@@ -119,7 +119,7 @@
                         </#if>
                         <#list titleArray as titlePart>
                             <p>
-                                ${titlePart?trim}
+                                ${titlePart!}
                             </p>
                         </#list>
                     </#if>
