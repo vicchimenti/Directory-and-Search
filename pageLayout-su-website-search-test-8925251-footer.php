@@ -62,7 +62,7 @@
         <!-- End Partial Scripts -->
 
         <script defer>
-            $('#input.on-page-sq-search').autocomple({
+            $('#input.on-page-sq-search').autocomplete({
                 alpha: '0.5',
                 show: '10',
                 sort: '0',
