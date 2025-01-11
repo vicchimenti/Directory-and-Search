@@ -54,35 +54,62 @@
 
         <!-- Partial Scripts -->
         <!-- <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/themes/stencils/js/main.js" defer></script> -->
-        <script src="https://dxp-us-admin.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/themes/stencils/js/main.js"></script>
+        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/themes/stencils/js/main.js"></script>
         
         <!-- <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js" defer></script> -->
-        <script src="https://dxp-us-admin.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js"></script>
+        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js"></script>
 
         <!-- <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js" defer></script> -->
-        <script src="https://dxp-us-admin.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
+        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
 
         <!-- <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js" defer></script> -->
         <!-- <script src="https://dxp-us-admin.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js"></script> -->
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion.js"></script>
         <!-- End Partial Scripts -->
+
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
         
 
         <script defer>
-            $('#input.on-page-sq-search').autocompletion({
-                alpha: '0.5',
-                show: '10',
-                sort: '0',
-                length: '3',
-                datasets: {
-                    organic: {
-                        name: 'Suggestions',
-                        collection: 'seattleu~sp-search',
-                        profile: '_default',
-                        program: 'https://dxp-us-search.funnelback.squiz.cloud/s/suggest.json',
-                        show: 10
-                    }
+            $(document).ready(function() {
+                // Add debounce/throttle to prevent too many requests
+                function debounce(func, wait) {
+                    let timeout;
+                    return function(...args) {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => func.apply(this, args), wait);
+                    };
                 }
+
+                $('#input.on-page-sq-search').autocomplete({
+                    minLength: 3,
+                    source: function(request, response) {
+                        const searchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+                        
+                        $.ajax({
+                            url: searchUrl,
+                            data: {
+                                query: request.term,
+                                collection: 'seattleu~sp-search',
+                                profile: '_default',
+                                form: 'partial'
+                            },
+                            success: function(data) {
+                                // Extract search suggestions from the response
+                                const suggestions = $(data)
+                                    .find('#result')
+                                    .map(function() {
+                                        return $(this).text().trim();
+                                    })
+                                    .get()
+                                    .slice(0, 10);  // Limit to 10 suggestions
+                                
+                                response(suggestions);
+                            }
+                        });
+                    }
+                });
             });
         </script>
 
