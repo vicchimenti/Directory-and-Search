@@ -60,6 +60,7 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.session-history-0.1.js" defer></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js" defer></script>
         <!-- End Partial Scripts -->
+        <script src="https://static.funnelback.com/v15.30.3862/js/jquery.autocompletion.js"></script>
 
         <script defer>
             $('#input.on-page-sq-search').autocomplete({
