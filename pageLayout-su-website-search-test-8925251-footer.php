@@ -39,6 +39,12 @@
         <!-- dynamic-results-manager.js -->
         <script src="<t4 type='media' id='9063951' formatter='path/*' />" defer></script>
         <!-- fb-global.js -->
+        <script src="<t4 type='media' id='9063951' formatter='path/*' />" defer></script>
+        <!-- fb-autocomplete.js -->
+        <script src="<t4 type='media' id='9063951' formatter='path/*' />" defer></script>
+        <!-- fb-react.js -->
+        <script src="<t4 type='media' id='9086597' formatter='path/*' />" defer></script>
+        <!-- fb-handlebars.js -->
 
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
@@ -55,6 +61,7 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.session-history-0.1.js" defer></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion-2.6.0.js" defer></script>
         <!-- End Partial Scripts -->
+
         <script defer>
             $('#input.on-page-sq-search').autocompletion({
             alpha: '0.5',
