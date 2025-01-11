@@ -44,6 +44,10 @@
         <!-- fb-react.js -->
         <script src="<t4 type='media' id='9086597' formatter='path/*' />" defer></script>
         <!-- fb-handlebars.js -->
+        <script src="<t4 type='media' id='9086604' formatter='path/*' />" defer></script>
+        <!-- custom-autocomplete.js -->
+
+        
 
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
