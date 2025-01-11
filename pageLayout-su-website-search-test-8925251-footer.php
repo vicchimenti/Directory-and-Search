@@ -63,7 +63,7 @@
         <script src="https://static.funnelback.com/v15.30.3862/js/jquery.autocompletion.js"></script>
 
         <script defer>
-            $('#input.on-page-sq-search').autocomplete({
+            $('#input.on-page-sq-search').autocompletion({
                 alpha: '0.5',
                 show: '10',
                 sort: '0',
