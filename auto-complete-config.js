@@ -19,7 +19,7 @@ const { name } = require("tar/lib/types");
     });
 })(jQuery);
 
-
+// example:
       window.addEventListener('load', function() {
         setupDeferredImages();
         setupFacetLessMoreButtons(6, '.search-facet');
