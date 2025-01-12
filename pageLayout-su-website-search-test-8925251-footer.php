@@ -65,7 +65,7 @@
                         name: 'Suggestions',
                         collection: 'seattleu~sp-search',
                         profile: '_default',
-                        program: 'hhttps://dxp-us-search.funnelback.squiz.cloud/s/suggest.html'
+                        program: 'https://dxp-us-search.funnelback.squiz.cloud/s/suggest.html'
                     }
                 }
             });
