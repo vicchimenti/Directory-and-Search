@@ -1,4 +1,3 @@
-// header-search.js
 class HeaderSearchManager {
     constructor() {
         this.setupHeaderSearch();
@@ -25,12 +24,16 @@ class HeaderSearchManager {
 
     handleHeaderSearch = async(event) => {
         event.preventDefault();
-        const searchQuery = document.getElementById('search-input')?.value;
+        const searchQuery = document.getElementById('search-button')?.value;
         
         if (!searchQuery?.trim()) {
             alert('Please enter a search term');
             return;
         }
+
+        // Add the IP to the request headers
+        const headers = new Headers();
+        headers.append('X-Forwarded-For', this.userIp);
 
         const redirectUrl = `/search-test/?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default`;
         window.location.href = redirectUrl;
