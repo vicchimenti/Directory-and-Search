@@ -63,7 +63,6 @@ class ResultsSearchManager {
             // Add Funnelback-specific headers and standard request headers
             const headers = {
                 'X-Forwarded-For': this.userIp || '',
-                'Client-IP': this.userIp || '',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Origin': 'https://www.seattleu.edu',
                 'X-Requested-With': 'XMLHttpRequest'
