@@ -24,7 +24,7 @@ class HeaderSearchManager {
 
     handleHeaderSearch = async(event) => {
         event.preventDefault();
-        const searchQuery = document.getElementById('search-button')?.value;
+        const searchQuery = document.getElementById('search-input')?.value;
         
         if (!searchQuery?.trim()) {
             alert('Please enter a search term');
