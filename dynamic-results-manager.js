@@ -156,7 +156,7 @@ class DynamicResultsManager {
             method,
             headers: {
               'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-              // 'X-Forwarded-For': userIp,
+              'X-Forwarded-For': this.userIp,
             },
           };
       
@@ -204,7 +204,7 @@ class DynamicResultsManager {
             method,
             headers: {
             'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-            // 'X-Forwarded-For': userIp,
+            'X-Forwarded-For': this.userIp,
             },
         };
     
@@ -254,7 +254,7 @@ class DynamicResultsManager {
             method,
             headers: {
               'Content-Type': method === 'POST' ? 'text/plain' : 'application/json',
-              // 'X-Forwarded-For': userIp,
+              'X-Forwarded-For': this.userIp,
             },
           };
       

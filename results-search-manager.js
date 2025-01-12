@@ -1,10 +1,11 @@
-// results-search.js
 class ResultsSearchManager {
     constructor() {
+        this.userIp = null;
         if (window.location.pathname.includes('search-test')) {
-            this.initializeIP();
-            this.setupResultsSearch();
-            this.handleURLParameters();
+            this.initializeIP().then(() => {
+                this.setupResultsSearch();
+                this.handleURLParameters();
+            });
         }
     }
 
@@ -58,7 +59,22 @@ class ResultsSearchManager {
         
         try {
             const url = `${prodOnPageSearchUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
-            const response = await fetch(url);
+            
+            // Add Funnelback-specific headers and standard request headers
+            const headers = {
+                'X-Forwarded-For': this.userIp || '',
+                'Client-IP': this.userIp || '',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            };
+
+            const response = await fetch(url, {
+                headers: headers
+            });
+
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
             const text = await response.text();
