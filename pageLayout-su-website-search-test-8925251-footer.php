@@ -63,9 +63,7 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion.js"></script>
         <!-- End Partial Scripts -->
 
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-        
+
 
         <script defer>
             $(document).ready(function() {
