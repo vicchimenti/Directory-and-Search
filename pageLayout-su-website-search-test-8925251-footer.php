@@ -37,10 +37,7 @@
         <script src="<t4 type='media' id='9017309' formatter='path/*' />" defer></script>
         <!-- dynamic-results-manager.js -->
         <script src="<t4 type='media' id='9063951' formatter='path/*' />" defer></script>
-        <!-- fb-global-collapse.js -->
-
-
-        
+        <!-- fb-global-collapse.js -->       
 
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
@@ -58,45 +55,21 @@
 
 
 
-        <script defer>
-            $(document).ready(function() {
-                // Add debounce/throttle to prevent too many requests
-                function debounce(func, wait) {
-                    let timeout;
-                    return function(...args) {
-                        clearTimeout(timeout);
-                        timeout = setTimeout(() => func.apply(this, args), wait);
-                    };
-                }
-
-                $('#input.on-page-sq-search').autocomplete({
-                    minLength: 3,
-                    source: function(request, response) {
-                        const searchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-                        
-                        $.ajax({
-                            url: searchUrl,
-                            data: {
-                                query: request.term,
-                                collection: 'seattleu~sp-search',
-                                profile: '_default',
-                                form: 'partial'
-                            },
-                            success: function(data) {
-                                // Extract search suggestions from the response
-                                const suggestions = $(data)
-                                    .find('#result')
-                                    .map(function() {
-                                        return $(this).text().trim();
-                                    })
-                                    .get()
-                                    .slice(0, 10);  // Limit to 10 suggestions
-                                
-                                response(suggestions);
-                            }
-                        });
+        <script>
+            $('#input.on-page-sq-search').autocompletion({
+                alpha: '0.5',
+                show: '10',
+                sort: '0',
+                length: '3',
+                datasets: {
+                    organic: {
+                        name: 'Suggestions',
+                        collection: 'seattleu~sp-search',
+                        profile: '_default',
+                        program: 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
+                        show: 10
                     }
-                });
+                }
             });
         </script>
 
