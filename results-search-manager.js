@@ -65,10 +65,8 @@ class ResultsSearchManager {
                 'X-Forwarded-For': this.userIp || '',
                 'Client-IP': this.userIp || '',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-Requested-With': 'XMLHttpRequest',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
+                'Origin': 'https://www.seattleu.edu',
+                'X-Requested-With': 'XMLHttpRequest'
             };
 
             const response = await fetch(url, {
