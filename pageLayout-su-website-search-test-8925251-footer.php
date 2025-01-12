@@ -38,14 +38,7 @@
         <!-- dynamic-results-manager.js -->
         <script src="<t4 type='media' id='9063951' formatter='path/*' />" defer></script>
         <!-- fb-global.js -->
-        <script src="<t4 type='media' id='9086594' formatter='path/*' />" defer></script>
-        <!-- fb-autocomplete.js -->
-        <script src="<t4 type='media' id='9086596' formatter='path/*' />" defer></script>
-        <!-- fb-react.js -->
-        <script src="<t4 type='media' id='9086597' formatter='path/*' />" defer></script>
-        <!-- fb-handlebars.js -->
-        <script src="<t4 type='media' id='9086604' formatter='path/*' />" defer></script>
-        <!-- custom-autocomplete.js -->
+
 
         
 
