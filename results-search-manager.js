@@ -64,8 +64,7 @@ class ResultsSearchManager {
             const headers = {
                 'X-Forwarded-For': this.userIp || '',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Origin': 'https://www.seattleu.edu',
-                'X-Requested-With': 'XMLHttpRequest'
+                'Origin': 'https://www.seattleu.edu/search-test'
             };
 
             const response = await fetch(url, {
