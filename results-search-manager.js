@@ -1,23 +1,8 @@
 class ResultsSearchManager {
     constructor() {
-        this.userIp = null;
         if (window.location.pathname.includes('search-test')) {
-            this.initializeIP().then(() => {
-                this.setupResultsSearch();
-                this.handleURLParameters();
-            });
-        }
-    }
-
-    async initializeIP() {
-        try {
-            let response = await fetch('https://api.ipify.org?format=json');
-            let data = await response.json();
-            this.userIp = data.ip;
-            console.log("userip: " + this.userIp);
-        } catch (error) {
-            console.error('Error fetching IP address:', error);
-            this.userIp = '';
+            this.setupResultsSearch();
+            this.handleURLParameters();
         }
     }
 
@@ -55,22 +40,20 @@ class ResultsSearchManager {
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
 
+        // Current Funnelback URL - will be replaced with T4 wrapper endpoint
         const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         
+        // Future T4 wrapper endpoint - uncomment when available
+        // const wrapperUrl = '/searchwrapper'; // Update with actual T4 API Gateway URL
+        
         try {
+            // Current URL construction - will be replaced with T4 wrapper
             const url = `${prodOnPageSearchUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
             
-            // Add Funnelback-specific headers and standard request headers
-            const headers = {
-                'X-Forwarded-For': this.userIp || '',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Origin': 'https://www.seattleu.edu/search-test'
-            };
-
-            const response = await fetch(url, {
-                headers: headers
-            });
-
+            // Future T4 wrapper URL construction - uncomment when available
+            // const url = `${wrapperUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
+            
+            const response = await fetch(url);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
             const text = await response.text();
