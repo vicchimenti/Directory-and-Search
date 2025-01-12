@@ -53,8 +53,7 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/funnelback.autocompletion.js"></script>
         <!-- End Partial Scripts -->
 
-
-
+        <!-- jquery autocompletion script -->
         <script>
             $('#input.on-page-sq-search').autocompletion({
                 alpha: '0.5',
@@ -66,8 +65,7 @@
                         name: 'Suggestions',
                         collection: 'seattleu~sp-search',
                         profile: '_default',
-                        program: 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
-                        show: 10
+                        program: 'hhttps://dxp-us-search.funnelback.squiz.cloud/s/suggest.html'
                     }
                 }
             });
