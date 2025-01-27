@@ -52,23 +52,6 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
         <!-- End Partial Scripts -->
 
-        <!-- jquery autocompletion script -->
-        <script>
-            $('#input.on-page-sq-search').autocompletion({
-                alpha: '0.5',
-                show: '10',
-                sort: '0',
-                length: '3',
-                datasets: {
-                    organic: {
-                        name: 'Suggestions',
-                        collection: 'seattleu~sp-search',
-                        profile: '_default',
-                        program: 'https://dxp-us-search.funnelback.squiz.cloud/s/suggest.html'
-                    }
-                }
-            });
-        </script>
 
     </body>
 </html>
