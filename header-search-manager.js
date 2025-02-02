@@ -21,7 +21,7 @@
  * - results-search-manager.js: Handles the actual Funnelback API calls
  * 
  * @author Victor Chimenti
- * @version 1.1.2
+ * @version 1.1.3
  * @lastModified 2025-02-02
  */
 
