@@ -1,18 +1,23 @@
-# Enable rewrite engine
+# Enable rewrite engine and headers module
 RewriteEngine On
+Options +FollowSymLinks
 
-# Allow CORS for Funnelback
+# CORS Headers for Funnelback
 <IfModule mod_headers.c>
-    # Only allow Funnelback domains
-    SetEnvIf Origin "^https://dxp-us-search\.funnelback\.squiz\.cloud$" ALLOW_ORIGIN=$0
-    Header set Access-Control-Allow-Origin %{ALLOW_ORIGIN}e env=ALLOW_ORIGIN
-    
-    # Set headers for preflight requests
-    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-    Header set Access-Control-Allow-Headers "X-Forwarded-For, Content-Type, Origin"
+    # Set headers for specific Funnelback domain
+    SetEnvIfNoCase Origin "^https://dxp-us-search\.funnelback\.squiz\.cloud$" ALLOW_ORIGIN=$0
+    Header set Access-Control-Allow-Origin "https://dxp-us-search.funnelback.squiz.cloud" env=ALLOW_ORIGIN
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD"
+    Header set Access-Control-Allow-Headers "DNT,X-Forwarded-For,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range"
+    Header set Access-Control-Expose-Headers "X-Forwarded-For"
     Header set Access-Control-Allow-Credentials "true"
+    Header set Access-Control-Max-Age "1728000"
     
-    # Handle OPTIONS preflight requests
+    # Handle OPTIONS method
     RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^(.*)$ $1 [R=200,L]
+    RewriteRule ^(.*)$ $1 [R=200,L,E=HTTP_ORIGIN:%{HTTP:ORIGIN}]
 </IfModule>
+
+# If the request is for OPTIONS method, return immediately with 200
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule .* / [R=200,L]
