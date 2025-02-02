@@ -26,7 +26,7 @@
  * Related Files:
  * - results-search-manager.js: Handles main search functionality
  * - header-search-manager.js: Handles initial search and redirects
- * - ip-service.js: Provides IP address headers for Funnelback
+ * - IPService.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
  * @version 1.1.2
