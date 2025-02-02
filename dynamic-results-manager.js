@@ -1,296 +1,436 @@
+/**
+ * @fileoverview Dynamic Results Manager for Funnelback Search Integration
+ * 
+ * This class manages dynamic content updates for search results, handling various
+ * user interactions like facet selection, tab changes, and pagination. It uses
+ * a MutationObserver to maintain functionality as content updates dynamically.
+ * 
+ * Features:
+ * - Manages dynamic content updates via MutationObserver
+ * - Handles multiple types of search result interactions
+ * - Maintains event listeners across dynamic content changes
+ * - Integrates with Funnelback search API including required IP headers
+ * 
+ * Dependencies:
+ * - Requires IPService for Funnelback headers
+ * - Requires DOM element with ID 'results'
+ * - Requires various interactive elements with specific classes:
+ *   - .facet-group__list
+ *   - .tab-list__nav
+ *   - .search-tools__button-group
+ *   - .facet-group__clear
+ *   - .facet-breadcrumb__link
+ *   - .pagination__link
+ *   etc.
+ * 
+ * Related Files:
+ * - results-search-manager.js: Handles main search functionality
+ * - header-search-manager.js: Handles initial search and redirects
+ * - ip-service.js: Provides IP address headers for Funnelback
+ * 
+ * @author [Your Name]
+ * @version 1.0.0
+ * @lastModified 2025-02-02
+ */
+
+import ipService from './ip-service.js';
+
 class DynamicResultsManager {
-  constructor() {
-      this.observerConfig = {
-          childList: true,
-          subtree: true
-      };
-      
-      if (window.location.pathname.includes('search-test')) {
-          this.initializeObserver();
-          
-          // Wait for DOM to be ready
-          if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', () => {
-                  this.setupDynamicListeners();
-                  this.startObserving();
-              });
-          } else {
-              this.setupDynamicListeners();
-              this.startObserving();
-          }
-      }
-  }
+    /**
+     * Initializes the Dynamic Results Manager.
+     * Sets up mutation observer and event listeners if on search test page.
+     */
+    constructor() {
+        this.observerConfig = {
+            childList: true,
+            subtree: true
+        };
+        
+        if (window.location.pathname.includes('search-test')) {
+            this.#initializeObserver();
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    this.#setupDynamicListeners();
+                    this.#startObserving();
+                });
+            } else {
+                this.#setupDynamicListeners();
+                this.#startObserving();
+            }
+        }
+    }
 
-  initializeObserver() {
-      this.observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-              if (mutation.type === 'childList') {
-                  // Re-attach event listeners to new content
-                  this.attachEventListenersToNewContent(mutation.addedNodes);
-              }
-          });
-      });
-  }
+    /**
+     * Initializes the MutationObserver to watch for DOM changes.
+     * 
+     * @private
+     */
+    #initializeObserver() {
+        this.observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    this.#attachEventListenersToNewContent(mutation.addedNodes);
+                }
+            });
+        });
+    }
 
-  startObserving() {
-      const resultsContainer = document.getElementById('results');
-      if (resultsContainer) {
-          this.observer.observe(resultsContainer, this.observerConfig);
-          console.log('Observer started watching results container');
-      } else {
-          console.warn('Results container not found, waiting for it to appear');
-          this.waitForResultsContainer();
-      }
-  }
+    /**
+     * Starts observing the results container for changes.
+     * 
+     * @private
+     */
+    #startObserving() {
+        const resultsContainer = document.getElementById('results');
+        if (resultsContainer) {
+            this.observer.observe(resultsContainer, this.observerConfig);
+            console.log('Observer started watching results container');
+        } else {
+            console.warn('Results container not found, waiting for it to appear');
+            this.#waitForResultsContainer();
+        }
+    }
 
-  waitForResultsContainer() {
-      const bodyObserver = new MutationObserver((mutations, obs) => {
-          const resultsContainer = document.getElementById('results');
-          if (resultsContainer) {
-              obs.disconnect();
-              this.observer.observe(resultsContainer, this.observerConfig);
-              console.log('Results container found and observer started');
-          }
-      });
+    /**
+     * Waits for the results container to appear in the DOM.
+     * 
+     * @private
+     */
+    #waitForResultsContainer() {
+        const bodyObserver = new MutationObserver((mutations, obs) => {
+            const resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                obs.disconnect();
+                this.observer.observe(resultsContainer, this.observerConfig);
+                console.log('Results container found and observer started');
+            }
+        });
 
-      bodyObserver.observe(document.body, {
-          childList: true,
-          subtree: true
-      });
-  }
+        bodyObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
 
-  attachEventListenersToNewContent(nodes) {
-      if (!nodes?.length) return;
-  
-      nodes.forEach(node => {
-          if (node?.nodeType === Node.ELEMENT_NODE) {
-              const elements = node.querySelectorAll([
-                  '.facet-group__list a',
-                  '.tab-list__nav a', 
-                  '.search-tools__button-group a',
-                  'a.facet-group__clear',
-                  '.facet-breadcrumb__link',
-                  '.facet-breadcrumb__item',
-                  'a.related-links__link',
-                  '.query-blending__highlight',
-                  '.search-spelling-suggestions__link',
-                  'a.pagination__link'
-              ].join(', '));
-  
-              elements.forEach(element => {
-                  if (element) {
-                      element.removeEventListener('click', this.handleDynamicClick);
-                      element.addEventListener('click', this.handleDynamicClick);
-                  }
-              });
-          }
-      });
-  }
-
-  setupDynamicListeners() {
-      console.log("DynamicResultsManager: setupDynamicListeners");
-      // Use document as the listener since content is dynamic
-      document.removeEventListener('click', this.handleDynamicClick);
-      document.addEventListener('click', this.handleDynamicClick);
-  }
-
-  handleDynamicClick = async(e) => {
-      try {
-          const handlers = {
-              '.facet-group__list a': this.handleFacetAnchor,
-              '.tab-list__nav a': this.handleTab,
-              '.search-tools__button-group a': this.handleSearchTools,
-              'a.facet-group__clear': this.handleClearFacet,
-              '.facet-breadcrumb__link': this.handleClearFacet,
-              '.facet-breadcrumb__item': this.handleClearFacet,
-              'a.related-links__link': this.handleClick,
-              '.query-blending__highlight': this.handleClick,
-              '.search-spelling-suggestions__link': this.handleSpellingClick,
-              'a.pagination__link': this.handleClick
-          };
-
-          for (const [selector, handler] of Object.entries(handlers)) {
-              const matchedElement = e.target.closest(selector);
-              if (matchedElement) {
-                  e.preventDefault();
-                  console.log("DynamicResultsManager: handleDynamicClick");
-                  console.log("element", matchedElement);
-                  console.log("e", e);
-                  await handler.call(this, e, matchedElement);
-                  break;
-              }
-          }
-      } catch (error) {
-          console.warn('Error in handleDynamicClick:', error);
-      }
-  }
-
-  // result fetchers
-  async fetchFunnelbackResults(url, method) {
-      let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-      // Future T4 wrapper endpoint - uncomment when available
-      // let prodTabUrl = '/searchwrapper';
+    /**
+     * Attaches event listeners to newly added content.
+     * 
+     * @private
+     * @param {NodeList} nodes - The newly added DOM nodes
+     */
+    #attachEventListenersToNewContent(nodes) {
+        if (!nodes?.length) return;
     
-      try {
-          if (method === 'GET') {
-              prodTabUrl += `${url}`;
-          }
+        nodes.forEach(node => {
+            if (node?.nodeType === Node.ELEMENT_NODE) {
+                const elements = node.querySelectorAll([
+                    '.facet-group__list a',
+                    '.tab-list__nav a', 
+                    '.search-tools__button-group a',
+                    'a.facet-group__clear',
+                    '.facet-breadcrumb__link',
+                    '.facet-breadcrumb__item',
+                    'a.related-links__link',
+                    '.query-blending__highlight',
+                    '.search-spelling-suggestions__link',
+                    'a.pagination__link'
+                ].join(', '));
     
-          const response = await fetch(prodTabUrl);
-          if (!response.ok) throw new Error(`Error: ${response.status}`);
-    
-          const text = await response.text();
-          return text;
-    
-      } catch (error) {
-          console.error(`Error with ${method} request:`, error);
-          return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
-      }
-  }
+                elements.forEach(element => {
+                    if (element) {
+                        element.removeEventListener('click', this.#handleDynamicClick);
+                        element.addEventListener('click', this.#handleDynamicClick);
+                    }
+                });
+            }
+        });
+    }
 
-  async fetchFunnelbackTools(url, method) {
-      let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-      // Future T4 wrapper endpoint - uncomment when available
-      // let prodToolsUrl = '/searchwrapper/tools/';
-  
-      try {
-          if (method === 'GET') {
-              prodToolsUrl += `${url}`;
-          }
-  
-          const response = await fetch(prodToolsUrl);
-          if (!response.ok) throw new Error(`Error: ${response.status}`);
-  
-          const text = await response.text();
-          return text;
-  
-      } catch (error) {
-          console.error(`Error with ${method} request:`, error);
-          return `<p>Error fetching ${method} tools request. Please try again later.</p>`;
-      }
-  }
+    /**
+     * Sets up event listeners for dynamic content.
+     * 
+     * @private
+     */
+    #setupDynamicListeners() {
+        console.log("DynamicResultsManager: setupDynamicListeners");
+        document.removeEventListener('click', this.#handleDynamicClick);
+        document.addEventListener('click', this.#handleDynamicClick);
+    }
 
-  async fetchFunnelbackSpelling(url, method) {
-      let prodSpellingUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-      // Future T4 wrapper endpoint - uncomment when available
-      // let prodSpellingUrl = '/searchwrapper/spelling/';
-      let partial = '&form=partial';
-      let query = url += `${partial}`;
+    /**
+     * Main click handler for all dynamic content interactions.
+     * Routes clicks to appropriate handlers based on element clicked.
+     * 
+     * @private
+     * @param {Event} e - The click event object
+     */
+    #handleDynamicClick = async(e) => {
+        try {
+            const handlers = {
+                '.facet-group__list a': this.#handleFacetAnchor,
+                '.tab-list__nav a': this.#handleTab,
+                '.search-tools__button-group a': this.#handleSearchTools,
+                'a.facet-group__clear': this.#handleClearFacet,
+                '.facet-breadcrumb__link': this.#handleClearFacet,
+                '.facet-breadcrumb__item': this.#handleClearFacet,
+                'a.related-links__link': this.#handleClick,
+                '.query-blending__highlight': this.#handleClick,
+                '.search-spelling-suggestions__link': this.#handleSpellingClick,
+                'a.pagination__link': this.#handleClick
+            };
+
+            for (const [selector, handler] of Object.entries(handlers)) {
+                const matchedElement = e.target.closest(selector);
+                if (matchedElement) {
+                    e.preventDefault();
+                    console.log("DynamicResultsManager: handleDynamicClick");
+                    console.log("element", matchedElement);
+                    await handler.call(this, e, matchedElement);
+                    break;
+                }
+            }
+        } catch (error) {
+            console.warn('Error in handleDynamicClick:', error);
+        }
+    }
+
+    /**
+     * Fetches results from Funnelback API.
+     * 
+     * @private
+     * @param {string} url - The URL to fetch from
+     * @param {string} method - The HTTP method to use
+     * @returns {Promise<string>} The response text
+     */
+    async #fetchFunnelbackResults(url, method) {
+        let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+        
+        try {
+            const headers = await ipService.getFunnelbackHeaders();
+            
+            if (method === 'GET') {
+                prodTabUrl += `${url}`;
+            }
     
-      try {
-          if (method === 'GET') {
-              prodSpellingUrl += `${query}`;
-          }
+            const response = await fetch(prodTabUrl, {
+                headers: headers
+            });
+            
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
     
-          const response = await fetch(prodSpellingUrl);
-          if (!response.ok) throw new Error(`Error: ${response.status}`);
+            const text = await response.text();
+            return text;
     
-          const text = await response.text();
-          return text;
+        } catch (error) {
+            console.error(`Error with ${method} request:`, error);
+            return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+        }
+    }
+
+    /**
+     * Fetches tool-specific results from Funnelback API.
+     * 
+     * @private
+     * @param {string} url - The URL to fetch from
+     * @param {string} method - The HTTP method to use
+     * @returns {Promise<string>} The response text
+     */
+    async #fetchFunnelbackTools(url, method) {
+        let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+        
+        try {
+            const headers = await ipService.getFunnelbackHeaders();
+            
+            if (method === 'GET') {
+                prodToolsUrl += `${url}`;
+            }
     
-      } catch (error) {
-          console.error(`Error with ${method} request:`, error);
-          return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
-      }
-  }
-
-  // click handlers
-  async handleClick(e, element) {
-      console.log("DynamicResultsManager: handleClick");
-      console.log("element", element);
-      console.log("e", e);
+            const response = await fetch(prodToolsUrl, {
+                headers: headers
+            });
+            
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
     
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No tab results found."}
-              </div>
-          `;
+            const text = await response.text();
+            return text;
+    
+        } catch (error) {
+            console.error(`Error with ${method} request:`, error);
+            return `<p>Error fetching ${method} tools request. Please try again later.</p>`;
+        }
+    }
 
-          // Smooth scroll to results
-          document.getElementById('on-page-search-input').scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'start'
-          });
-      }
-  }
-  
-  async handleSpellingClick(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackSpelling(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No spelling results found."}
-              </div>
-          `;
-      }
-  }
+    /**
+     * Fetches spelling suggestions from Funnelback API.
+     * 
+     * @private
+     * @param {string} url - The URL to fetch from
+     * @param {string} method - The HTTP method to use
+     * @returns {Promise<string>} The response text
+     */
+    async #fetchFunnelbackSpelling(url, method) {
+        let prodSpellingUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
+        let partial = '&form=partial';
+        let query = url += `${partial}`;
+        
+        try {
+            const headers = await ipService.getFunnelbackHeaders();
+            
+            if (method === 'GET') {
+                prodSpellingUrl += `${query}`;
+            }
+    
+            const response = await fetch(prodSpellingUrl, {
+                headers: headers
+            });
+            
+            if (!response.ok) throw new Error(`Error: ${response.status}`);
+    
+            const text = await response.text();
+            return text;
+    
+        } catch (error) {
+            console.error(`Error with ${method} request:`, error);
+            return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
+        }
+    }
 
-  async handleFacetAnchor(e, element) {
-      const facetAnchor = e.target.closest('.facet-group__list a');
-      const facetHref = facetAnchor.getAttribute('href');
-      console.log("Relative facetHref:", facetHref);
-      if (facetHref) {
-          const response = await this.fetchFunnelbackResults(facetHref, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No tab results found."}
-              </div>
-          `;
-      }
-  }
-  
-  async handleTab(e, element) {
-      console.log("DynamicResultsManager: handleTab");
-      console.log("element", element);
-      console.log("e", e);
+    /**
+     * Handles generic click events.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} element - The clicked element
+     */
+    async #handleClick(e, element) {
+        console.log("DynamicResultsManager: handleClick");
+        
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.#fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">
+                    ${response || "No results found."}
+                </div>
+            `;
 
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No tab results found."}
-              </div>
-          `;
-      }
-  }
-  
-  async handleSearchTools(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackTools(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No tab results found."}
-              </div>
-          `;
-      }
-  }
-  
-  async handleClearFacet(e, element) {
-      const href = element.getAttribute('href');
-      if (href) {
-          const response = await this.fetchFunnelbackResults(href, 'GET');
-          document.getElementById('results').innerHTML = `
-              <div class="funnelback-search-container">
-                  ${response || "No tab results found."}
-              </div>
-          `;
-      }
-  }
+            document.getElementById('on-page-search-input')?.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
 
-  // Cleanup method
-  destroy() {
-      if (this.observer) {
-          this.observer.disconnect();
-      }
-      document.removeEventListener('click', this.handleDynamicClick);
-  }
+    /**
+     * Handles spelling suggestion clicks.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} element - The clicked element
+     */
+    async #handleSpellingClick(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.#fetchFunnelbackSpelling(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">
+                    ${response || "No spelling results found."}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Handles facet anchor clicks.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} element - The clicked element
+     */
+    async #handleFacetAnchor(e, element) {
+        const facetAnchor = e.target.closest('.facet-group__list a');
+        const facetHref = facetAnchor.getAttribute('href');
+        if (facetHref) {
+            const response = await this.#fetchFunnelbackResults(facetHref, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">
+                    ${response || "No facet results found."}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Handles tab clicks.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} element - The clicked element
+     */
+    async #handleTab(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.#fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">
+                    ${response || "No tab results found."}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Handles search tools clicks.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} element - The clicked element
+     */
+    async #handleSearchTools(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.#fetchFunnelbackTools(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">
+                    ${response || "No tool results found."}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Handles clear facet clicks.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} element - The clicked element
+     */
+    async #handleClearFacet(e, element) {
+        const href = element.getAttribute('href');
+        if (href) {
+            const response = await this.#fetchFunnelbackResults(href, 'GET');
+            document.getElementById('results').innerHTML = `
+                <div class="funnelback-search-container">
+                    ${response || "No results found."}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Cleans up event listeners and observers.
+     * Should be called when the component is being removed.
+     * 
+     * @public
+     */
+    destroy() {
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+        document.removeEventListener('click', this.#handleDynamicClick);
+    }
 }
 
-// Initialize
+// Initialize singleton instance
 const dynamicResults = new DynamicResultsManager();
