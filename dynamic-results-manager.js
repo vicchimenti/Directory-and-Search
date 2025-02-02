@@ -29,7 +29,7 @@
  * - IPService.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.1.3
+ * @version 1.1.4
  * @lastModified 2025-02-02
  */
 
