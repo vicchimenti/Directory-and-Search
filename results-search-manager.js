@@ -173,3 +173,4 @@ class ResultsSearchManager {
 
 // Initialize results search singleton instance
 const resultsSearch = new ResultsSearchManager();
+export default resultsSearch;
