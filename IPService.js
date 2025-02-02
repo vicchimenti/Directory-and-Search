@@ -20,8 +20,8 @@
  * - Requires access to the ipify.org API for IP detection
  * - Uses modern JavaScript features (async/await, classes)
  * 
- * @author [Your Name]
- * @version 1.0.0
+ * @author Victor Chimenti
+ * @version 1.0.1
  * @lastModified 2025-02-02
  */
 
