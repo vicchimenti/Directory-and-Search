@@ -242,15 +242,17 @@ class DynamicResultsManager {
         let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
         
         try {
-            const headers = await ipService.getFunnelbackHeaders();
+            // const headers = await ipService.getFunnelbackHeaders();
             
             if (method === 'GET') {
                 prodToolsUrl += `${url}`;
             }
     
-            const response = await fetch(prodToolsUrl, {
-                headers: headers
-            });
+            // const response = await fetch(prodToolsUrl, {
+            //     headers: headers
+            // });
+
+            const response = await fetch(prodToolsUrl);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
     
