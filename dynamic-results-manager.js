@@ -28,8 +28,8 @@
  * - header-search-manager.js: Handles initial search and redirects
  * - ip-service.js: Provides IP address headers for Funnelback
  * 
- * @author [Your Name]
- * @version 1.0.0
+ * @author Victor Chimenti
+ * @version 1.1.1
  * @lastModified 2025-02-02
  */
 
