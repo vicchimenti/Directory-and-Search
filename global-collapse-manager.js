@@ -21,8 +21,8 @@
  *   - [data-component="facet-group-show-more-button"]
  * - Requires specific CSS classes for transitions
  * 
- * @author [Your Name]
- * @version 1.0.0
+ * @author Victor Chimenti
+ * @version 1.1.0
  * @lastModified 2025-02-02
  */
 
