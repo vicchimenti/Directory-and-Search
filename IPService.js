@@ -7,7 +7,7 @@
  * to minimize API calls.
  * 
  * Usage:
- * import ipService from './ip-service.js';
+ * import ipService from './IPService.js';
  * const headers = await ipService.getFunnelbackHeaders();
  * 
  * Features:
@@ -21,7 +21,7 @@
  * - Uses modern JavaScript features (async/await, classes)
  * 
  * @author Victor Chimenti
- * @version 1.0.1
+ * @version 1.0.2
  * @lastModified 2025-02-02
  */
 
