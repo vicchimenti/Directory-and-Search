@@ -91,3 +91,4 @@ class HeaderSearchManager {
 
 // Initialize header search singleton instance
 const headerSearch = new HeaderSearchManager();
+export default headerSearch;
