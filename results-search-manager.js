@@ -1,3 +1,5 @@
+import ipService from './ip-service.js';
+
 class ResultsSearchManager {
     constructor() {
         if (window.location.pathname.includes('search-test')) {
