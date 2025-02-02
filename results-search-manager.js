@@ -1,21 +1,73 @@
+/**
+ * @fileoverview Results Search Manager for Funnelback Search Integration
+ * 
+ * This class manages the search results page functionality, handling both
+ * URL parameter-based searches and user-initiated searches. It integrates with
+ * Funnelback search services and manages the display of search results.
+ * 
+ * Features:
+ * - Handles URL-based search parameters from HeaderSearchManager redirects
+ * - Manages search input and button interactions on results page
+ * - Integrates with Funnelback search API including required IP headers
+ * - Displays search results dynamically
+ * 
+ * Dependencies:
+ * - Requires IPService for Funnelback headers
+ * - Requires DOM elements with specific IDs:
+ *   - 'on-page-search-button': The search button
+ *   - 'on-page-search-input': The search input field
+ *   - 'results': Container for search results
+ * 
+ * Related Files:
+ * - header-search-manager.js: Handles initial search and redirects
+ * - ip-service.js: Provides IP address headers for Funnelback
+ * 
+ * @author [Your Name]
+ * @version 1.0.0
+ * @lastModified 2025-02-02
+ */
+
 import ipService from './ip-service.js';
 
 class ResultsSearchManager {
+    /**
+     * Initializes the Results Search Manager.
+     * Sets up event listeners and handles URL parameters if on search test page.
+     * 
+     * @throws {Error} If required DOM elements are not found (error will be caught internally)
+     */
     constructor() {
         if (window.location.pathname.includes('search-test')) {
-            this.setupResultsSearch();
-            this.handleURLParameters();
+            this.#setupResultsSearch();
+            this.handleURLParameters(); // Public as it's part of the API
         }
     }
 
-    setupResultsSearch() {
+    /**
+     * Sets up the event listener for the search button on the results page.
+     * 
+     * @private
+     * @throws {Error} If search button element is not found (error will be caught internally)
+     */
+    #setupResultsSearch() {
         console.log("setupResultsSearch");
         const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
-            onPageSearch.addEventListener('click', this.handleResultsSearch);
+            onPageSearch.addEventListener('click', this.#handleResultsSearch);
+        } else {
+            console.warn('Search button not found in DOM');
         }
     }
 
+    /**
+     * Handles search parameters from the URL.
+     * If a query parameter exists, it populates the search field and performs the search.
+     * This method is public as it's part of the class's public API and may be called
+     * from other parts of the application.
+     * 
+     * @public
+     * @returns {Promise<void>}
+     */
     async handleURLParameters() {
         console.log("handleURLParameters");
 
@@ -31,47 +83,93 @@ class ResultsSearchManager {
         }
     }
 
-    handleResultsSearch = async(event) => {
+    /**
+     * Event handler for search button clicks on the results page.
+     * Prevents default form submission and initiates the search process.
+     * 
+     * @private
+     * @param {Event} event - The click event object
+     * @returns {Promise<void>}
+     */
+    #handleResultsSearch = async(event) => {
         console.log("handleResultsSearch");
 
         event.preventDefault();
-        const searchQuery = document.getElementById('on-page-search-input').value;
+        const searchInput = document.getElementById('on-page-search-input');
+        if (!searchInput) {
+            console.error('Search input field not found');
+            return;
+        }
+
+        const searchQuery = searchInput.value;
+        if (!searchQuery?.trim()) {
+            alert('Please enter a search term');
+            return;
+        }
+
         await this.performFunnelbackSearch(searchQuery);
     }
 
+    /**
+     * Performs the actual search using Funnelback's API.
+     * This method is public as it's part of the class's public API and may be called
+     * from other parts of the application.
+     * 
+     * @public
+     * @param {string} searchQuery - The search query to perform
+     * @returns {Promise<void>}
+     * @throws {Error} If the search request fails
+     */
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
 
         // Current Funnelback URL - will be replaced with T4 wrapper endpoint
         const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         
-        // Future T4 wrapper endpoint - uncomment when available
-        // const wrapperUrl = '/searchwrapper'; // Update with actual T4 API Gateway URL
-        
         try {
-            // Current URL construction - will be replaced with T4 wrapper
-            const url = `${prodOnPageSearchUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
+            // Get headers with IP address for Funnelback
+            const headers = await ipService.getFunnelbackHeaders();
             
-            // Future T4 wrapper URL construction - uncomment when available
-            // const url = `${wrapperUrl}?query=${encodeURIComponent(searchQuery)}&collection=seattleu~sp-search&profile=_default&form=partial`;
+            // Construct search URL with parameters
+            const searchParams = new URLSearchParams({
+                query: searchQuery,
+                collection: 'seattleu~sp-search',
+                profile: '_default',
+                form: 'partial'
+            });
             
-            const response = await fetch(url);
+            const url = `${prodOnPageSearchUrl}?${searchParams.toString()}`;
+            
+            const response = await fetch(url, {
+                headers: headers  // Include the X-Forwarded-For header
+            });
+            
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
             const text = await response.text();
-            document.getElementById('results').innerHTML = `
-                <div id="funnelback-search-container-response" class="funnelback-search-container">${text}</div>
-            `;
+            const resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <div id="funnelback-search-container-response" class="funnelback-search-container">
+                        ${text}
+                    </div>
+                `;
+            } else {
+                console.error('Results container not found');
+            }
         } catch (error) {
             console.error('Search error:', error);
-            document.getElementById('results').innerHTML = `
-                <div class="error-message">
-                    <p>Sorry, we couldn't complete your search. ${error.message}</p>
-                </div>
-            `;
+            const resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <div class="error-message">
+                        <p>Sorry, we couldn't complete your search. ${error.message}</p>
+                    </div>
+                `;
+            }
         }
     }
 }
 
-// Initialize results search
+// Initialize results search singleton instance
 const resultsSearch = new ResultsSearchManager();
