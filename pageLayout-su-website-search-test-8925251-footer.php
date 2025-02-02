@@ -38,8 +38,8 @@
         <!-- dynamic-results-manager.js -->
         <script src="<t4 type='media' id='9056000' formatter='path/*' />" type="module" defer></script>
         <!-- header-search-manager.js -->
-        <script src="<t4 type='media' id='9063951' formatter='path/*' />" defer></script>
-        <!-- fb-global-collapse.js -->
+        <script src="<t4 type='media' id='9063951' formatter='path/*' />" type="module" defer></script>
+        <!-- global-collapse-manager.js -->
 
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
