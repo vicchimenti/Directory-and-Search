@@ -279,15 +279,17 @@ class DynamicResultsManager {
         let query = url += `${partial}`;
         
         try {
-            const headers = await ipService.getFunnelbackHeaders();
+            // const headers = await ipService.getFunnelbackHeaders();
             
             if (method === 'GET') {
                 prodSpellingUrl += `${query}`;
             }
     
-            const response = await fetch(prodSpellingUrl, {
-                headers: headers
-            });
+            // const response = await fetch(prodSpellingUrl, {
+            //     headers: headers
+            // });
+
+            const response = await fetch(prodSpellingUrl);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
     
