@@ -33,7 +33,7 @@
  * @lastModified 2025-02-02
  */
 
-import ipService from './ip-service.js';
+import ipService from './IPService.js';
 
 class DynamicResultsManager {
     /**
