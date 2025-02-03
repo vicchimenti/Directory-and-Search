@@ -129,7 +129,8 @@ class ResultsSearchManager {
         try {
             // Get headers with IP address for Funnelback
             const headers = await ipService.getFunnelbackHeaders();
-            
+            console.log('Funnelback Headers:', headers); // Shows the headers object with IP
+
             // Construct search URL with parameters
             const searchParams = new URLSearchParams({
                 query: searchQuery,
@@ -137,12 +138,24 @@ class ResultsSearchManager {
                 profile: '_default',
                 form: 'partial'
             });
-            
+
             const url = `${prodOnPageSearchUrl}?${searchParams.toString()}`;
-            
-            const response = await fetch(url, {
-                headers: headers  // Include the X-Forwarded-For header
+            console.log('Request URL:', url); // Shows the full URL being requested
+
+            // Log full request details
+            console.log('Making Funnelback request with:', {
+                url: url,
+                headers: headers,
+                method: 'GET'
             });
+
+            const response = await fetch(url, {
+                headers: headers
+            });
+
+            // Log response details
+            console.log('Funnelback Response Status:', response.status);
+            console.log('Funnelback Response OK:', response.ok);
 
             // const response = await fetch(url);
             
