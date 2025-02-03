@@ -128,7 +128,7 @@ class ResultsSearchManager {
         
         try {
             // Get headers with IP address for Funnelback
-            // const headers = await ipService.getFunnelbackHeaders();
+            const headers = await ipService.getFunnelbackHeaders();
             
             // Construct search URL with parameters
             const searchParams = new URLSearchParams({
@@ -140,11 +140,11 @@ class ResultsSearchManager {
             
             const url = `${prodOnPageSearchUrl}?${searchParams.toString()}`;
             
-            // const response = await fetch(url, {
-            //     headers: headers  // Include the X-Forwarded-For header
-            // });
+            const response = await fetch(url, {
+                headers: headers  // Include the X-Forwarded-For header
+            });
 
-            const response = await fetch(url);
+            // const response = await fetch(url);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
