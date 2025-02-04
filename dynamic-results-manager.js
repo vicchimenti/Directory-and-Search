@@ -29,7 +29,7 @@
  * - IPService.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.2.0
+ * @version 1.2.1
  * @lastModified 2025-02-04
  */
 
@@ -268,7 +268,7 @@ class DynamicResultsManager {
             return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
         }
     }
-    
+
     /**
      * Handles generic click events.
      * 
