@@ -204,26 +204,13 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The response text
      */
     async #fetchFunnelbackResults(url, method) {
-        let prodTabUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-        
+        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/search';
         try {
-            // const headers = await ipService.getFunnelbackHeaders();
-            
-            if (method === 'GET') {
-                prodTabUrl += `${url}`;
-            }
-    
-            // const response = await fetch(prodTabUrl, {
-            //     headers: headers
-            // });
-
-            const response = await fetch(prodTabUrl);
-            
+            const queryString = url.includes('?') ? url.split('?')[1] : '';
+            const fullUrl = `${proxyUrl}?${queryString}`;
+            const response = await fetch(fullUrl);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
-    
-            const text = await response.text();
-            return text;
-    
+            return await response.text();
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
