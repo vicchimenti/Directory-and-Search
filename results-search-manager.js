@@ -123,11 +123,9 @@ class ResultsSearchManager {
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
     
-        // Replace the direct Funnelback URL with your proxy
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback';
         
         try {
-            // Construct search parameters
             const searchParams = new URLSearchParams({
                 query: searchQuery,
                 collection: 'seattleu~sp-search',
@@ -138,15 +136,7 @@ class ResultsSearchManager {
             const url = `${proxyUrl}?${searchParams.toString()}`;
             console.log('Request URL:', url);
     
-            // Log request details
-            console.log('Making proxy request with:', {
-                url: url,
-                method: 'GET'
-            });
-    
             const response = await fetch(url);
-    
-            // Log response details
             console.log('Proxy Response Status:', response.status);
             console.log('Proxy Response OK:', response.ok);
             
