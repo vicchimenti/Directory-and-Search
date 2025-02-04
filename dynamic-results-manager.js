@@ -226,26 +226,15 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The response text
      */
     async #fetchFunnelbackTools(url, method) {
-        let prodToolsUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-        
+        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/tools';
         try {
-            // const headers = await ipService.getFunnelbackHeaders();
-            
-            if (method === 'GET') {
-                prodToolsUrl += `${url}`;
-            }
-    
-            // const response = await fetch(prodToolsUrl, {
-            //     headers: headers
-            // });
-
-            const response = await fetch(prodToolsUrl);
-            
+            const queryString = new URLSearchParams({
+                path: url.split('/s/')[1]
+            });
+            const fullUrl = `${proxyUrl}?${queryString}`;
+            const response = await fetch(fullUrl);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
-    
-            const text = await response.text();
-            return text;
-    
+            return await response.text();
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching ${method} tools request. Please try again later.</p>`;
