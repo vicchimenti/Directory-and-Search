@@ -251,18 +251,24 @@ class DynamicResultsManager {
      */
     async #fetchFunnelbackSpelling(url, method) {
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/spelling';
+        
         try {
-            const queryString = url;
+            // Just pass through the original query parameters
+            const queryString = url.includes('?') ? url.split('?')[1] : '';
             const fullUrl = `${proxyUrl}?${queryString}`;
+            console.log('Making spelling proxy request to:', fullUrl);
+            
             const response = await fetch(fullUrl);
+            
             if (!response.ok) throw new Error(`Error: ${response.status}`);
+            
             return await response.text();
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
         }
     }
-
+    
     /**
      * Handles generic click events.
      * 
