@@ -23,8 +23,8 @@
  * - ip-service.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.1.8
- * @lastModified 2025-02-03
+ * @version 1.1.9
+ * @lastModified 2025-02-04
  */
 
 import ipService from './IPService.js';
