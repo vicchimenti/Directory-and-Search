@@ -145,7 +145,7 @@ class ResultsSearchManager {
             // Log full request details
             console.log('Making Funnelback request with:', {
                 url: url,
-                headers: headers,
+                // headers: headers,
                 method: 'GET'
             });
 
