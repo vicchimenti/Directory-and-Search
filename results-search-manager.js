@@ -23,7 +23,7 @@
  * - ip-service.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.1.10
+ * @version 1.2.0
  * @lastModified 2025-02-04
  */
 
@@ -122,43 +122,33 @@ class ResultsSearchManager {
      */
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
-
-        // Current Funnelback URL - will be replaced with T4 wrapper endpoint
-        const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+    
+        // Replace the direct Funnelback URL with your proxy
+        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback';
         
         try {
-            // Get headers with IP address for Funnelback
-            // const headers = await ipService.getFunnelbackHeaders();
-            // console.log('Funnelback Headers:', headers); // Shows the headers object with IP
-
-            // Construct search URL with parameters
+            // Construct search parameters
             const searchParams = new URLSearchParams({
                 query: searchQuery,
                 collection: 'seattleu~sp-search',
                 profile: '_default',
                 form: 'partial'
             });
-
-            const url = `${prodOnPageSearchUrl}?${searchParams.toString()}`;
-            console.log('Request URL:', url); // Shows the full URL being requested
-
-            // Log full request details
-            console.log('Making Funnelback request with:', {
+    
+            const url = `${proxyUrl}?${searchParams.toString()}`;
+            console.log('Request URL:', url);
+    
+            // Log request details
+            console.log('Making proxy request with:', {
                 url: url,
-                // headers: headers,
                 method: 'GET'
             });
-
-            // const response = await fetch(url, {
-            //     headers: headers
-            // });
-
-
+    
             const response = await fetch(url);
-
+    
             // Log response details
-            console.log('Funnelback Response Status:', response.status);
-            console.log('Funnelback Response OK:', response.ok);
+            console.log('Proxy Response Status:', response.status);
+            console.log('Proxy Response OK:', response.ok);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
