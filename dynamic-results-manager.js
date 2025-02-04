@@ -250,28 +250,13 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The response text
      */
     async #fetchFunnelbackSpelling(url, method) {
-        let prodSpellingUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/';
-        let partial = '&form=partial';
-        let query = url += `${partial}`;
-        
+        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/spelling';
         try {
-            // const headers = await ipService.getFunnelbackHeaders();
-            
-            if (method === 'GET') {
-                prodSpellingUrl += `${query}`;
-            }
-    
-            // const response = await fetch(prodSpellingUrl, {
-            //     headers: headers
-            // });
-
-            const response = await fetch(prodSpellingUrl);
-            
+            const queryString = url;
+            const fullUrl = `${proxyUrl}?${queryString}`;
+            const response = await fetch(fullUrl);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
-    
-            const text = await response.text();
-            return text;
-    
+            return await response.text();
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
