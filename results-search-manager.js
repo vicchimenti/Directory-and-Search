@@ -128,8 +128,8 @@ class ResultsSearchManager {
         
         try {
             // Get headers with IP address for Funnelback
-            const headers = await ipService.getFunnelbackHeaders();
-            console.log('Funnelback Headers:', headers); // Shows the headers object with IP
+            // const headers = await ipService.getFunnelbackHeaders();
+            // console.log('Funnelback Headers:', headers); // Shows the headers object with IP
 
             // Construct search URL with parameters
             const searchParams = new URLSearchParams({
@@ -149,15 +149,16 @@ class ResultsSearchManager {
                 method: 'GET'
             });
 
-            const response = await fetch(url, {
-                headers: headers
-            });
+            // const response = await fetch(url, {
+            //     headers: headers
+            // });
+
+
+            const response = await fetch(url);
 
             // Log response details
             console.log('Funnelback Response Status:', response.status);
             console.log('Funnelback Response OK:', response.ok);
-
-            // const response = await fetch(url);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
