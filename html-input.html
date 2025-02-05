@@ -2,20 +2,26 @@
     <div class="grid-container">
         <div class="grid-x grid-margin-x">
             <div class="cell medium-12">
-                <div class="searchAreaWrapper">
-                    <div class="searchArea">
-                        <div class="global-margin--3x">
-                            <form>
-                                <label for="on-page-search-input" hidden>Search</label>
-                                <input type="text" id="on-page-search-input" name="on-page-search-input" class="on-page-sq-search" />
-                                <input type="submit" id="on-page-search-button" value="Submit">
-                            </form>
-                        </div>
-                        <div class="global-spacing--3x">
-                            <div id="results"></div>
+                <form action="" method="GET">
+                    <input type="hidden" name="collection" value="gonzaga-search">               
+                    <input type="hidden" name="f.Site|gonzagaedu" value="Gonzaga.edu">
+                    <input type="hidden" name="f.Type|pages" value="Pages">
+                    <input type="hidden" name="f.Tabs|allresults" value="All Results">
+                    <div class="searchAreaWrapper">
+                        <div class="searchArea">
+                            <div class="global-margin--3x">
+                                <form>
+                                    <label for="on-page-search-input" hidden>Search</label>
+                                    <input type="text" id="on-page-search-input" name="on-page-search-input" class="on-page-sq-search" />
+                                    <input type="submit" id="on-page-search-button" value="Submit">
+                                </form>
+                            </div>
+                            <div class="global-spacing--3x">
+                                <div id="results"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
