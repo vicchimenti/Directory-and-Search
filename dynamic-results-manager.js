@@ -32,6 +32,7 @@
 * @lastModified 2025-02-05
 */
 import DOMObserverManager from './dom-observer-manager.js';
+
 class DynamicResultsManager {
     /** @private {DOMObserverManager} Instance of DOM observer for managing dynamic content */
     #observer;
@@ -47,6 +48,11 @@ class DynamicResultsManager {
         }
     }
 
+    /**
+     * Sets up DOM observer for dynamic content changes.
+     * Configures observer with target selectors and event handling callback.
+     * @private
+     */
     #setupObserver() {
         this.#observer = new DOMObserverManager({
             targets: [
