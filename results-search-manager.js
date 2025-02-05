@@ -22,8 +22,8 @@
  * - header-search-manager.js: Handles initial search and redirects
  * 
  * @author Victor Chimenti
- * @version 1.3.0
- * @lastModified 2025-02-04
+ * @version 1.3.1
+ * @lastModified 2025-02-05
  */
 
 import DOMObserverManager from './dom-observer-manager.js';
