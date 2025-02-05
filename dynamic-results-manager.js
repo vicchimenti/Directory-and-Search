@@ -407,5 +407,4 @@ class DynamicResultsManager {
  }
  
  // Initialize singleton instance
- const dynamicResults = new DynamicResultsManager();
- export default dynamicResults;
+ export default new DynamicResultsManager();
