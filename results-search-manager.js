@@ -29,15 +29,12 @@
  * @lastModified 2025-02-05
  */
 
-
-
 import DOMObserverManager from './dom-observer-manager.js';
-
 class ResultsSearchManager {
     
     /** @private {DOMObserverManager} Instance of DOM observer for managing search button changes */
     #observer;
-    
+
     /**
      * Initializes the Results Search Manager with observer and event listeners.
      * Sets up page functionality if on search test page.
