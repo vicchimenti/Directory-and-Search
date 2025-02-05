@@ -53,6 +53,17 @@ class ResultsSearchManager {
         });
     }
 
+    #handleAddedNodes(nodes) {
+        nodes.forEach(node => {
+            if (node?.nodeType === Node.ELEMENT_NODE) {
+                const searchButton = node.querySelector('#on-page-search-button');
+                if (searchButton) {
+                    searchButton.addEventListener('click', this.#handleResultsSearch);
+                }
+            }
+        });
+    }
+
     /**
      * Sets up the event listener for the search button on the results page.
      * 
