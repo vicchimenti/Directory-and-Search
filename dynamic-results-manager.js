@@ -67,58 +67,6 @@ class DynamicResultsManager {
     }
  
     /**
-     * Initializes the MutationObserver to watch for DOM changes.
-     * 
-     * @private
-     */
-    #initializeObserver() {
-        this.observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    this.#attachEventListenersToNewContent(mutation.addedNodes);
-                }
-            });
-        });
-    }
- 
-    /**
-     * Starts observing the results container for changes.
-     * 
-     * @private
-     */
-    #startObserving() {
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            this.observer.observe(resultsContainer, this.observerConfig);
-            console.log('Observer started watching results container');
-        } else {
-            console.warn('Results container not found, waiting for it to appear');
-            this.#waitForResultsContainer();
-        }
-    }
- 
-    /**
-     * Waits for the results container to appear in the DOM.
-     * 
-     * @private
-     */
-    #waitForResultsContainer() {
-        const bodyObserver = new MutationObserver((mutations, obs) => {
-            const resultsContainer = document.getElementById('results');
-            if (resultsContainer) {
-                obs.disconnect();
-                this.observer.observe(resultsContainer, this.observerConfig);
-                console.log('Results container found and observer started');
-            }
-        });
- 
-        bodyObserver.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-    }
- 
-    /**
      * Attaches event listeners to newly added content.
      * 
      * @private
