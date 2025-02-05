@@ -35,29 +35,35 @@ import DOMObserverManager from './dom-observer-manager.js';
 class DynamicResultsManager {
     /** @private {DOMObserverManager} Instance of DOM observer for managing dynamic content */
     #observer;
+    
     /**
      * Initializes the Dynamic Results Manager.
      * Sets up mutation observer and event listeners if on search test page.
      */
     constructor() {
-        this.observerConfig = {
-            childList: true,
-            subtree: true
-        };
-        
         if (window.location.pathname.includes('search-test')) {
-            this.#initializeObserver();
-            
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.#setupDynamicListeners();
-                    this.#startObserving();
-                });
-            } else {
-                this.#setupDynamicListeners();
-                this.#startObserving();
-            }
+            this.#setupObserver();
+            this.#setupDynamicListeners();
         }
+    }
+
+    #setupObserver() {
+        this.#observer = new DOMObserverManager({
+            targets: [
+                '.facet-group__list a',
+                '.tab-list__nav a', 
+                '.search-tools__button-group a',
+                'a.facet-group__clear',
+                '.facet-breadcrumb__link',
+                '.facet-breadcrumb__item',
+                'a.related-links__link',
+                '.query-blending__highlight',
+                '.search-spelling-suggestions__link',
+                'a.pagination__link'
+            ],
+            callback: this.#attachEventListenersToNewContent.bind(this),
+            subtree: true
+        });
     }
  
     /**
