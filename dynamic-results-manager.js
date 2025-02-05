@@ -262,7 +262,14 @@ class DynamicResultsManager {
     async #handleSpellingClick(e, element) {
         const href = element.getAttribute('href');
         if (href) {
-            const response = await this.#fetchFunnelbackSpelling(href, 'GET');
+            // Extract just the query parameters if it's a full URL
+            const queryString = href.includes('?') ? 
+                href.split('?')[1] : 
+                href.startsWith('/') ? 
+                    href.split('/search?')[1] : 
+                    href;
+
+            const response = await this.#fetchFunnelbackSpelling(queryString, 'GET');
             document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">
                     ${response || "No spelling results found."}
