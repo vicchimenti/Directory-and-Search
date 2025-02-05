@@ -121,7 +121,7 @@ class ResultsSearchManager {
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
     
-        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback';
+        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/search';
         
         try {
             const searchParams = new URLSearchParams({
