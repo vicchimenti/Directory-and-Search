@@ -1,48 +1,46 @@
 <section class="su-listing">
     <div class="su-listing--form-wrapper bg--dark global-padding--8x">
         <div class="">
-            <form action="https://dxp-us-admin.funnelback.squiz.cloud/s/search.html" method="GET" class="autocomplete-concierge__form">
-                <label class="sr-only" aria-live="polite" id="autocomplete-concierge-label"></label>
-                <input id="autocomplete-concierge-inputField"
-                    type="text"
-                    autocomplete="off"
-                    role="combobox"
-                    aria-haspopup="grid"
-                    aria-labelledby="autocomplete-concierge-label"
-                    aria-autocomplete="list"
-                    aria-controls="autocomplete-concierge-grid"
-                    placeholder="Start your search here..."
-                    class="autocomplete-concierge__input"
-                    name="query"
-                    value
-                    aria-expanded="false"
-                >
-                <input type="hidden" name="collection" value="seattleu~sp-search">
-                <input type="hidden" name="profile" value="_default">
-                <button type="button" class="autocomplete-concierge__submit hidden">
-                    <svg class="autocomplete-concierge__icon" role="img" focusable="false">
-                        <title>Clear search</title>
-                        <use href="#close"></use>
-                    </svg>Clear
-                </button>
-                <button type="submit" class="autocomplete-concierge__submit" aria-labelledby="autocomplete-concierge-submit-label"><svg class="autocomplete-concierge__icon" role="img" focusable="false">
-                    <title id="autocomplete-concierge-submit-label">Submit search</title>
-                    <use href="#search"></use></svg>
-                </button>
-                <div role="grid" aria-labelledby="autocomplete-concierge-label" aria-hidden="true" id="autocomplete-concierge-grid" class="autocomplete-concierge__results autocomplete-concierge__results--collapsing" tabindex="-1" style="display: none;"></div>
-                <div style="border: 0px; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(50%); height: 1px; margin: 0px -1px -1px 0px; overflow: hidden; padding: 0px; position: absolute; width: 1px; white-space: nowrap;"><button tabindex="-1" aria-label="Dismiss"></button></div>  
-                <div class="searchAreaWrapper">
-                    <div class="searchArea">
+            <div class="searchAreaWrapper">
+                <div class="searchArea">
+                    <form action="https://dxp-us-admin.funnelback.squiz.cloud/s/search.html" method="GET" class="autocomplete-concierge__form">
+                        <label class="sr-only" aria-live="polite" id="autocomplete-concierge-label"></label>
+                        <input id="autocomplete-concierge-inputField"
+                            type="text"
+                            autocomplete="off"
+                            role="combobox"
+                            aria-haspopup="grid"
+                            aria-labelledby="autocomplete-concierge-label"
+                            aria-autocomplete="list"
+                            aria-controls="autocomplete-concierge-grid"
+                            placeholder="Start your search here..."
+                            class="autocomplete-concierge__input"
+                            name="query"
+                            value
+                            aria-expanded="false"
+                        >
+                        <input type="hidden" name="collection" value="seattleu~sp-search">
+                        <input type="hidden" name="profile" value="_default">
+                        <button type="button" class="autocomplete-concierge__submit hidden">
+                            <svg class="autocomplete-concierge__icon" role="img" focusable="false">
+                                <title>Clear search</title>
+                                <use href="#close"></use>
+                            </svg>Clear
+                        </button>
+                        <button type="submit" class="autocomplete-concierge__submit" aria-labelledby="autocomplete-concierge-submit-label"><svg class="autocomplete-concierge__icon" role="img" focusable="false">
+                            <title id="autocomplete-concierge-submit-label">Submit search</title>
+                            <use href="#search"></use></svg>
+                        </button>
+                        <div role="grid" aria-labelledby="autocomplete-concierge-label" aria-hidden="true" id="autocomplete-concierge-grid" class="autocomplete-concierge__results autocomplete-concierge__results--collapsing" tabindex="-1" style="display: none;"></div>
+                        <div style="border: 0px; clip: rect(0px, 0px, 0px, 0px); clip-path: inset(50%); height: 1px; margin: 0px -1px -1px 0px; overflow: hidden; padding: 0px; position: absolute; width: 1px; white-space: nowrap;"><button tabindex="-1" aria-label="Dismiss"></button></div>  
                         <div class="global-margin--3x">
-                            <form>
-                                <label for="on-page-search-input" hidden>Search</label>
-                                <input type="text" id="on-page-search-input" name="on-page-search-input" class="on-page-sq-search" />
-                                <input type="submit" id="on-page-search-button" value="Search">
-                            </form>
+                            <label for="on-page-search-input" hidden>Search</label>
+                            <input type="text" id="on-page-search-input" name="on-page-search-input" class="on-page-sq-search" />
+                            <input type="submit" id="on-page-search-button" value="Search">
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
     <div id="results"></div>
