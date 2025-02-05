@@ -49,7 +49,7 @@ class ResultsSearchManager {
         this.#observer = new DOMObserverManager({
             targets: '#on-page-search-button',
             callback: this.#handleAddedNodes.bind(this),
-            subtree: false
+            subtree: true
         });
     }
 
