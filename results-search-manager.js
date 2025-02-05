@@ -25,7 +25,7 @@
  * - header-search-manager.js: Handles initial search redirects
  * 
  * @author Victor Chimenti
- * @version 1.3.3
+ * @version 1.3.4
  * @lastModified 2025-02-05
  */
 
