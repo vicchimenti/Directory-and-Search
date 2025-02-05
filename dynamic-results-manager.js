@@ -28,46 +28,84 @@
 * - header-search-manager.js: Handles initial search and redirects
 * 
 * @author Victor Chimenti
-* @version 1.3.3
-* @lastModified 2025-02-05
+* @version 1.3.0
+* @lastModified 2025-02-04
 */
-import DOMObserverManager from './dom-observer-manager.js';
 
 class DynamicResultsManager {
-    /** @private {DOMObserverManager} Instance of DOM observer for managing dynamic content */
-    #observer;
-    
     /**
      * Initializes the Dynamic Results Manager.
      * Sets up mutation observer and event listeners if on search test page.
      */
     constructor() {
+        this.observerConfig = {
+            childList: true,
+            subtree: true
+        };
+        
         if (window.location.pathname.includes('search-test')) {
-            this.#setupObserver();
-            this.#setupDynamicListeners();
+            this.#initializeObserver();
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    this.#setupDynamicListeners();
+                    this.#startObserving();
+                });
+            } else {
+                this.#setupDynamicListeners();
+                this.#startObserving();
+            }
         }
     }
-
+ 
     /**
-     * Sets up DOM observer for dynamic content changes.
-     * Configures observer with target selectors and event handling callback.
+     * Initializes the MutationObserver to watch for DOM changes.
+     * 
      * @private
      */
-    #setupObserver() {
-        this.#observer = new DOMObserverManager({
-            targets: [
-                '.facet-group__list a',
-                '.tab-list__nav a', 
-                '.search-tools__button-group a',
-                'a.facet-group__clear',
-                '.facet-breadcrumb__link',
-                '.facet-breadcrumb__item',
-                'a.related-links__link',
-                '.query-blending__highlight',
-                '.search-spelling-suggestions__link',
-                'a.pagination__link'
-            ],
-            callback: this.#attachEventListenersToNewContent.bind(this),
+    #initializeObserver() {
+        this.observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    this.#attachEventListenersToNewContent(mutation.addedNodes);
+                }
+            });
+        });
+    }
+ 
+    /**
+     * Starts observing the results container for changes.
+     * 
+     * @private
+     */
+    #startObserving() {
+        const resultsContainer = document.getElementById('results');
+        if (resultsContainer) {
+            this.observer.observe(resultsContainer, this.observerConfig);
+            console.log('Observer started watching results container');
+        } else {
+            console.warn('Results container not found, waiting for it to appear');
+            this.#waitForResultsContainer();
+        }
+    }
+ 
+    /**
+     * Waits for the results container to appear in the DOM.
+     * 
+     * @private
+     */
+    #waitForResultsContainer() {
+        const bodyObserver = new MutationObserver((mutations, obs) => {
+            const resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                obs.disconnect();
+                this.observer.observe(resultsContainer, this.observerConfig);
+                console.log('Results container found and observer started');
+            }
+        });
+ 
+        bodyObserver.observe(document.body, {
+            childList: true,
             subtree: true
         });
     }
@@ -112,6 +150,7 @@ class DynamicResultsManager {
      * @private
      */
     #setupDynamicListeners() {
+        console.log("DynamicResultsManager: setupDynamicListeners");
         document.removeEventListener('click', this.#handleDynamicClick);
         document.addEventListener('click', this.#handleDynamicClick);
     }
@@ -262,14 +301,7 @@ class DynamicResultsManager {
     async #handleSpellingClick(e, element) {
         const href = element.getAttribute('href');
         if (href) {
-            // Extract just the query parameters if it's a full URL
-            const queryString = href.includes('?') ? 
-                href.split('?')[1] : 
-                href.startsWith('/') ? 
-                    href.split('/search?')[1] : 
-                    href;
-
-            const response = await this.#fetchFunnelbackSpelling(queryString, 'GET');
+            const response = await this.#fetchFunnelbackSpelling(href, 'GET');
             document.getElementById('results').innerHTML = `
                 <div class="funnelback-search-container">
                     ${response || "No spelling results found."}
@@ -362,10 +394,13 @@ class DynamicResultsManager {
      * @public
      */
     destroy() {
-        this.#observer?.destroy();
+        if (this.observer) {
+            this.observer.disconnect();
+        }
         document.removeEventListener('click', this.#handleDynamicClick);
     }
  }
  
  // Initialize singleton instance
- export default new DynamicResultsManager();
+ const dynamicResults = new DynamicResultsManager();
+ export default dynamicResults;
