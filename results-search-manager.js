@@ -34,14 +34,16 @@
 import DOMObserverManager from './dom-observer-manager.js';
 
 class ResultsSearchManager {
+    
+    /** @private {DOMObserverManager} Instance of DOM observer for managing search button changes */
+    #observer;
+    
     /**
-     * Initializes the Results Search Manager.
-     * Sets up event listeners and handles URL parameters if on search test page.
+     * Initializes the Results Search Manager with observer and event listeners.
+     * Sets up page functionality if on search test page.
      * 
      * @throws {Error} If required DOM elements are not found (error will be caught internally)
      */
-    #observer;
-
     constructor() {
         if (window.location.pathname.includes('search-test')) {
             this.#setupObserver();
@@ -50,6 +52,11 @@ class ResultsSearchManager {
         }
     }
 
+    /**
+     * Sets up DOM observer for search button changes.
+     * Initializes observer with button target and node handling callback.
+     * @private
+     */
     #setupObserver() {
         this.#observer = new DOMObserverManager({
             targets: '#on-page-search-button',
@@ -58,6 +65,12 @@ class ResultsSearchManager {
         });
     }
 
+    /**
+     * Handles nodes added to observed DOM elements.
+     * Attaches click listeners to any new search buttons.
+     * @private
+     * @param {NodeList} nodes - Newly added DOM nodes
+     */
     #handleAddedNodes(nodes) {
         nodes.forEach(node => {
             if (node?.nodeType === Node.ELEMENT_NODE) {
@@ -190,6 +203,12 @@ class ResultsSearchManager {
         }
     }
 
+    /**
+     * Destroys the Results Search Manager instance.
+     * Removes event listeners and destroys the DOM observer.
+     * 
+     * @public
+     */
     destroy() {
         this.#observer?.destroy();
         document.getElementById("on-page-search-button")?.removeEventListener('click', this.#handleResultsSearch);
