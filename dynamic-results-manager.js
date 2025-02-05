@@ -32,6 +32,8 @@
 * @lastModified 2025-02-04
 */
 
+import DOMObserverManager from './dom-observer-manager.js';
+
 class DynamicResultsManager {
     /**
      * Initializes the Dynamic Results Manager.
