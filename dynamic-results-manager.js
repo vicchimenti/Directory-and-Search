@@ -158,7 +158,6 @@ class DynamicResultsManager {
      * @private
      */
     #setupDynamicListeners() {
-        console.log("DynamicResultsManager: setupDynamicListeners");
         document.removeEventListener('click', this.#handleDynamicClick);
         document.addEventListener('click', this.#handleDynamicClick);
     }
