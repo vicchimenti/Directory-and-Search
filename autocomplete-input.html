@@ -8,8 +8,19 @@
                             <label for="on-page-search-input" aria-live="polite" id="autocomplete-concierge-label" class="sr-only" hidden>Search Seattle University</label>
                             <input type="hidden" name="collection" value="seattleu~sp-search">
                             <input type="hidden" name="profile" value="_default">
-                            <input type="text" id="on-page-search-input" name="on-page-search-input" class="on-page-sq-search" autocomplete="off" spellcheck="false" autofocus="" value="" class="form-control tt-input" />
+                            <input type="text" id="on-page-search-input"  name="on-page-search-input" class="on-page-sq-search" autocomplete="off" spellcheck="false" autofocus value />
                             <input type="submit" id="on-page-search-button" value="Search">
+                            <button type="button" class="autocomplete-concierge__submit hidden">
+                                <svg class="autocomplete-concierge__icon" role="img" focusable="false">
+                                    <title>Clear search</title>
+                                    <use href="#close"></use>
+                                </svg>Clear
+                            </button>
+                            <button type="submit" class="autocomplete-concierge__submit hidden" aria-labelledby="autocomplete-concierge-submit-label"><svg class="autocomplete-concierge__icon" role="img" focusable="false">
+                                <title id="autocomplete-concierge-submit-label">Submit search</title>
+                                <use href="#search"></use></svg>
+                            </button>
+                            <div role="grid" aria-labelledby="autocomplete-concierge-label" aria-hidden="true" id="autocomplete-concierge-grid" class="autocomplete-concierge__results autocomplete-concierge__results--collapsing" tabindex="-1" style="display: none;"></div>
                         </form>
                     </div>
                 </div>
@@ -18,3 +29,9 @@
     </div>
     <div id="results"></div>
 </section>
+
+
+
+<!-- 
+    id="autocomplete-concierge-inputField"
+  -->
