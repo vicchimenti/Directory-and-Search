@@ -34,7 +34,6 @@
 import DOMObserverManager from './dom-observer-manager.js';
 
 class DynamicResultsManager {
-    
     /** @private {DOMObserverManager} Instance of DOM observer for managing dynamic content */
     #observer;
     
