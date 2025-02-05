@@ -35,11 +35,22 @@ class ResultsSearchManager {
      * 
      * @throws {Error} If required DOM elements are not found (error will be caught internally)
      */
+    #observer;
+
     constructor() {
         if (window.location.pathname.includes('search-test')) {
+            this.#setupObserver();
             this.#setupResultsSearch();
-            this.handleURLParameters(); // Public as it's part of the API
+            this.handleURLParameters();
         }
+    }
+
+    #setupObserver() {
+        this.#observer = new DOMObserverManager({
+            targets: '#on-page-search-button',
+            callback: this.#handleAddedNodes.bind(this),
+            subtree: false
+        });
     }
 
     /**
