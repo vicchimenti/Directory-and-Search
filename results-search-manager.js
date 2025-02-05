@@ -1,30 +1,35 @@
 /**
  * @fileoverview Results Search Manager for Funnelback Search Integration
  * 
- * This class manages the search results page functionality, handling both
- * URL parameter-based searches and user-initiated searches. It integrates with
- * Funnelback search services via a proxy server and manages the display of search results.
+ * Manages search functionality on results pages, handling both URL parameter-based 
+ * and user-initiated searches. Integrates with Funnelback search services via proxy
+ * and manages dynamic result display using DOM observation.
  * 
  * Features:
- * - Handles URL-based search parameters from HeaderSearchManager redirects
- * - Manages search input and button interactions on results page
- * - Integrates with Funnelback search API via Vercel proxy
+ * - Handles URL parameter searches from HeaderSearchManager redirects
+ * - Manages search input and button interactions
+ * - Integrates with Funnelback API via Vercel proxy
+ * - Observes DOM for dynamic search button updates
  * - Displays search results dynamically
  * 
  * Dependencies:
- * - Requires Vercel proxy endpoint for Funnelback API access
- * - Requires DOM elements with specific IDs:
- *   - 'on-page-search-button': The search button
- *   - 'on-page-search-input': The search input field
- *   - 'results': Container for search results
+ * - DOMObserverManager for DOM mutation handling
+ * - Vercel proxy endpoint for Funnelback API access
+ * - DOM elements with specific IDs:
+ *   - 'on-page-search-button': Search button
+ *   - 'on-page-search-input': Search input field
+ *   - 'results': Results container
  * 
  * Related Files:
- * - header-search-manager.js: Handles initial search and redirects
+ * - dom-observer-manager.js: Handles DOM observation
+ * - header-search-manager.js: Handles initial search redirects
  * 
  * @author Victor Chimenti
  * @version 1.3.2
  * @lastModified 2025-02-05
  */
+
+
 
 import DOMObserverManager from './dom-observer-manager.js';
 
