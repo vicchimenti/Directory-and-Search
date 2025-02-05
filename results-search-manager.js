@@ -71,12 +71,9 @@ class ResultsSearchManager {
      * @throws {Error} If search button element is not found (error will be caught internally)
      */
     #setupResultsSearch() {
-        console.log("setupResultsSearch");
         const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
             onPageSearch.addEventListener('click', this.#handleResultsSearch);
-        } else {
-            console.warn('Search button not found in DOM');
         }
     }
 
@@ -186,6 +183,11 @@ class ResultsSearchManager {
                 `;
             }
         }
+    }
+
+    destroy() {
+        this.#observer?.destroy();
+        document.getElementById("on-page-search-button")?.removeEventListener('click', this.#handleResultsSearch);
     }
 }
 
