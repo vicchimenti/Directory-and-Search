@@ -28,7 +28,6 @@
  * @version 1.3.4
  * @lastModified 2025-02-05
  */
-
 import DOMObserverManager from './dom-observer-manager.js';
 
 class ResultsSearchManager {
