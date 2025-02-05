@@ -1,39 +1,36 @@
 /**
- * @fileoverview Dynamic Results Manager for Funnelback Search Integration
- * 
- * This class manages dynamic content updates for search results, handling various
- * user interactions like facet selection, tab changes, and pagination. It uses
- * a MutationObserver to maintain functionality as content updates dynamically.
- * 
- * Features:
- * - Manages dynamic content updates via MutationObserver
- * - Handles multiple types of search result interactions
- * - Maintains event listeners across dynamic content changes
- * - Integrates with Funnelback search API including required IP headers
- * 
- * Dependencies:
- * - Requires IPService for Funnelback headers
- * - Requires DOM element with ID 'results'
- * - Requires various interactive elements with specific classes:
- *   - .facet-group__list
- *   - .tab-list__nav
- *   - .search-tools__button-group
- *   - .facet-group__clear
- *   - .facet-breadcrumb__link
- *   - .pagination__link
- *   etc.
- * 
- * Related Files:
- * - results-search-manager.js: Handles main search functionality
- * - header-search-manager.js: Handles initial search and redirects
- * - IPService.js: Provides IP address headers for Funnelback
- * 
- * @author Victor Chimenti
- * @version 1.2.1
- * @lastModified 2025-02-04
- */
-
-import ipService from './IPService.js';
+* @fileoverview Dynamic Results Manager for Funnelback Search Integration
+* 
+* This class manages dynamic content updates for search results, handling various
+* user interactions like facet selection, tab changes, and pagination. It uses
+* a MutationObserver to maintain functionality as content updates dynamically.
+* 
+* Features:
+* - Manages dynamic content updates via MutationObserver
+* - Handles multiple types of search result interactions
+* - Maintains event listeners across dynamic content changes
+* - Integrates with Funnelback search API via Vercel proxy
+* 
+* Dependencies:
+* - Requires DOM element with ID 'results'
+* - Requires Vercel proxy endpoint for Funnelback API access
+* - Requires various interactive elements with specific classes:
+*   - .facet-group__list
+*   - .tab-list__nav
+*   - .search-tools__button-group
+*   - .facet-group__clear
+*   - .facet-breadcrumb__link
+*   - .pagination__link
+*   etc.
+* 
+* Related Files:
+* - results-search-manager.js: Handles main search functionality
+* - header-search-manager.js: Handles initial search and redirects
+* 
+* @author Victor Chimenti
+* @version 1.2.2
+* @lastModified 2025-02-04
+*/
 
 class DynamicResultsManager {
     /**
@@ -60,7 +57,7 @@ class DynamicResultsManager {
             }
         }
     }
-
+ 
     /**
      * Initializes the MutationObserver to watch for DOM changes.
      * 
@@ -75,7 +72,7 @@ class DynamicResultsManager {
             });
         });
     }
-
+ 
     /**
      * Starts observing the results container for changes.
      * 
@@ -91,7 +88,7 @@ class DynamicResultsManager {
             this.#waitForResultsContainer();
         }
     }
-
+ 
     /**
      * Waits for the results container to appear in the DOM.
      * 
@@ -106,13 +103,13 @@ class DynamicResultsManager {
                 console.log('Results container found and observer started');
             }
         });
-
+ 
         bodyObserver.observe(document.body, {
             childList: true,
             subtree: true
         });
     }
-
+ 
     /**
      * Attaches event listeners to newly added content.
      * 
@@ -146,7 +143,7 @@ class DynamicResultsManager {
             }
         });
     }
-
+ 
     /**
      * Sets up event listeners for dynamic content.
      * 
@@ -157,7 +154,7 @@ class DynamicResultsManager {
         document.removeEventListener('click', this.#handleDynamicClick);
         document.addEventListener('click', this.#handleDynamicClick);
     }
-
+ 
     /**
      * Main click handler for all dynamic content interactions.
      * Routes clicks to appropriate handlers based on element clicked.
@@ -179,7 +176,7 @@ class DynamicResultsManager {
                 '.search-spelling-suggestions__link': this.#handleSpellingClick,
                 'a.pagination__link': this.#handleClick
             };
-
+ 
             for (const [selector, handler] of Object.entries(handlers)) {
                 const matchedElement = e.target.closest(selector);
                 if (matchedElement) {
@@ -194,14 +191,15 @@ class DynamicResultsManager {
             console.warn('Error in handleDynamicClick:', error);
         }
     }
-
+ 
     /**
-     * Fetches results from Funnelback API.
+     * Fetches results from Funnelback API via proxy.
+     * Maps the original Funnelback URL parameters to the proxy endpoint.
      * 
      * @private
-     * @param {string} url - The URL to fetch from
+     * @param {string} url - The original Funnelback URL to fetch from
      * @param {string} method - The HTTP method to use
-     * @returns {Promise<string>} The response text
+     * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackResults(url, method) {
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/search';
@@ -216,14 +214,15 @@ class DynamicResultsManager {
             return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
         }
     }
-
+ 
     /**
-     * Fetches tool-specific results from Funnelback API.
+     * Fetches tool-specific results from Funnelback API via proxy.
+     * Handles specialized tool endpoints through the proxy service.
      * 
      * @private
-     * @param {string} url - The URL to fetch from
+     * @param {string} url - The original Funnelback tools URL
      * @param {string} method - The HTTP method to use
-     * @returns {Promise<string>} The response text
+     * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackTools(url, method) {
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/tools';
@@ -240,35 +239,32 @@ class DynamicResultsManager {
             return `<p>Error fetching ${method} tools request. Please try again later.</p>`;
         }
     }
-
+ 
     /**
-     * Fetches spelling suggestions from Funnelback API.
+     * Fetches spelling suggestions from Funnelback API via proxy.
+     * Uses a dedicated spelling endpoint that ensures proper parameter handling.
      * 
      * @private
-     * @param {string} url - The URL to fetch from
+     * @param {string} url - The original Funnelback spelling URL
      * @param {string} method - The HTTP method to use
-     * @returns {Promise<string>} The response text
+     * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackSpelling(url, method) {
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/spelling';
-        
         try {
-            // Just pass through the original query parameters
             const queryString = url.includes('?') ? url.split('?')[1] : '';
             const fullUrl = `${proxyUrl}?${queryString}`;
             console.log('Making spelling proxy request to:', fullUrl);
             
             const response = await fetch(fullUrl);
-            
             if (!response.ok) throw new Error(`Error: ${response.status}`);
-            
             return await response.text();
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
         }
     }
-
+ 
     /**
      * Handles generic click events.
      * 
@@ -287,14 +283,14 @@ class DynamicResultsManager {
                     ${response || "No results found."}
                 </div>
             `;
-
+ 
             document.getElementById('on-page-search-input')?.scrollIntoView({ 
                 behavior: 'smooth',
                 block: 'start'
             });
         }
     }
-
+ 
     /**
      * Handles spelling suggestion clicks.
      * 
@@ -313,7 +309,7 @@ class DynamicResultsManager {
             `;
         }
     }
-
+ 
     /**
      * Handles facet anchor clicks.
      * 
@@ -333,7 +329,7 @@ class DynamicResultsManager {
             `;
         }
     }
-
+ 
     /**
      * Handles tab clicks.
      * 
@@ -352,7 +348,7 @@ class DynamicResultsManager {
             `;
         }
     }
-
+ 
     /**
      * Handles search tools clicks.
      * 
@@ -371,7 +367,7 @@ class DynamicResultsManager {
             `;
         }
     }
-
+ 
     /**
      * Handles clear facet clicks.
      * 
@@ -390,7 +386,7 @@ class DynamicResultsManager {
             `;
         }
     }
-
+ 
     /**
      * Cleans up event listeners and observers.
      * Should be called when the component is being removed.
@@ -403,8 +399,8 @@ class DynamicResultsManager {
         }
         document.removeEventListener('click', this.#handleDynamicClick);
     }
-}
-
-// Initialize singleton instance
-const dynamicResults = new DynamicResultsManager();
-export default dynamicResults;
+ }
+ 
+ // Initialize singleton instance
+ const dynamicResults = new DynamicResultsManager();
+ export default dynamicResults;
