@@ -29,12 +29,12 @@
 * 
 * @author Victor Chimenti
 * @version 1.3.0
-* @lastModified 2025-02-04
+* @lastModified 2025-02-05
 */
-
 import DOMObserverManager from './dom-observer-manager.js';
-
 class DynamicResultsManager {
+    /** @private {DOMObserverManager} Instance of DOM observer for managing dynamic content */
+    #observer;
     /**
      * Initializes the Dynamic Results Manager.
      * Sets up mutation observer and event listeners if on search test page.
