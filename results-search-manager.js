@@ -1,81 +1,46 @@
 /**
  * @fileoverview Results Search Manager for Funnelback Search Integration
  * 
- * Manages search functionality on results pages, handling both URL parameter-based 
- * and user-initiated searches. Integrates with Funnelback search services via proxy
- * and manages dynamic result display using DOM observation.
+ * This class manages the search results page functionality, handling both
+ * URL parameter-based searches and user-initiated searches. It integrates with
+ * Funnelback search services and manages the display of search results.
  * 
  * Features:
- * - Handles URL parameter searches from HeaderSearchManager redirects
- * - Manages search input and button interactions
- * - Integrates with Funnelback API via Vercel proxy
- * - Observes DOM for dynamic search button updates
+ * - Handles URL-based search parameters from HeaderSearchManager redirects
+ * - Manages search input and button interactions on results page
+ * - Integrates with Funnelback search API including required IP headers
  * - Displays search results dynamically
  * 
  * Dependencies:
- * - DOMObserverManager for DOM mutation handling
- * - Vercel proxy endpoint for Funnelback API access
- * - DOM elements with specific IDs:
- *   - 'on-page-search-button': Search button
- *   - 'on-page-search-input': Search input field
- *   - 'results': Results container
+ * - Requires IPService for Funnelback headers
+ * - Requires DOM elements with specific IDs:
+ *   - 'on-page-search-button': The search button
+ *   - 'on-page-search-input': The search input field
+ *   - 'results': Container for search results
  * 
  * Related Files:
- * - dom-observer-manager.js: Handles DOM observation
- * - header-search-manager.js: Handles initial search redirects
+ * - header-search-manager.js: Handles initial search and redirects
+ * - ip-service.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.3.4
- * @lastModified 2025-02-05
+ * @version 1.1.8
+ * @lastModified 2025-02-03
  */
-import DOMObserverManager from './dom-observer-manager.js';
+
+import ipService from './IPService.js';
 
 class ResultsSearchManager {
-    /** @private {DOMObserverManager} Instance of DOM observer for managing search button changes */
-    #observer;
-
     /**
-     * Initializes the Results Search Manager with observer and event listeners.
-     * Sets up page functionality if on search test page.
+     * Initializes the Results Search Manager.
+     * Sets up event listeners and handles URL parameters if on search test page.
      * 
      * @throws {Error} If required DOM elements are not found (error will be caught internally)
      */
     constructor() {
         if (window.location.pathname.includes('search-test')) {
-            this.#setupObserver();
             this.#setupResultsSearch();
-            this.handleURLParameters();
+            this.handleURLParameters(); // Public as it's part of the API
         }
-    }
-
-    /**
-     * Sets up DOM observer for search button changes.
-     * Initializes observer with button target and node handling callback.
-     * @private
-     */
-    #setupObserver() {
-        this.#observer = new DOMObserverManager({
-            targets: '#on-page-search-button',
-            callback: this.#handleAddedNodes.bind(this),
-            subtree: true
-        });
-    }
-
-    /**
-     * Handles nodes added to observed DOM elements.
-     * Attaches click listeners to any new search buttons.
-     * @private
-     * @param {NodeList} nodes - Newly added DOM nodes
-     */
-    #handleAddedNodes(nodes) {
-        nodes.forEach(node => {
-            if (node?.nodeType === Node.ELEMENT_NODE) {
-                const searchButton = node.querySelector('#on-page-search-button');
-                if (searchButton) {
-                    searchButton.addEventListener('click', this.#handleResultsSearch);
-                }
-            }
-        });
     }
 
     /**
@@ -85,9 +50,12 @@ class ResultsSearchManager {
      * @throws {Error} If search button element is not found (error will be caught internally)
      */
     #setupResultsSearch() {
+        console.log("setupResultsSearch");
         const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
             onPageSearch.addEventListener('click', this.#handleResultsSearch);
+        } else {
+            console.warn('Search button not found in DOM');
         }
     }
 
@@ -143,35 +111,53 @@ class ResultsSearchManager {
     }
 
     /**
-     * Performs a search using the Funnelback API via proxy server.
-     * Constructs the search request with required parameters and handles
-     * the response display. This method is public as it's part of the
-     * class's public API and may be called from other parts of the application.
+     * Performs the actual search using Funnelback's API.
+     * This method is public as it's part of the class's public API and may be called
+     * from other parts of the application.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
      * @returns {Promise<void>}
-     * @throws {Error} If the search request fails or response handling fails
+     * @throws {Error} If the search request fails
      */
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
-    
-        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback';
+
+        // Current Funnelback URL - will be replaced with T4 wrapper endpoint
+        const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
         
         try {
+            // Get headers with IP address for Funnelback
+            const headers = await ipService.getFunnelbackHeaders();
+            console.log('Funnelback Headers:', headers); // Shows the headers object with IP
+
+            // Construct search URL with parameters
             const searchParams = new URLSearchParams({
                 query: searchQuery,
                 collection: 'seattleu~sp-search',
                 profile: '_default',
                 form: 'partial'
             });
-    
-            const url = `${proxyUrl}?${searchParams.toString()}`;
-            console.log('Request URL:', url);
-    
-            const response = await fetch(url);
-            console.log('Proxy Response Status:', response.status);
-            console.log('Proxy Response OK:', response.ok);
+
+            const url = `${prodOnPageSearchUrl}?${searchParams.toString()}`;
+            console.log('Request URL:', url); // Shows the full URL being requested
+
+            // Log full request details
+            console.log('Making Funnelback request with:', {
+                url: url,
+                headers: headers,
+                method: 'GET'
+            });
+
+            const response = await fetch(url, {
+                headers: headers
+            });
+
+            // Log response details
+            console.log('Funnelback Response Status:', response.status);
+            console.log('Funnelback Response OK:', response.ok);
+
+            // const response = await fetch(url);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
@@ -198,18 +184,8 @@ class ResultsSearchManager {
             }
         }
     }
-
-    /**
-     * Destroys the Results Search Manager instance.
-     * Removes event listeners and destroys the DOM observer.
-     * 
-     * @public
-     */
-    destroy() {
-        this.#observer?.destroy();
-        document.getElementById("on-page-search-button")?.removeEventListener('click', this.#handleResultsSearch);
-    }
 }
 
 // Initialize results search singleton instance
-export default new ResultsSearchManager();
+const resultsSearch = new ResultsSearchManager();
+export default resultsSearch;
