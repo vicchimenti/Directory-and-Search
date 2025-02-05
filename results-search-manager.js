@@ -30,6 +30,7 @@
  */
 
 import DOMObserverManager from './dom-observer-manager.js';
+
 class ResultsSearchManager {
     
     /** @private {DOMObserverManager} Instance of DOM observer for managing search button changes */
