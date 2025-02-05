@@ -30,8 +30,6 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="<t4 type='media' id='9152849' formatter='path/*' />" type="module" defer></script>
-        <!-- dom-observer-manager.js -->
         <script src="<t4 type='media' id='9055999' formatter='path/*' />" type="module" defer></script>
         <!-- results-search-manager.js -->
         <script src="<t4 type='media' id='9017309' formatter='path/*' />" type="module" defer></script>
