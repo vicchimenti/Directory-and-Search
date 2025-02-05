@@ -3,16 +3,16 @@
  * 
  * This class manages the search results page functionality, handling both
  * URL parameter-based searches and user-initiated searches. It integrates with
- * Funnelback search services and manages the display of search results.
+ * Funnelback search services via a proxy server and manages the display of search results.
  * 
  * Features:
  * - Handles URL-based search parameters from HeaderSearchManager redirects
  * - Manages search input and button interactions on results page
- * - Integrates with Funnelback search API including required IP headers
+ * - Integrates with Funnelback search API via Vercel proxy
  * - Displays search results dynamically
  * 
  * Dependencies:
- * - Requires IPService for Funnelback headers
+ * - Requires Vercel proxy endpoint for Funnelback API access
  * - Requires DOM elements with specific IDs:
  *   - 'on-page-search-button': The search button
  *   - 'on-page-search-input': The search input field
@@ -20,14 +20,11 @@
  * 
  * Related Files:
  * - header-search-manager.js: Handles initial search and redirects
- * - ip-service.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.1.8
- * @lastModified 2025-02-03
+ * @version 1.3.0
+ * @lastModified 2025-02-04
  */
-
-import ipService from './IPService.js';
 
 class ResultsSearchManager {
     /**
@@ -111,53 +108,35 @@ class ResultsSearchManager {
     }
 
     /**
-     * Performs the actual search using Funnelback's API.
-     * This method is public as it's part of the class's public API and may be called
-     * from other parts of the application.
+     * Performs a search using the Funnelback API via proxy server.
+     * Constructs the search request with required parameters and handles
+     * the response display. This method is public as it's part of the
+     * class's public API and may be called from other parts of the application.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
      * @returns {Promise<void>}
-     * @throws {Error} If the search request fails
+     * @throws {Error} If the search request fails or response handling fails
      */
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
-
-        // Current Funnelback URL - will be replaced with T4 wrapper endpoint
-        const prodOnPageSearchUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+    
+        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback';
         
         try {
-            // Get headers with IP address for Funnelback
-            const headers = await ipService.getFunnelbackHeaders();
-            console.log('Funnelback Headers:', headers); // Shows the headers object with IP
-
-            // Construct search URL with parameters
             const searchParams = new URLSearchParams({
                 query: searchQuery,
                 collection: 'seattleu~sp-search',
                 profile: '_default',
                 form: 'partial'
             });
-
-            const url = `${prodOnPageSearchUrl}?${searchParams.toString()}`;
-            console.log('Request URL:', url); // Shows the full URL being requested
-
-            // Log full request details
-            console.log('Making Funnelback request with:', {
-                url: url,
-                headers: headers,
-                method: 'GET'
-            });
-
-            const response = await fetch(url, {
-                headers: headers
-            });
-
-            // Log response details
-            console.log('Funnelback Response Status:', response.status);
-            console.log('Funnelback Response OK:', response.ok);
-
-            // const response = await fetch(url);
+    
+            const url = `${proxyUrl}?${searchParams.toString()}`;
+            console.log('Request URL:', url);
+    
+            const response = await fetch(url);
+            console.log('Proxy Response Status:', response.status);
+            console.log('Proxy Response OK:', response.ok);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
