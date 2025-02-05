@@ -401,9 +401,7 @@ class DynamicResultsManager {
      * @public
      */
     destroy() {
-        if (this.observer) {
-            this.observer.disconnect();
-        }
+        this.#observer?.destroy();
         document.removeEventListener('click', this.#handleDynamicClick);
     }
  }
