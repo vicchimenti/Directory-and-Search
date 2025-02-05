@@ -3,16 +3,16 @@
  * 
  * This class manages the search results page functionality, handling both
  * URL parameter-based searches and user-initiated searches. It integrates with
- * Funnelback search services and manages the display of search results.
+ * Funnelback search services via a proxy server and manages the display of search results.
  * 
  * Features:
  * - Handles URL-based search parameters from HeaderSearchManager redirects
  * - Manages search input and button interactions on results page
- * - Integrates with Funnelback search API including required IP headers
+ * - Integrates with Funnelback search API via Vercel proxy
  * - Displays search results dynamically
  * 
  * Dependencies:
- * - Requires IPService for Funnelback headers
+ * - Requires Vercel proxy endpoint for Funnelback API access
  * - Requires DOM elements with specific IDs:
  *   - 'on-page-search-button': The search button
  *   - 'on-page-search-input': The search input field
@@ -20,14 +20,11 @@
  * 
  * Related Files:
  * - header-search-manager.js: Handles initial search and redirects
- * - ip-service.js: Provides IP address headers for Funnelback
  * 
  * @author Victor Chimenti
- * @version 1.2.1
+ * @version 1.2.2
  * @lastModified 2025-02-04
  */
-
-import ipService from './IPService.js';
 
 class ResultsSearchManager {
     /**
@@ -111,14 +108,15 @@ class ResultsSearchManager {
     }
 
     /**
-     * Performs the actual search using Funnelback's API.
-     * This method is public as it's part of the class's public API and may be called
-     * from other parts of the application.
+     * Performs a search using the Funnelback API via proxy server.
+     * Constructs the search request with required parameters and handles
+     * the response display. This method is public as it's part of the
+     * class's public API and may be called from other parts of the application.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
      * @returns {Promise<void>}
-     * @throws {Error} If the search request fails
+     * @throws {Error} If the search request fails or response handling fails
      */
     async performFunnelbackSearch(searchQuery) {
         console.log("performFunnelbackSearch");
