@@ -2,6 +2,7 @@ const { name } = require("tar/lib/types");
 
 (function($) {
     $('#input.on-page-sq-search').autocompletion({
+      program   : 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
       alpha: '0.5',
       show: '10',
       sort: '0',
@@ -11,7 +12,6 @@ const { name } = require("tar/lib/types");
           name: 'Suggestions',
           collection: 'seattleu~sp-search',
           profile   : '_default',
-          program   : 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
           show: 10,
         }
       },
