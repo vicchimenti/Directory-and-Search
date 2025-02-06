@@ -52,5 +52,27 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
         <!-- End Partial Scripts -->
 
+        <!-- Autocomplete -->
+        <script>
+            (function($) {
+                $('#autocomplete-concierge-inputField').autocompletion({
+                program   : 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
+                alpha: '0.5',
+                show: '10',
+                sort: '0',
+                length: '3',
+                datasets: {
+                    organic: {
+                    name: 'Suggestions',
+                    collection: 'seattleu~sp-search',
+                    profile   : '_default',
+                    show: 10,
+                    }
+                },
+                length: 3
+                });
+            })(jQuery);
+        </script>
+
     </body>
 </html>
