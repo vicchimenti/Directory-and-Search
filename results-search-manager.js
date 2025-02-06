@@ -100,6 +100,7 @@ class ResultsSearchManager {
 
         const searchQuery = searchInput.value;
         if (!searchQuery?.trim()) {
+            alert('Please enter a search term');
             return;
         }
 
