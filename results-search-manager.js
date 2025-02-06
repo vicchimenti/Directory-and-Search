@@ -72,7 +72,7 @@ class ResultsSearchManager {
         const urlSearchQuery = urlParams.get('query');
 
         if (urlSearchQuery) {
-            const searchInputField = document.getElementById('on-page-search-input');
+            const searchInputField = document.getElementById('autocomplete-concierge-inputField');
             if (searchInputField) {
                 searchInputField.value = urlSearchQuery;
             }
@@ -92,7 +92,7 @@ class ResultsSearchManager {
         console.log("handleResultsSearch");
 
         event.preventDefault();
-        const searchInput = document.getElementById('on-page-search-input');
+        const searchInput = document.getElementById('autocomplete-concierge-inputField');
         if (!searchInput) {
             console.error('Search input field not found');
             return;
