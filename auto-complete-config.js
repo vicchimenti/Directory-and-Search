@@ -1,7 +1,7 @@
 const { name } = require("tar/lib/types");
 
 (function($) {
-    $('#input.on-page-sq-search').autocompletion({
+    $('#autocomplete-concierge-inputField').autocompletion({
       program   : 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
       alpha: '0.5',
       show: '10',
