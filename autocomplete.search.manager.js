@@ -106,11 +106,42 @@ class AutocompleteSearchManager {
         // Add click handlers to suggestions
         this.suggestionsContainer.querySelectorAll('.suggestion-item')
             .forEach((item, index) => {
-                item.addEventListener('click', () => {
-                    this.inputField.value = suggestions[index].display ?? suggestions[index];
+                item.addEventListener('click', async () => {
+                    const selectedValue = suggestions[index].display ?? suggestions[index];
+                    this.inputField.value = selectedValue;
                     this.suggestionsContainer.innerHTML = '';
-                    // Trigger search if needed
-                    document.getElementById('on-page-search-button')?.click();
+                    
+                    const searchParams = new URLSearchParams({
+                        query: selectedValue,
+                        collection: 'seattleu~sp-search',
+                        profile: '_default',
+                        form: 'partial'
+                    });
+
+                    try {
+                        const response = await fetch(`https://funnelback-proxy.vercel.app/proxy/funnelback/search?${searchParams}`);
+                        if (!response.ok) throw new Error(`Error: ${response.status}`);
+                        
+                        const text = await response.text();
+                        const resultsContainer = document.getElementById('results');
+                        if (resultsContainer) {
+                            resultsContainer.innerHTML = `
+                                <div id="funnelback-search-container-response" class="funnelback-search-container">
+                                    ${text}
+                                </div>
+                            `;
+                        }
+                    } catch (error) {
+                        console.error('Search error:', error);
+                        const resultsContainer = document.getElementById('results');
+                        if (resultsContainer) {
+                            resultsContainer.innerHTML = `
+                                <div class="error-message">
+                                    <p>Sorry, we couldn't complete your search. ${error.message}</p>
+                                </div>
+                            `;
+                        }
+                    }
                 });
             });
     }
