@@ -135,9 +135,9 @@
 }
 
 /* Results Container */
-#results {
+/* #results {
     margin-top: 20px;
-}
+} */
 
 /* Responsive Adjustments */
 @media (max-width: 640px) {
