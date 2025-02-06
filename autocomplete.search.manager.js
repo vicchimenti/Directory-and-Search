@@ -46,11 +46,8 @@
 
 class AutocompleteSearchManager {
     /**
-     * Creates an instance of AutocompleteSearchManager.
-     * Initializes configuration and sets up the suggestions container.
-     * 
-     * @param {AutocompleteConfig} [config={}] - Configuration options
-     * @throws {Error} If input field element is not found in DOM
+     * Creates an instance of AutocompleteSearchManager
+     * @param {Object} config - Configuration options
      */
     constructor(config = {}) {
         this.config = {
@@ -59,53 +56,126 @@ class AutocompleteSearchManager {
             profile: '_default',
             maxResults: 10,
             minLength: 3,
+            // Separate endpoints for autocomplete and search
+            endpoints: {
+                suggest: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
+                search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search'
+            },
             ...config
         };
-        
+
+        // Initialize DOM elements
         this.inputField = document.getElementById(this.config.inputId);
-        this.suggestionsContainer = document.createElement('div');
-        this.suggestionsContainer.id = 'autocomplete-suggestions';
-        this.suggestionsContainer.className = 'suggestions-container';
+        if (!this.inputField) {
+            console.error('Search input field not found');
+            return;
+        }
+
+        this.form = this.inputField.closest('form');
+        if (!this.form) {
+            console.error('Search form not found');
+            return;
+        }
+
+        // Get existing elements
+        this.clearButton = this.form.querySelector('.clear-search-button');
+        this.submitButton = this.form.querySelector('#on-page-search-button');
+        this.suggestionsContainer = document.getElementById('autocomplete-suggestions');
+        this.resultsContainer = document.getElementById('results');
+
         this.debounceTimeout = null;
-        this.proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest';
-        
+        this.isLoading = false;
+
         this.#init();
     }
 
     /**
-     * Initializes the autocomplete functionality.
-     * Sets up event listeners and DOM elements.
-     * 
+     * Initialize the manager
      * @private
-     * @throws {Error} If input field is not found in DOM
      */
     #init() {
-        if (!this.inputField) {
-            console.error('Autocomplete input field not found');
-            return;
-        }
-
-        this.inputField.parentNode.insertBefore(
-            this.suggestionsContainer, 
-            this.inputField.nextSibling
-        );
-
+        // Set up input event listeners
         this.inputField.addEventListener('input', this.#handleInput.bind(this));
         this.inputField.addEventListener('keydown', this.#handleKeydown.bind(this));
+        
+        // Form submission handling
+        this.form.addEventListener('submit', this.#handleFormSubmit.bind(this));
+        
+        // Clear button functionality
+        if (this.clearButton) {
+            this.clearButton.addEventListener('click', () => {
+                this.#clearSearch();
+            });
+        }
+
+        // Outside click handling
         document.addEventListener('click', this.#handleClickOutside.bind(this));
+
+        // Initial state
+        this.#updateButtonStates();
     }
 
     /**
-     * Handles input events with debouncing.
-     * Triggers suggestion fetching after user stops typing.
-     * 
+     * Clear search and reset state
      * @private
-     * @param {InputEvent} event - The input event object
+     */
+    #clearSearch() {
+        this.inputField.value = '';
+        this.suggestionsContainer.innerHTML = '';
+        this.inputField.focus();
+        this.#updateButtonStates();
+    }
+
+    /**
+     * Update clear and submit button states
+     * @private
+     */
+    #updateButtonStates() {
+        const hasValue = this.inputField.value.trim().length > 0;
+        
+        if (this.clearButton) {
+            this.clearButton.classList.toggle('hidden', !hasValue);
+        }
+        
+        if (this.submitButton) {
+            this.submitButton.disabled = !hasValue;
+        }
+    }
+
+    /**
+     * Handle form submission
+     * @private
+     * @param {Event} event 
+     */
+    async #handleFormSubmit(event) {
+        event.preventDefault();
+        const query = this.inputField.value.trim();
+        
+        if (!query) return;
+
+        try {
+            this.isLoading = true;
+            this.#updateLoadingState(true);
+            await this.#performSearch(query);
+        } catch (error) {
+            console.error('Search failed:', error);
+            this.#showError('Search failed. Please try again.');
+        } finally {
+            this.isLoading = false;
+            this.#updateLoadingState(false);
+        }
+    }
+
+    /**
+     * Handle input events with debouncing
+     * @private
+     * @param {Event} event 
      */
     #handleInput(event) {
+        this.#updateButtonStates();
         clearTimeout(this.debounceTimeout);
+        
         const query = event.target.value.trim();
-
         if (query.length < this.config.minLength) {
             this.suggestionsContainer.innerHTML = '';
             return;
@@ -117,11 +187,9 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Fetches suggestions from the Funnelback API via proxy.
-     * 
+     * Fetch suggestions from the suggest endpoint
      * @private
-     * @param {string} query - The search query
-     * @returns {Promise<void>}
+     * @param {string} query 
      */
     async #fetchSuggestions(query) {
         try {
@@ -132,8 +200,8 @@ class AutocompleteSearchManager {
                 profile: this.config.profile
             });
 
-            const response = await fetch(`${this.proxyUrl}?${params}`);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
+            const response = await fetch(`${this.config.endpoints.suggest}?${params}`);
+            if (!response.ok) throw new Error(`Suggestions failed: ${response.status}`);
 
             const suggestions = await response.json();
             this.#displaySuggestions(suggestions);
@@ -144,11 +212,35 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Displays suggestions in the dropdown container.
-     * Creates clickable suggestion items with event handlers.
-     * 
+     * Perform search using the search endpoint
      * @private
-     * @param {Array<Object>} suggestions - Array of suggestion objects
+     * @param {string} query 
+     */
+    async #performSearch(query) {
+        const params = new URLSearchParams({
+            query: query,
+            collection: this.config.collection,
+            profile: this.config.profile,
+            form: 'partial'
+        });
+
+        const response = await fetch(`${this.config.endpoints.search}?${params}`);
+        if (!response.ok) throw new Error(`Search failed: ${response.status}`);
+        
+        const text = await response.text();
+        if (this.resultsContainer) {
+            this.resultsContainer.innerHTML = `
+                <div id="funnelback-search-container-response" class="funnelback-search-container">
+                    ${text}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Display suggestions in the dropdown
+     * @private
+     * @param {Array} suggestions 
      */
     #displaySuggestions(suggestions) {
         if (!suggestions?.length) {
@@ -167,60 +259,29 @@ class AutocompleteSearchManager {
                 ${suggestionsList}
             </div>
         `;
+        this.suggestionsContainer.hidden = false;
 
+        // Add click handlers
         this.suggestionsContainer.querySelectorAll('.suggestion-item')
             .forEach((item, index) => {
                 item.addEventListener('click', async () => {
                     const selectedValue = suggestions[index].display ?? suggestions[index];
                     this.inputField.value = selectedValue;
                     this.suggestionsContainer.innerHTML = '';
-                    
-                    const searchParams = new URLSearchParams({
-                        query: selectedValue,
-                        collection: this.config.collection,
-                        profile: this.config.profile,
-                        form: 'partial'
-                    });
-
-                    try {
-                        const response = await fetch(`https://funnelback-proxy.vercel.app/proxy/funnelback/search?${searchParams}`);
-                        if (!response.ok) throw new Error(`Error: ${response.status}`);
-                        
-                        const text = await response.text();
-                        const resultsContainer = document.getElementById('results');
-                        if (resultsContainer) {
-                            resultsContainer.innerHTML = `
-                                <div id="funnelback-search-container-response" class="funnelback-search-container">
-                                    ${text}
-                                </div>
-                            `;
-                        }
-                    } catch (error) {
-                        console.error('Search error:', error);
-                        const resultsContainer = document.getElementById('results');
-                        if (resultsContainer) {
-                            resultsContainer.innerHTML = `
-                                <div class="error-message">
-                                    <p>Sorry, we couldn't complete your search. ${error.message}</p>
-                                </div>
-                            `;
-                        }
-                    }
+                    this.#updateButtonStates();
+                    await this.#performSearch(selectedValue);
                 });
             });
     }
 
     /**
-     * Handles keyboard navigation within suggestions.
-     * Supports arrow keys, enter, and escape.
-     * 
+     * Handle keyboard navigation
      * @private
-     * @param {KeyboardEvent} event - The keyboard event object
+     * @param {KeyboardEvent} event 
      */
     #handleKeydown(event) {
         const items = this.suggestionsContainer.querySelectorAll('.suggestion-item');
         const activeItem = this.suggestionsContainer.querySelector('.suggestion-item.active');
-        let newActiveItem;
 
         switch (event.key) {
             case 'ArrowDown':
@@ -253,55 +314,22 @@ class AutocompleteSearchManager {
                     const selectedValue = activeItem.textContent.trim();
                     this.inputField.value = selectedValue;
                     this.suggestionsContainer.innerHTML = '';
-                    
-                    const searchParams = new URLSearchParams({
-                        query: selectedValue,
-                        collection: this.config.collection,
-                        profile: this.config.profile,
-                        form: 'partial'
-                    });
-
-                    (async () => {
-                        try {
-                            const response = await fetch(`https://funnelback-proxy.vercel.app/proxy/funnelback/search?${searchParams}`);
-                            if (!response.ok) throw new Error(`Error: ${response.status}`);
-                            
-                            const text = await response.text();
-                            const resultsContainer = document.getElementById('results');
-                            if (resultsContainer) {
-                                resultsContainer.innerHTML = `
-                                    <div id="funnelback-search-container-response" class="funnelback-search-container">
-                                        ${text}
-                                    </div>
-                                `;
-                            }
-                        } catch (error) {
-                            console.error('Search error:', error);
-                            const resultsContainer = document.getElementById('results');
-                            if (resultsContainer) {
-                                resultsContainer.innerHTML = `
-                                    <div class="error-message">
-                                        <p>Sorry, we couldn't complete your search. ${error.message}</p>
-                                    </div>
-                                `;
-                            }
-                        }
-                    })();
+                    this.#updateButtonStates();
+                    this.#performSearch(selectedValue);
                 }
                 break;
 
             case 'Escape':
                 this.suggestionsContainer.innerHTML = '';
+                this.inputField.blur();
                 break;
         }
     }
 
     /**
-     * Handles clicks outside the autocomplete component.
-     * Closes the suggestions dropdown when clicking elsewhere.
-     * 
+     * Handle clicks outside the component
      * @private
-     * @param {MouseEvent} event - The click event object
+     * @param {MouseEvent} event 
      */
     #handleClickOutside(event) {
         if (!this.inputField.contains(event.target) && 
@@ -309,7 +337,57 @@ class AutocompleteSearchManager {
             this.suggestionsContainer.innerHTML = '';
         }
     }
+
+    /**
+     * Update loading state UI
+     * @private
+     * @param {boolean} isLoading 
+     */
+    #updateLoadingState(isLoading) {
+        this.submitButton?.classList.toggle('loading', isLoading);
+        this.inputField.disabled = isLoading;
+        if (this.clearButton) {
+            this.clearButton.disabled = isLoading;
+        }
+    }
+
+    /**
+     * Show error message
+     * @private
+     * @param {string} message 
+     */
+    #showError(message) {
+        if (this.resultsContainer) {
+            this.resultsContainer.innerHTML = `
+                <div class="error-message">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Initialize autocomplete on all matching elements
+     * @static
+     */
+    static bindToElements() {
+        const elements = document.querySelectorAll('[data-autocomplete]');
+        elements.forEach(element => {
+            const config = {
+                inputId: element.id,
+                collection: element.dataset.collection || 'seattleu~sp-search',
+                profile: element.dataset.profile || '_default',
+                maxResults: parseInt(element.dataset.maxResults, 10) || 10,
+                minLength: parseInt(element.dataset.minLength, 10) || 3
+            };
+            new AutocompleteSearchManager(config);
+        });
+    }
 }
 
-// Export for use in other modules
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    AutocompleteSearchManager.bindToElements();
+});
+
 export default AutocompleteSearchManager;
