@@ -4,8 +4,17 @@
  */
 
 class AutocompleteSearchManager {
-    constructor() {
-        this.inputField = document.getElementById('autocomplete-concierge-inputField');
+    constructor(config = {}) {
+        this.config = {
+            inputId: 'autocomplete-concierge-inputField',
+            collection: 'seattleu~sp-search',
+            profile: '_default',
+            maxResults: 10,
+            minLength: 3,
+            ...config
+        };
+        
+        this.inputField = document.getElementById(this.config.inputId);
         this.suggestionsContainer = document.createElement('div');
         this.suggestionsContainer.id = 'autocomplete-suggestions';
         this.suggestionsContainer.className = 'suggestions-container';
@@ -46,7 +55,7 @@ class AutocompleteSearchManager {
         clearTimeout(this.debounceTimeout);
         const query = event.target.value.trim();
 
-        if (query.length < 2) {
+        if (query.length < this.config.minLength) {
             this.suggestionsContainer.innerHTML = '';
             return;
         }
