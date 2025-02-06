@@ -1,9 +1,57 @@
 /**
- * @fileoverview Autocomplete Search Manager for Funnelback Integration
- * Provides real-time search suggestions as users type
+ * @fileoverview Autocomplete Search Manager for Funnelback Search Integration
+ * 
+ * This class manages real-time search suggestions functionality, integrating with
+ * Funnelback search services via a proxy server. It provides typeahead suggestions
+ * as users type in the search input field and handles suggestion selection with
+ * immediate search results display.
+ * 
+ * Features:
+ * - Real-time suggestions as users type
+ * - Debounced API calls to prevent request flooding
+ * - Keyboard navigation support (up/down arrows, enter, escape)
+ * - Click selection support
+ * - Accessible ARIA attributes
+ * - Configurable parameters (collection, profile, result count, etc.)
+ * - Direct integration with Funnelback search API
+ * 
+ * Dependencies:
+ * - Requires proxy endpoint for Funnelback API access
+ * - Requires DOM element with specified input ID
+ * - Requires results container for search results display
+ * 
+ * Configuration Options:
+ * @typedef {Object} AutocompleteConfig
+ * @property {string} [inputId='autocomplete-concierge-inputField'] - ID of input element
+ * @property {string} [collection='seattleu~sp-search'] - Funnelback collection ID
+ * @property {string} [profile='_default'] - Search profile name
+ * @property {number} [maxResults=10] - Maximum number of suggestions to show
+ * @property {number} [minLength=3] - Minimum characters before showing suggestions
+ * 
+ * Related Files:
+ * - suggest.js: Proxy server handler for suggestions
+ * - vercel.json: Route configuration for proxy endpoints
+ * 
+ * @example
+ * const autocomplete = new AutocompleteSearchManager({
+ *   inputId: 'my-search-input',
+ *   collection: 'my-collection',
+ *   maxResults: 5
+ * });
+ * 
+ * @author Victor Chimenti
+ * @version 1.0.0
+ * @lastModified 2025-02-06
  */
 
 class AutocompleteSearchManager {
+    /**
+     * Creates an instance of AutocompleteSearchManager.
+     * Initializes configuration and sets up the suggestions container.
+     * 
+     * @param {AutocompleteConfig} [config={}] - Configuration options
+     * @throws {Error} If input field element is not found in DOM
+     */
     constructor(config = {}) {
         this.config = {
             inputId: 'autocomplete-concierge-inputField',
@@ -25,8 +73,11 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Initialize the autocomplete functionality
+     * Initializes the autocomplete functionality.
+     * Sets up event listeners and DOM elements.
+     * 
      * @private
+     * @throws {Error} If input field is not found in DOM
      */
     #init() {
         if (!this.inputField) {
@@ -34,22 +85,22 @@ class AutocompleteSearchManager {
             return;
         }
 
-        // Insert suggestions container after input field
         this.inputField.parentNode.insertBefore(
             this.suggestionsContainer, 
             this.inputField.nextSibling
         );
 
-        // Setup event listeners
         this.inputField.addEventListener('input', this.#handleInput.bind(this));
         this.inputField.addEventListener('keydown', this.#handleKeydown.bind(this));
         document.addEventListener('click', this.#handleClickOutside.bind(this));
     }
 
     /**
-     * Handle input events with debouncing
+     * Handles input events with debouncing.
+     * Triggers suggestion fetching after user stops typing.
+     * 
      * @private
-     * @param {Event} event 
+     * @param {InputEvent} event - The input event object
      */
     #handleInput(event) {
         clearTimeout(this.debounceTimeout);
@@ -66,16 +117,19 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Fetch suggestions from the proxy endpoint
+     * Fetches suggestions from the Funnelback API via proxy.
+     * 
      * @private
-     * @param {string} query 
+     * @param {string} query - The search query
+     * @returns {Promise<void>}
      */
     async #fetchSuggestions(query) {
         try {
             const params = new URLSearchParams({
-                collection: 'seattleu~sp-search',
+                collection: this.config.collection,
                 partial_query: query,
-                show: 5
+                show: this.config.maxResults,
+                profile: this.config.profile
             });
 
             const response = await fetch(`${this.proxyUrl}?${params}`);
@@ -90,9 +144,11 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Display suggestions in the dropdown
+     * Displays suggestions in the dropdown container.
+     * Creates clickable suggestion items with event handlers.
+     * 
      * @private
-     * @param {Array} suggestions 
+     * @param {Array<Object>} suggestions - Array of suggestion objects
      */
     #displaySuggestions(suggestions) {
         if (!suggestions?.length) {
@@ -112,7 +168,6 @@ class AutocompleteSearchManager {
             </div>
         `;
 
-        // Add click handlers to suggestions
         this.suggestionsContainer.querySelectorAll('.suggestion-item')
             .forEach((item, index) => {
                 item.addEventListener('click', async () => {
@@ -122,8 +177,8 @@ class AutocompleteSearchManager {
                     
                     const searchParams = new URLSearchParams({
                         query: selectedValue,
-                        collection: 'seattleu~sp-search',
-                        profile: '_default',
+                        collection: this.config.collection,
+                        profile: this.config.profile,
                         form: 'partial'
                     });
 
@@ -156,9 +211,11 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Handle keyboard navigation
+     * Handles keyboard navigation within suggestions.
+     * Supports arrow keys, enter, and escape.
+     * 
      * @private
-     * @param {KeyboardEvent} event 
+     * @param {KeyboardEvent} event - The keyboard event object
      */
     #handleKeydown(event) {
         const items = this.suggestionsContainer.querySelectorAll('.suggestion-item');
@@ -199,8 +256,8 @@ class AutocompleteSearchManager {
                     
                     const searchParams = new URLSearchParams({
                         query: selectedValue,
-                        collection: 'seattleu~sp-search',
-                        profile: '_default',
+                        collection: this.config.collection,
+                        profile: this.config.profile,
                         form: 'partial'
                     });
 
@@ -240,9 +297,11 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Handle clicks outside the autocomplete component
+     * Handles clicks outside the autocomplete component.
+     * Closes the suggestions dropdown when clicking elsewhere.
+     * 
      * @private
-     * @param {Event} event 
+     * @param {MouseEvent} event - The click event object
      */
     #handleClickOutside(event) {
         if (!this.inputField.contains(event.target) && 
@@ -252,6 +311,5 @@ class AutocompleteSearchManager {
     }
 }
 
-// Initialize autocomplete manager
-const autocompleteSearch = new AutocompleteSearchManager();
-export default autocompleteSearch;
+// Export for use in other modules
+export default AutocompleteSearchManager;
