@@ -4,23 +4,71 @@
             <div class="searchAreaWrapper">
                 <div class="searchArea">
                     <div class="global-margin--3x">
-                        <form action method="GET" type="partial_query" class="autocomplete-concierge__form">
-                            <label for="autocomplete-concierge-inputField" aria-live="polite" id="autocomplete-concierge-label" class="sr-only" hidden>Search Seattle University</label>
-                            <input type="hidden" name="collection" value="seattleu~sp-search">
-                            <input type="hidden" name="profile" value="_default">
-                            <input type="text" id="autocomplete-concierge-inputField"  name="autocomplete-concierge-inputField" class="on-page-sq-search autocomplete-concierge__form" autocomplete="off" spellcheck="false" autofocus value />
-                            <input type="submit" id="on-page-search-button" value="Search">
-                            <button type="button" class="autocomplete-concierge__submit hidden">
-                                <svg class="autocomplete-concierge__icon" role="img" focusable="false">
-                                    <title>Clear search</title>
-                                    <use href="#close"></use>
-                                </svg>Clear
-                            </button>
-                            <button type="submit" class="autocomplete-concierge__submit hidden" aria-labelledby="autocomplete-concierge-submit-label"><svg class="autocomplete-concierge__icon" role="img" focusable="false">
-                                <title id="autocomplete-concierge-submit-label">Submit search</title>
-                                <use href="#search"></use></svg>
-                            </button>
-                            <div role="grid" aria-labelledby="autocomplete-concierge-label" aria-hidden="true" id="autocomplete-concierge-grid" class="autocomplete-concierge__results autocomplete-concierge__results--collapsing" tabindex="-1" style="display: none;"></div>
+                        <form id="concierge-search-form" 
+                                class="autocomplete-concierge__form" 
+                                method="GET" 
+                                action="">
+                            <!-- Screen reader label -->
+                            <label for="autocomplete-concierge-inputField" 
+                                    aria-live="polite" 
+                                    id="autocomplete-concierge-label" 
+                                    class="sr-only" 
+                                    hidden>
+                                Search Seattle University
+                            </label>
+                        
+                            <!-- Hidden fields for Funnelback configuration -->
+                            <div class="search-config" hidden>
+                                <input type="hidden" name="collection" value="seattleu~sp-search">
+                                <input type="hidden" name="profile" value="_default">
+                            </div>
+                        
+                            <!-- Main search input with data attributes for autocomplete -->
+                            <input type="text" 
+                                    id="autocomplete-concierge-inputField"
+                                    name="query"
+                                    class="on-page-sq-search"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                    autofocus
+                                    data-autocomplete
+                                    data-collection="seattleu~sp-search"
+                                    data-profile="_default"
+                                    data-max-results="10"
+                                    data-min-length="3"
+                                    data-results-container="results">
+                        
+                            <!-- Search controls wrapper -->
+                            <div class="search-controls">
+                                <!-- Primary search button -->
+                                <button type="submit" 
+                                        id="on-page-search-button" 
+                                        class="search-submit-button" 
+                                        aria-labelledby="autocomplete-concierge-submit-label">
+                                    <svg class="autocomplete-concierge__icon" role="img" focusable="false">
+                                        <title id="autocomplete-concierge-submit-label">Submit search</title>
+                                        <use href="#search"></use>
+                                    </svg>
+                                </button>
+                        
+                                <!-- Clear search button -->
+                                <button type="button" 
+                                        class="clear-search-button" 
+                                        aria-label="Clear search">
+                                    <svg class="autocomplete-concierge__icon" role="img" focusable="false">
+                                        <title>Clear search</title>
+                                        <use href="#close"></use>
+                                    </svg>
+                                </button>
+                            </div>
+                        
+                            <!-- Results container for autocomplete suggestions -->
+                            <div id="autocomplete-suggestions" 
+                                class="autocomplete-concierge__results" 
+                                role="listbox" 
+                                aria-labelledby="autocomplete-concierge-label"
+                                hidden>
+                            </div>
                         </form>
                     </div>
                 </div>

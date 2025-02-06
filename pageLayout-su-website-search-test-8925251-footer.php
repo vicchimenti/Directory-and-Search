@@ -38,7 +38,9 @@
         <!-- header-search-manager.js -->
         <script src="<t4 type='media' id='9063951' formatter='path/*' />" type="module" defer></script>
         <!-- global-collapse-manager.js -->
-
+        <script src="<t4 type='media' id='9155586' formatter='path/*' />" type="module" defer></script>
+        <!-- autocomplete-search-manager.js -->
+        
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
         <t4 type="navigation" name="Contact Listing JS" id="1029" />
@@ -55,21 +57,16 @@
         <!-- Autocomplete -->
         <script>
             (function($) {
-                $('#autocomplete-concierge-inputField').autocompletion({
-                program   : 'https://seattleu~sp-search.clients.us.funnelback.com/s/suggest.json',
-                alpha: '0.5',
-                show: '10',
-                sort: '0',
-                length: '3',
-                datasets: {
-                    organic: {
-                    name: 'Suggestions',
-                    collection: 'seattleu~sp-search',
-                    profile   : '_default',
-                    show: 10,
-                    }
-                },
-                length: 3
+                // Wait for DOM to be ready
+                $(document).ready(function() {
+                    // Initialize our custom AutocompleteSearchManager
+                    const autocomplete = new AutocompleteSearchManager({
+                        inputId: 'autocomplete-concierge-inputField',
+                        collection: 'seattleu~sp-search',
+                        profile: '_default',
+                        maxResults: 10,
+                        minLength: 3
+                    });
                 });
             })(jQuery);
         </script>
