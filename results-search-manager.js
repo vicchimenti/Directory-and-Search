@@ -48,7 +48,7 @@ class ResultsSearchManager {
      */
     #setupResultsSearch() {
         console.log("setupResultsSearch");
-        const onPageSearch = document.getElementById("autocomplete-concierge-inputField");
+        const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
             onPageSearch.addEventListener('click', this.#handleResultsSearch);
         } else {
