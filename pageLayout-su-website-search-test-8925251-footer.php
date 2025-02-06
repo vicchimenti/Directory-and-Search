@@ -54,22 +54,5 @@
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
         <!-- End Partial Scripts -->
 
-        <!-- Autocomplete -->
-        <script>
-            (function($) {
-                // Wait for DOM to be ready
-                $(document).ready(function() {
-                    // Initialize our custom AutocompleteSearchManager
-                    const autocomplete = new AutocompleteSearchManager({
-                        inputId: 'autocomplete-concierge-inputField',
-                        collection: 'seattleu~sp-search',
-                        profile: '_default',
-                        maxResults: 10,
-                        minLength: 3
-                    });
-                });
-            })(jQuery);
-        </script>
-
     </body>
 </html>
