@@ -40,7 +40,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.0.2
+ * @version 1.1.0
  * @lastModified 2025-02-06
  */
 
