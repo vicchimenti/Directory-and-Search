@@ -15,7 +15,7 @@
  * - Requires Vercel proxy endpoint for Funnelback API access
  * - Requires DOM elements with specific IDs:
  *   - 'on-page-search-button': The search button
- *   - 'on-page-search-input': The search input field
+ *   - 'autocomplete-concierge-inputField': The search input field
  *   - 'results': Container for search results
  * 
  * Related Files:
