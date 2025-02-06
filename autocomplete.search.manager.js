@@ -184,9 +184,43 @@ class AutocompleteSearchManager {
             case 'Enter':
                 if (activeItem) {
                     event.preventDefault();
-                    this.inputField.value = activeItem.textContent.trim();
+                    const selectedValue = activeItem.textContent.trim();
+                    this.inputField.value = selectedValue;
                     this.suggestionsContainer.innerHTML = '';
-                    document.getElementById('on-page-search-button')?.click();
+                    
+                    const searchParams = new URLSearchParams({
+                        query: selectedValue,
+                        collection: 'seattleu~sp-search',
+                        profile: '_default',
+                        form: 'partial'
+                    });
+
+                    (async () => {
+                        try {
+                            const response = await fetch(`https://funnelback-proxy.vercel.app/proxy/funnelback/search?${searchParams}`);
+                            if (!response.ok) throw new Error(`Error: ${response.status}`);
+                            
+                            const text = await response.text();
+                            const resultsContainer = document.getElementById('results');
+                            if (resultsContainer) {
+                                resultsContainer.innerHTML = `
+                                    <div id="funnelback-search-container-response" class="funnelback-search-container">
+                                        ${text}
+                                    </div>
+                                `;
+                            }
+                        } catch (error) {
+                            console.error('Search error:', error);
+                            const resultsContainer = document.getElementById('results');
+                            if (resultsContainer) {
+                                resultsContainer.innerHTML = `
+                                    <div class="error-message">
+                                        <p>Sorry, we couldn't complete your search. ${error.message}</p>
+                                    </div>
+                                `;
+                            }
+                        }
+                    })();
                 }
                 break;
 
