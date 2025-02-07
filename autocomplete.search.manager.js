@@ -6,12 +6,15 @@
  * as users type in the search input field and handles suggestion selection with
  * immediate search results display.
  * 
- * The manager supports multiple suggestion types (general, programs, staff) and
- * provides a structured, two-column layout for displaying categorized results.
+ * The manager supports multiple data sources and suggestion types (general, programs, staff)
+ * and provides a structured, three-column layout for displaying categorized results
+ * based on data source mapping.
  * 
  * Features:
- * - Real-time suggestions with categorization
- * - Two-column layout for Programs and Staff results
+ * - Real-time suggestions with smart categorization
+ * - Data source routing and mapping
+ * - Three-column layout for General, Programs, and Staff results
+ * - Metadata display support
  * - Debounced API calls to prevent request flooding
  * - Keyboard navigation support (up/down arrows, enter, escape)
  * - Click selection support
@@ -32,18 +35,24 @@
  * @property {string} [profile='_default'] - Search profile name
  * @property {number} [maxResults=10] - Maximum number of suggestions to show
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
+ * @property {Object} [sourceMapping] - Mapping of data sources to categories
  * 
  * @example
  * const autocomplete = new AutocompleteSearchManager({
  *   inputId: 'my-search-input',
  *   collection: 'my-collection',
  *   maxResults: 5,
- *   minLength: 2
+ *   minLength: 2,
+ *   sourceMapping: {
+ *     program: ['program', 'academic', 'degree'],
+ *     staff: ['staff', 'faculty', 'directory'],
+ *     general: ['general', 'default']
+ *   }
  * });
  * 
  * @author Victor Chimenti
- * @version 1.2.2
- * @lastModified 2025-02-06
+ * @version 1.3.0
+ * @lastModified 2025-02-07
  */
 
 class AutocompleteSearchManager {
@@ -68,6 +77,11 @@ class AutocompleteSearchManager {
             endpoints: {
                 suggest: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
                 search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search'
+            },
+            sourceMapping: {
+                program: ['program', 'academic', 'degree'],
+                staff: ['staff', 'faculty', 'directory', 'people'],
+                general: ['general', 'default']
             },
             ...config
         };
@@ -311,8 +325,28 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Displays suggestions in a three-column layout.
-     * Handles general suggestions, programs, and staff categories.
+     * Identifies the category for a given suggestion based on its data source.
+     * Uses the sourceMapping configuration to determine the appropriate category.
+     * 
+     * @private
+     * @param {Object} suggestion - The suggestion object to categorize
+     * @returns {string} The category name ('program', 'staff', or 'general')
+     */
+    #identifyCategory(suggestion) {
+        const source = (suggestion.dataSource || suggestion.type || '').toLowerCase();
+        
+        for (const [category, sources] of Object.entries(this.config.sourceMapping)) {
+            if (sources.includes(source)) {
+                return category;
+            }
+        }
+        
+        return 'general';
+    }
+
+    /**
+     * Displays suggestions in a three-column layout with source-based routing.
+     * Handles general suggestions, programs, and staff categories based on data sources.
      * 
      * @private
      * @param {Array} suggestions - Array of suggestion objects
@@ -331,10 +365,22 @@ class AutocompleteSearchManager {
         // Limit to 10 items max
         const limitedSuggestions = suggestions.slice(0, 10);
 
-        // Split suggestions into categories
-        const generalSuggestions = limitedSuggestions.filter(s => !s.type);
-        const programSuggestions = limitedSuggestions.filter(s => s.type === 'program').slice(0, 5);
-        const staffSuggestions = limitedSuggestions.filter(s => s.type === 'staff').slice(0, 5);
+        // Enhanced categorization with data source handling
+        const categorizedSuggestions = {
+            general: [],
+            programs: [],
+            staff: []
+        };
+
+        limitedSuggestions.forEach(suggestion => {
+            const category = this.#identifyCategory(suggestion);
+            categorizedSuggestions[category + 's']?.push(suggestion);
+        });
+
+        // Limit each category
+        const generalSuggestions = categorizedSuggestions.general;
+        const programSuggestions = categorizedSuggestions.programs.slice(0, 5);
+        const staffSuggestions = categorizedSuggestions.staff.slice(0, 5);
 
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
@@ -344,8 +390,9 @@ class AutocompleteSearchManager {
                     <div class="suggestions-column">
                         <div class="column-header">All Results</div>
                         ${generalSuggestions.map(suggestion => `
-                            <div class="suggestion-item" role="option">
+                            <div class="suggestion-item" role="option" data-source="${suggestion.dataSource || 'general'}">
                                 <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
+                                ${suggestion.metadata ? `<span class="suggestion-metadata">${suggestion.metadata}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -354,9 +401,10 @@ class AutocompleteSearchManager {
                     <div class="suggestions-column">
                         <div class="column-header">Programs</div>
                         ${programSuggestions.map(program => `
-                            <div class="suggestion-item program-item" role="option">
+                            <div class="suggestion-item program-item" role="option" data-source="${program.dataSource || program.type || 'program'}">
                                 <span class="suggestion-text">${program.display ?? program}</span>
                                 <span class="suggestion-type">Program</span>
+                                ${program.metadata ? `<span class="suggestion-metadata">${program.metadata}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -365,9 +413,10 @@ class AutocompleteSearchManager {
                     <div class="suggestions-column">
                         <div class="column-header">Faculty & Staff</div>
                         ${staffSuggestions.map(staff => `
-                            <div class="suggestion-item staff-item" role="option">
-                                <span class="suggestion-text">${staff.display ?? staff}</span>
+                            <div class="suggestion-item staff-item" role="option" data-source="${staff.dataSource || staff.type || 'staff'}">
+                            <span class="suggestion-text">${staff.display ?? staff}</span>
                                 <span class="suggestion-type">Staff</span>
+                                ${staff.metadata ? `<span class="suggestion-metadata">${staff.metadata}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -397,6 +446,7 @@ class AutocompleteSearchManager {
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
+     * Handles navigation across columns.
      * 
      * @private
      * @param {KeyboardEvent} event - The keyboard event
@@ -495,7 +545,8 @@ class AutocompleteSearchManager {
 
     /**
      * Initializes autocomplete functionality on all matching elements.
-     * Looks for elements with the data-autocomplete attribute.
+     * Looks for elements with the data-autocomplete attribute and applies
+     * configuration from data attributes.
      * 
      * @static
      */
