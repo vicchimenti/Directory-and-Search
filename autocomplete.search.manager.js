@@ -373,21 +373,10 @@ class AutocompleteSearchManager {
         };
 
         limitedSuggestions.forEach(suggestion => {
-            const source = suggestion.dataSource || suggestion.type || 'general';
-            
-            switch(source.toLowerCase()) {
-                case 'program':
-                case 'academic':
-                    categorizedSuggestions.programs.push(suggestion);
-                    break;
-                case 'staff':
-                case 'faculty':
-                case 'directory':
-                    categorizedSuggestions.staff.push(suggestion);
-                    break;
-                default:
-                    categorizedSuggestions.general.push(suggestion);
-            }
+            const category = this.#identifyCategory(suggestion);
+            const mappedCategory = category === 'program' ? 'programs' : 
+                                   category === 'staff' ? 'staff' : 'general';
+            categorizedSuggestions[mappedCategory].push(suggestion);
         });
 
         // Limit each category
