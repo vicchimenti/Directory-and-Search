@@ -1,83 +1,14 @@
-/* Autocomplete Form Container */
-.autocomplete-concierge__form {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-/* Input Field */
-.on-page-sq-search {
-    width: 100%;
-    padding: 12px 40px 12px 16px; /* Space for icons */
-    border: 2px solid #e2e8f0;
-    border-radius: 4px;
-    font-size: 16px;
-    line-height: 1.5;
-    transition: border-color 0.2s ease;
-}
-
-.on-page-sq-search:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-}
-
-/* Search Controls */
-.search-controls {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-/* Buttons */
-.search-submit-button,
-.clear-search-button {
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s ease;
-}
-
-.search-submit-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.clear-search-button.hidden {
-    display: none;
-}
-
-/* SVG Icons */
-.autocomplete-concierge__icon {
-    width: 20px;
-    height: 20px;
-    fill: currentColor;
-    color: #64748b;
-}
-
 /* Suggestions Container */
 #autocomplete-suggestions {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 1px);
     left: 0;
     right: 0;
     background: white;
     border: 1px solid #e2e8f0;
-    border-top: none;
     border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    margin-top: -1px;
-    max-height: none; /* Remove scrolling */
 }
 
 /* Suggestions List */
@@ -85,12 +16,13 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    background: white;
 }
 
 /* General Suggestions Section */
 .suggestions-section {
+    padding: 4px 0;
     border-bottom: 1px solid #e2e8f0;
-    padding: 8px 0;
 }
 
 /* Two-column layout */
@@ -103,7 +35,7 @@
 
 .suggestions-column {
     background: white;
-    padding: 8px 0;
+    padding: 4px 0;
 }
 
 /* Column Headers */
@@ -112,6 +44,7 @@
     font-weight: 600;
     color: #64748b;
     font-size: 0.875rem;
+    background: white;
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -122,12 +55,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.15s ease;
 }
 
 .suggestion-item:hover,
 .suggestion-item.active {
-    background-color: #f8fafc;
+    background-color: #f1f5f9;
 }
 
 /* Suggestion Text and Type */
