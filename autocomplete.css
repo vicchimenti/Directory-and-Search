@@ -5,16 +5,16 @@
     left: 0;
     right: 0;
     background: white;
-    border: 1px solid #e2e8f0;
     border-radius: 0 0 4px 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    /* Hide empty container borders */
-    border: none;
+    /* Hide initially */
+    display: none;
 }
 
-/* Only show borders when there's content */
+/* Show and style when has content */
 #autocomplete-suggestions:not(:empty) {
+    display: block;
     border: 1px solid #e2e8f0;
 }
 
