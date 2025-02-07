@@ -1,5 +1,17 @@
 /* Suggestions Container */
-.autocomplete-concierge__form #autocomplete-suggestions {
+#autocomplete-suggestions {
+    position: absolute;
+    top: calc(100% - 1px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    /* Hide initially */
+    display: none;
+}
+/* .autocomplete-concierge__form #autocomplete-suggestions {
     position: absolute;
     top: calc(100% - 1px);
     left: 0;
@@ -9,12 +21,26 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     display: none;
-}
+} */
 
 /* Show container with content */
 .autocomplete-concierge__form #autocomplete-suggestions:not(:empty) {
     display: block;
     border: 1px solid #e2e8f0;
+}
+
+
+
+/* Show and style when has content */
+/* #autocomplete-suggestions:not(:empty) {
+    display: block;
+    border: 1px solid #e2e8f0;
+} */
+
+/* Add this to ensure proper positioning context */
+.autocomplete-concierge__form {
+    position: relative;
+    width: 100%;
 }
 
 /* Suggestions List */
