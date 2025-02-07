@@ -427,7 +427,7 @@ class AutocompleteSearchManager {
                         <div class="column-header">Faculty & Staff</div>
                         ${staffSuggestions.map(staff => `
                             <div class="suggestion-item staff-item" role="option" data-source="${staff.dataSource || staff.type || 'staff'}">
-                            <span class="suggestion-text">${staff.display ?? staff}</span>
+                                <span class="suggestion-text">${staff.display ?? staff}</span>
                                 <span class="suggestion-type">Staff</span>
                                 ${staff.metadata ? `<span class="suggestion-metadata">${staff.metadata}</span>` : ''}
                             </div>
