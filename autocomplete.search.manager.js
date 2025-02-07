@@ -311,8 +311,8 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Displays suggestions in a categorized two-column layout.
-     * Handles general suggestions and categorized results for Programs and Staff.
+     * Displays suggestions in a three-column layout.
+     * Handles general suggestions, programs, and staff categories.
      * 
      * @private
      * @param {Array} suggestions - Array of suggestion objects
@@ -338,17 +338,18 @@ class AutocompleteSearchManager {
 
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
-                <!-- General suggestions -->
-                <div class="suggestions-section">
-                    ${generalSuggestions.map(suggestion => `
-                        <div class="suggestion-item" role="option">
-                            <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
-                        </div>
-                    `).join('')}
-                </div>
-
-                <!-- Two-column layout for Programs and Staff -->
+                <!-- Three-column layout -->
                 <div class="suggestions-columns">
+                    <!-- General suggestions column -->
+                    <div class="suggestions-column">
+                        <div class="column-header">All Results</div>
+                        ${generalSuggestions.map(suggestion => `
+                            <div class="suggestion-item" role="option">
+                                <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
                     <!-- Programs column -->
                     <div class="suggestions-column">
                         <div class="column-header">Programs</div>
