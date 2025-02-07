@@ -11,11 +11,7 @@
     visibility: hidden; /* Instead of display: none */
 }
 
-#autocomplete-suggestions:empty {
-    visibility: hidden;
-}
-
-#autocomplete-suggestions:not(:empty) {
+#autocomplete-suggestions:has(*) {
     visibility: visible;
     border: 1px solid #e2e8f0;
 }
