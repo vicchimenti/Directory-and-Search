@@ -11,65 +11,11 @@
     visibility: hidden; /* Instead of display: none */
 }
 
+/* Show and style when has content */
 #autocomplete-suggestions:has(*) {
     visibility: visible;
     border: 1px solid #e2e8f0;
 }
-
-/* 
-#autocomplete-suggestions {
-    position: absolute;
-    top: calc(100% - 1px);
-    left: 0;
-    right: 0;
-    background: white;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  #autocomplete-suggestions {
-    position: absolute;
-    top: calc(100% - 1px);
-    left: 0;
-    right: 0;
-    background: white;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    visibility: hidden; /* Instead of display: none */
-/* }
-
-#autocomplete-suggestions:empty {
-    visibility: hidden;
-}
-
-#autocomplete-suggestions:not(:empty) {
-    visibility: visible;
-    border: 1px solid #e2e8f0;
-}  */
-
-/* .autocomplete-concierge__form #autocomplete-suggestions {
-    position: absolute;
-    top: calc(100% - 1px);
-    left: 0;
-    right: 0;
-    background: white;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    display: none;
-} */
-
-/* Show container with content */
-/* .autocomplete-concierge__form #autocomplete-suggestions:not(:empty) {
-
-    display: block;
-    border: 1px solid #e2e8f0;
-} */
-
-
-
-/* Show and style when has content */
-
 
 /* Add this to ensure proper positioning context */
 .autocomplete-concierge__form {
