@@ -11,6 +11,12 @@
     z-index: 1000;
 }
 
+/* Add this to ensure proper positioning context */
+.autocomplete-concierge__form {
+    position: relative;
+    width: 100%;
+}
+
 /* Suggestions List */
 .suggestions-list {
     display: flex;
