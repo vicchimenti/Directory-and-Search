@@ -9,6 +9,13 @@
     border-radius: 0 0 4px 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    /* Hide empty container borders */
+    border: none;
+}
+
+/* Only show borders when there's content */
+#autocomplete-suggestions:not(:empty) {
+    border: 1px solid #e2e8f0;
 }
 
 /* Add this to ensure proper positioning context */
