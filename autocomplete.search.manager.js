@@ -67,7 +67,7 @@ class AutocompleteSearchManager {
     constructor(config = {}) {
         console.group('AutocompleteSearchManager Initialization');
         console.log('Configuration:', config);
-        
+
         this.config = {
             inputId: 'autocomplete-concierge-inputField',
             collection: 'seattleu~sp-search',
@@ -79,13 +79,13 @@ class AutocompleteSearchManager {
                 search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search'
             },
             sourceMapping: {
-                program: ['program', 'academic', 'degree'],
-                staff: ['staff', 'faculty', 'directory', 'people'],
+                program: ['program-main', 'academic', 'degree'],
+                staff: ['Faculty & Staff', 'faculty', 'directory'],
                 general: ['general', 'default']
             },
             ...config
         };
-
+        
         // Initialize DOM elements
         this.inputField = document.getElementById(this.config.inputId);
         if (!this.inputField) {
