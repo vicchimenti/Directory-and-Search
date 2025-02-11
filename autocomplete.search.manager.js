@@ -213,7 +213,7 @@ class AutocompleteSearchManager {
     #handleInput(event) {
         console.group('Input Event');
         const query = event.target.value.trim();
-        console.log('Input Value:', query);
+        console.log('Input Value:', query, 'Length:', query.length);
         
         this.#updateButtonStates();
         clearTimeout(this.debounceTimeout);
@@ -224,10 +224,12 @@ class AutocompleteSearchManager {
             console.groupEnd();
             return;
         }
-
+    
+        // Set a shorter debounce time for better responsiveness
         this.debounceTimeout = setTimeout(() => {
+            console.log('Debounce complete, fetching suggestions for:', query);
             this.#fetchSuggestions(query);
-        }, 300);
+        }, 200);  // Reduced from 300ms for better responsiveness
         
         console.groupEnd();
     }
