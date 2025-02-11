@@ -245,21 +245,20 @@ class AutocompleteSearchManager {
         console.time('fetchTotal');
         
         try {
-            // Fetch suggestions
+            // Fetch suggestions - removed 'show' parameter
             const suggestParams = new URLSearchParams({
                 collection: this.config.collection,
                 partial_query: query,
-                show: this.config.maxResults,
                 profile: this.config.profile
             });
     
-            // Fetch initial results
+            // Fetch initial results - removed 'show' parameter
             const searchParams = new URLSearchParams({
                 collection: this.config.collection,
                 query: query,
                 profile: this.config.profile,
-                show: this.config.maxResults * 2,
-                form: 'partial'     // Request partial results
+                form: 'partial',
+                format: 'json'      // Keep JSON format request
             });
     
             // Add tab parameters for both requests
@@ -284,28 +283,22 @@ class AutocompleteSearchManager {
                 search: searchUrl
             });
     
-            // Make both requests concurrently
+            // Make requests
             const [suggestResponse, searchResponse] = await Promise.all([
                 fetch(suggestUrl),
                 fetch(searchUrl)
             ]);
     
-            // Log response statuses
-            console.log('Response status:', {
-                suggest: suggestResponse.status,
-                search: searchResponse.status
-            });
-    
             // Get response content
             const suggestText = await suggestResponse.text();
             const searchText = await searchResponse.text();
     
-            console.log('Raw response content:', {
+            console.log('Raw responses:', {
                 suggest: suggestText,
                 search: searchText
             });
     
-            // Try parsing responses
+            // Parse responses
             let suggestions, searchResults;
             try {
                 suggestions = JSON.parse(suggestText);
@@ -315,7 +308,7 @@ class AutocompleteSearchManager {
                 throw e;
             }
     
-            console.log('Parsed responses:', {
+            console.log('Parsed data:', {
                 suggestions,
                 searchResults
             });
@@ -324,28 +317,18 @@ class AutocompleteSearchManager {
             const suggestionArray = suggestions?.suggestions || [];
             const resultsArray = searchResults?.response?.resultPacket?.results || [];
     
-            console.log('Extracted arrays:', {
-                suggestionArray,
-                resultsArray
-            });
-    
             // Update display
             this.#displaySuggestions(suggestionArray, resultsArray);
     
         } catch (error) {
             console.error('Fetch error:', error);
-            console.error('Error details:', {
-                name: error.name,
-                message: error.message,
-                stack: error.stack
-            });
             this.suggestionsContainer.innerHTML = '';
         } finally {
             console.timeEnd('fetchTotal');
             console.groupEnd();
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
