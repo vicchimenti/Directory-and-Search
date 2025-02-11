@@ -414,7 +414,6 @@ class AutocompleteSearchManager {
                     ${programSuggestions.map(program => `
                         <div class="suggestion-item program-item" role="option" data-source="program">
                             <span class="suggestion-text">${program.display ?? program}</span>
-                            <span class="suggestion-type">Program</span>
                         </div>
                     `).join('')}
                 </div>
@@ -425,7 +424,6 @@ class AutocompleteSearchManager {
                     ${staffSuggestions.map(staff => `
                         <div class="suggestion-item staff-item" role="option" data-source="staff">
                             <span class="suggestion-text">${staff.display ?? staff}</span>
-                            <span class="suggestion-type">Staff</span>
                         </div>
                     `).join('')}
                 </div>
