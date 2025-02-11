@@ -44,7 +44,7 @@
  *   maxResults: 5,
  *   minLength: 2,
  *   sourceMapping: {
- *     program: ['program', 'academic', 'degree'],
+ *     programs: ['program', 'academic', 'degree'],
  *     staff: ['staff', 'faculty', 'directory'],
  *     general: ['general', 'default']
  *   }
