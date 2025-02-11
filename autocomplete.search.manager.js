@@ -483,34 +483,82 @@ class AutocompleteSearchManager {
      * @param {KeyboardEvent} event - The keyboard event
      */
     #handleKeydown(event) {
-        const items = this.suggestionsContainer.querySelectorAll('.suggestion-item');
+        const columns = this.suggestionsContainer.querySelectorAll('.suggestions-column');
         const activeItem = this.suggestionsContainer.querySelector('.suggestion-item.active');
-
+        let currentColumn, currentIndex;
+    
+        if (activeItem) {
+            currentColumn = activeItem.closest('.suggestions-column');
+            currentIndex = Array.from(currentColumn.querySelectorAll('.suggestion-item'))
+                .indexOf(activeItem);
+        }
+    
         switch (event.key) {
             case 'ArrowDown':
                 event.preventDefault();
                 if (!activeItem) {
-                    items[0]?.classList.add('active');
+                    // Select first item in first column with items
+                    for (const column of columns) {
+                        const firstItem = column.querySelector('.suggestion-item');
+                        if (firstItem) {
+                            firstItem.classList.add('active');
+                            break;
+                        }
+                    }
                 } else {
-                    const nextItem = activeItem.nextElementSibling;
-                    if (nextItem) {
+                    const columnItems = currentColumn.querySelectorAll('.suggestion-item');
+                    if (currentIndex < columnItems.length - 1) {
+                        // Move down within column
                         activeItem.classList.remove('active');
-                        nextItem.classList.add('active');
+                        columnItems[currentIndex + 1].classList.add('active');
                     }
                 }
                 break;
-
+    
             case 'ArrowUp':
                 event.preventDefault();
                 if (activeItem) {
-                    const prevItem = activeItem.previousElementSibling;
-                    if (prevItem) {
+                    const columnItems = currentColumn.querySelectorAll('.suggestion-item');
+                    if (currentIndex > 0) {
+                        // Move up within column
                         activeItem.classList.remove('active');
-                        prevItem.classList.add('active');
+                        columnItems[currentIndex - 1].classList.add('active');
                     }
                 }
                 break;
-
+    
+            case 'ArrowRight':
+                event.preventDefault();
+                if (activeItem) {
+                    const nextColumn = currentColumn.nextElementSibling;
+                    if (nextColumn) {
+                        const nextColumnItems = nextColumn.querySelectorAll('.suggestion-item');
+                        if (nextColumnItems.length > 0) {
+                            // Move to next column, try to maintain similar position
+                            activeItem.classList.remove('active');
+                            const nextIndex = Math.min(currentIndex, nextColumnItems.length - 1);
+                            nextColumnItems[nextIndex].classList.add('active');
+                        }
+                    }
+                }
+                break;
+    
+            case 'ArrowLeft':
+                event.preventDefault();
+                if (activeItem) {
+                    const prevColumn = currentColumn.previousElementSibling;
+                    if (prevColumn) {
+                        const prevColumnItems = prevColumn.querySelectorAll('.suggestion-item');
+                        if (prevColumnItems.length > 0) {
+                            // Move to previous column, try to maintain similar position
+                            activeItem.classList.remove('active');
+                            const prevIndex = Math.min(currentIndex, prevColumnItems.length - 1);
+                            prevColumnItems[prevIndex].classList.add('active');
+                        }
+                    }
+                }
+                break;
+    
             case 'Enter':
                 if (activeItem) {
                     event.preventDefault();
@@ -521,14 +569,14 @@ class AutocompleteSearchManager {
                     this.#performSearch(selectedText);
                 }
                 break;
-
+    
             case 'Escape':
                 this.suggestionsContainer.innerHTML = '';
                 this.inputField.blur();
                 break;
         }
     }
-
+    
     /**
      * Handles clicks outside the autocomplete component.
      * Closes the suggestions dropdown when clicking elsewhere.
