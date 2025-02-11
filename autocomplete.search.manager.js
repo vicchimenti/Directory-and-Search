@@ -259,8 +259,7 @@ class AutocompleteSearchManager {
                 query: query,
                 profile: this.config.profile,
                 show: this.config.maxResults * 2,
-                form: 'partial',     // Request partial results
-                type: '.json'        // Ensure JSON response
+                form: 'partial'     // Request partial results
             });
     
             // Add tab parameters for both requests
@@ -268,45 +267,78 @@ class AutocompleteSearchManager {
             if (hiddenConfig) {
                 const tabInputs = hiddenConfig.querySelectorAll('input[name^="f.Tabs|"]');
                 tabInputs.forEach(input => {
-                    suggestParams.append(input.name, input.value);
-                    searchParams.append(input.name, input.value);
+                    const paramName = input.name;
+                    const paramValue = input.value;
+                    suggestParams.append(paramName, paramValue);
+                    searchParams.append(paramName, paramValue);
+                    console.log(`Adding tab parameter: ${paramName} = ${paramValue}`);
                 });
             }
     
-            console.log('Request parameters:', {
-                suggest: Object.fromEntries(suggestParams),
-                search: Object.fromEntries(searchParams)
+            // Log full request URLs
+            const suggestUrl = `${this.config.endpoints.suggest}?${suggestParams}`;
+            const searchUrl = `${this.config.endpoints.search}?${searchParams}`;
+            
+            console.log('Request URLs:', {
+                suggest: suggestUrl,
+                search: searchUrl
             });
     
             // Make both requests concurrently
             const [suggestResponse, searchResponse] = await Promise.all([
-                fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
-                fetch(`${this.config.endpoints.search}?${searchParams}`)
+                fetch(suggestUrl),
+                fetch(searchUrl)
             ]);
     
-            if (!suggestResponse.ok) throw new Error(`Suggestions failed: ${suggestResponse.status}`);
-            if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
-    
-            // Parse the responses
-            const [suggestions, searchResults] = await Promise.all([
-                suggestResponse.json(),
-                searchResponse.json()
-            ]);
-    
-            console.log('Raw responses:', {
-                suggestions: suggestions,
-                searchResults: searchResults
+            // Log response statuses
+            console.log('Response status:', {
+                suggest: suggestResponse.status,
+                search: searchResponse.status
             });
     
-            // Extract the actual suggestions array and search results
-            const suggestionArray = Array.isArray(suggestions) ? suggestions : suggestions.suggestions || [];
-            const resultsArray = searchResults?.results || searchResults?.response?.resultPacket?.results || [];
+            // Get response content
+            const suggestText = await suggestResponse.text();
+            const searchText = await searchResponse.text();
     
-            // Update the display
+            console.log('Raw response content:', {
+                suggest: suggestText,
+                search: searchText
+            });
+    
+            // Try parsing responses
+            let suggestions, searchResults;
+            try {
+                suggestions = JSON.parse(suggestText);
+                searchResults = JSON.parse(searchText);
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                throw e;
+            }
+    
+            console.log('Parsed responses:', {
+                suggestions,
+                searchResults
+            });
+    
+            // Extract arrays
+            const suggestionArray = suggestions?.suggestions || [];
+            const resultsArray = searchResults?.response?.resultPacket?.results || [];
+    
+            console.log('Extracted arrays:', {
+                suggestionArray,
+                resultsArray
+            });
+    
+            // Update display
             this.#displaySuggestions(suggestionArray, resultsArray);
     
         } catch (error) {
             console.error('Fetch error:', error);
+            console.error('Error details:', {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            });
             this.suggestionsContainer.innerHTML = '';
         } finally {
             console.timeEnd('fetchTotal');
