@@ -360,95 +360,57 @@ class AutocompleteSearchManager {
         return 'general';
     }
 
-/**
-     * Displays suggestions in a three-column layout with source-based routing.
-     * Handles general suggestions, programs, and staff categories based on data sources.
+    /**
+     * Displays suggestions in a single column layout.
      * 
      * @private
      * @param {Array} suggestions - Array of suggestion objects
      */
-#displaySuggestions(suggestions) {
-    console.group('Displaying Suggestions');
-    console.log('Raw suggestions:', suggestions);
+    #displaySuggestions(suggestions) {
+        console.group('Displaying Suggestions');
+        console.log('Raw suggestions:', suggestions);
 
-    if (!suggestions?.length) {
-        this.suggestionsContainer.innerHTML = '';
-        console.log('No suggestions to display');
-        console.groupEnd();
-        return;
-    }
+        if (!suggestions?.length) {
+            this.suggestionsContainer.innerHTML = '';
+            console.log('No suggestions to display');
+            console.groupEnd();
+            return;
+        }
 
-    // Categorize suggestions
-    const categorizedSuggestions = {
-        general: [],
-        programs: [],
-        staff: []
-    };
+        // Limit to maximum number of suggestions
+        const limitedSuggestions = suggestions.slice(0, this.config.maxResults);
 
-    suggestions.forEach(suggestion => {
-        const category = this.#identifyCategory(suggestion);
-        categorizedSuggestions[category].push(suggestion);
-    });
-
-    // Limit each category
-    const generalSuggestions = categorizedSuggestions.general.slice(0, 10);
-    const programSuggestions = categorizedSuggestions.programs.slice(0, 5);
-    const staffSuggestions = categorizedSuggestions.staff.slice(0, 5);
-
-    const suggestionHTML = `
-        <div class="suggestions-list" role="listbox">
-            <div class="suggestions-columns">
-                <!-- General suggestions column -->
+        const suggestionHTML = `
+            <div class="suggestions-list" role="listbox">
                 <div class="suggestions-column">
-                    <div class="column-header">All Results</div>
-                    ${generalSuggestions.map(suggestion => `
-                        <div class="suggestion-item" role="option" data-source="general">
+                    <div class="column-header">Suggestions</div>
+                    ${limitedSuggestions.map(suggestion => `
+                        <div class="suggestion-item" role="option">
                             <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
                         </div>
                     `).join('')}
                 </div>
-
-                <!-- Programs column -->
-                <div class="suggestions-column">
-                    <div class="column-header">Programs</div>
-                    ${programSuggestions.map(program => `
-                        <div class="suggestion-item program-item" role="option" data-source="program">
-                            <span class="suggestion-text">${program.display ?? program}</span>
-                        </div>
-                    `).join('')}
-                </div>
-
-                <!-- Staff column -->
-                <div class="suggestions-column">
-                    <div class="column-header">Faculty & Staff</div>
-                    ${staffSuggestions.map(staff => `
-                        <div class="suggestion-item staff-item" role="option" data-source="staff">
-                            <span class="suggestion-text">${staff.display ?? staff}</span>
-                        </div>
-                    `).join('')}
-                </div>
             </div>
-        </div>
-    `;
+        `;
 
-    this.suggestionsContainer.innerHTML = suggestionHTML;
-    this.suggestionsContainer.hidden = false;
+        this.suggestionsContainer.innerHTML = suggestionHTML;
+        this.suggestionsContainer.hidden = false;
 
-    // Add click handlers
-    this.suggestionsContainer.querySelectorAll('.suggestion-item')
-        .forEach((item) => {
-            item.addEventListener('click', async () => {
-                const selectedText = item.querySelector('.suggestion-text').textContent;
-                this.inputField.value = selectedText;
-                this.suggestionsContainer.innerHTML = '';
-                this.#updateButtonStates();
-                await this.#performSearch(selectedText);
+        // Add click handlers
+        this.suggestionsContainer.querySelectorAll('.suggestion-item')
+            .forEach((item) => {
+                item.addEventListener('click', async () => {
+                    const selectedText = item.querySelector('.suggestion-text').textContent;
+                    this.inputField.value = selectedText;
+                    this.suggestionsContainer.innerHTML = '';
+                    this.#updateButtonStates();
+                    await this.#performSearch(selectedText);
+                });
             });
-        });
 
-    console.log('Suggestions displayed');
-    console.groupEnd();
-}
+        console.log('Suggestions displayed');
+        console.groupEnd();
+    }
 
     /**
      * Handles keyboard navigation within suggestions.
