@@ -250,16 +250,16 @@ class AutocompleteSearchManager {
                 show: this.config.maxResults,
                 profile: this.config.profile
             });
-
+    
             // Fetch initial results
             const searchParams = new URLSearchParams({
                 collection: this.config.collection,
                 query: query,
                 profile: this.config.profile,
-                show: this.config.maxResults * 2, // Double for programs and staff
-                format: 'json'    // Request JSON format for easier processing
+                show: this.config.maxResults * 2,
+                format: 'json'
             });
-
+    
             // Add tab parameters for both requests
             const hiddenConfig = this.form.querySelector('.search-config');
             if (hiddenConfig) {
@@ -269,29 +269,46 @@ class AutocompleteSearchManager {
                     searchParams.append(input.name, input.value);
                 });
             }
-
+    
+            console.log('Request parameters:', {
+                suggest: Object.fromEntries(suggestParams),
+                search: Object.fromEntries(searchParams)
+            });
+    
             // Make both requests concurrently
             const [suggestResponse, searchResponse] = await Promise.all([
                 fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
                 fetch(`${this.config.endpoints.search}?${searchParams}`)
             ]);
-
-            console.log('Suggestion Response Status:', suggestResponse.status);
-            console.log('Search Response Status:', searchResponse.status);
-
+    
+            console.log('Response status:', {
+                suggestions: suggestResponse.status,
+                search: searchResponse.status
+            });
+    
             if (!suggestResponse.ok) throw new Error(`Suggestions failed: ${suggestResponse.status}`);
             if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
-
+    
             const [suggestions, searchResults] = await Promise.all([
                 suggestResponse.json(),
                 searchResponse.json()
             ]);
-
-            console.log('Suggestions received:', suggestions);
-            console.log('Search results received:', searchResults);
-
+    
+            // Log the exact structure of responses
+            console.log('Raw suggestion response:', JSON.stringify(suggestions, null, 2));
+            console.log('Raw search response:', JSON.stringify(searchResults, null, 2));
+    
+            // Check if suggestions is an array or needs to be accessed differently
+            const suggestionArray = Array.isArray(suggestions) ? suggestions : suggestions.suggestions;
+            const resultsArray = searchResults.results || [];
+    
+            console.log('Processed arrays:', {
+                suggestions: suggestionArray,
+                results: resultsArray
+            });
+    
             // Pass both suggestions and results to display method
-            this.#displaySuggestions(suggestions, searchResults.results);
+            this.#displaySuggestions(suggestionArray, resultsArray);
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
@@ -300,7 +317,7 @@ class AutocompleteSearchManager {
             console.groupEnd();
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
