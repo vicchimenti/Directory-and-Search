@@ -6,14 +6,13 @@
  * as users type in the search input field and handles suggestion selection with
  * immediate search results display.
  * 
- * The manager supports multiple data sources and suggestion types (general, programs, staff)
- * and provides a structured, three-column layout for displaying categorized results
- * based on data source mapping.
+ * The manager provides a streamlined, single-column layout for displaying search
+ * suggestions, supporting multiple data sources and suggestion types.
  * 
  * Features:
- * - Real-time suggestions with smart categorization
- * - Data source routing and mapping
- * - Three-column layout for General, Programs, and Staff results
+ * - Real-time suggestions with smart filtering
+ * - Data source integration
+ * - Clean, unified suggestions display
  * - Metadata display support
  * - Debounced API calls to prevent request flooding
  * - Keyboard navigation support (up/down arrows, enter, escape)
@@ -35,19 +34,13 @@
  * @property {string} [profile='_default'] - Search profile name
  * @property {number} [maxResults=10] - Maximum number of suggestions to show
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
- * @property {Object} [sourceMapping] - Mapping of data sources to categories
  * 
  * @example
  * const autocomplete = new AutocompleteSearchManager({
  *   inputId: 'my-search-input',
  *   collection: 'my-collection',
  *   maxResults: 5,
- *   minLength: 2,
- *   sourceMapping: {
- *     programs: ['program', 'academic', 'degree'],
- *     staff: ['staff', 'faculty', 'directory'],
- *     general: ['general', 'default']
- *   }
+ *   minLength: 2
  * });
  * 
  * @author Victor Chimenti
