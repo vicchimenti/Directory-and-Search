@@ -395,121 +395,75 @@ class AutocompleteSearchManager {
      */
     #displaySuggestions(suggestions, results = []) {
         console.group('Displaying Suggestions');
+        console.log('Container element:', this.suggestionsContainer);
         console.log('Raw suggestions:', suggestions);
-        console.log('Search results:', results);
-        console.log('Suggestions container:', this.suggestionsContainer);
+        console.log('Raw results:', results);
     
+        // Early return if container is missing
         if (!this.suggestionsContainer) {
             console.error('Suggestions container not found');
             console.groupEnd();
             return;
         }
     
+        // Early return if no data
         if (!suggestions?.length && !results?.length) {
+            console.log('No data to display');
             this.suggestionsContainer.innerHTML = '';
-            console.log('No suggestions or results to display');
             console.groupEnd();
             return;
         }
     
-        // Get general suggestions (excluding programs and staff)
-        const generalSuggestions = suggestions
-            .filter(suggestion => this.#identifyCategory(suggestion) === 'general')
-            .slice(0, this.config.maxResults);
-        console.log('Filtered general suggestions:', generalSuggestions);
+        try {
+            // Get general suggestions
+            const generalSuggestions = Array.isArray(suggestions) ? 
+                suggestions.filter(s => this.#identifyCategory(s) === 'general') : [];
     
-        // Get program-specific content
-        const programResults = results
-            .filter(result => result.metadata?.tabs?.includes('program-main'))
-            .slice(0, Math.floor(this.config.maxResults / 2));
-        console.log('Filtered program results:', programResults);
+            // Get program and staff results
+            const programResults = Array.isArray(results) ?
+                results.filter(r => r.metadata?.tabs?.includes('program-main')) : [];
+            const staffResults = Array.isArray(results) ?
+                results.filter(r => r.metadata?.tabs?.includes('Faculty & Staff')) : [];
     
-        // Get staff-specific content
-        const staffResults = results
-            .filter(result => result.metadata?.tabs?.includes('Faculty & Staff'))
-            .slice(0, Math.floor(this.config.maxResults / 2));
-        console.log('Filtered staff results:', staffResults);
-    
-        const suggestionHTML = `
-            <div class="suggestions-list" role="listbox">
-                <div class="suggestions-column general-column">
-                    <div class="column-header">Suggestions</div>
-                    ${generalSuggestions.length ? `
-                        ${generalSuggestions.map(suggestion => `
-                            <div class="suggestion-item general-item" role="option">
-                                <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
-                            </div>
-                        `).join('')}
-                    ` : '<div class="no-results">No suggestions found</div>'}
-                </div>
-                
-                <div class="suggestions-column programs-column">
-                    <div class="column-header">Programs</div>
-                    ${programResults.length ? `
-                        ${programResults.map(result => `
-                            <div class="suggestion-item program-item" role="option">
-                                <span class="suggestion-text">${result.title}</span>
-                                ${result.metadata?.degree ? `
-                                    <span class="suggestion-metadata">${result.metadata.degree}</span>
-                                ` : ''}
-                                ${result.metadata?.description ? `
-                                    <span class="suggestion-description">${result.metadata.description}</span>
-                                ` : ''}
-                            </div>
-                        `).join('')}
-                    ` : '<div class="no-results">No programs found</div>'}
-                </div>
-                
-                <div class="suggestions-column staff-column">
-                    <div class="column-header">Faculty & Staff</div>
-                    ${staffResults.length ? `
-                        ${staffResults.map(result => `
-                            <div class="suggestion-item staff-item" role="option">
-                                <span class="suggestion-text">${result.title}</span>
-                                ${result.metadata?.department ? `
-                                    <span class="suggestion-metadata">${result.metadata.department}</span>
-                                ` : ''}
-                                ${result.metadata?.title ? `
-                                    <span class="suggestion-role">${result.metadata.title}</span>
-                                ` : ''}
-                            </div>
-                        `).join('')}
-                    ` : '<div class="no-results">No staff members found</div>'}
-                </div>
-            </div>
-        `;
-    
-        console.log('Generated HTML:', suggestionHTML);
-        
-        // Set the HTML content
-        this.suggestionsContainer.innerHTML = suggestionHTML;
-        
-        // Ensure the container is visible
-        this.suggestionsContainer.hidden = false;
-        this.suggestionsContainer.style.display = 'block';
-        
-        console.log('Container after update:', {
-            hidden: this.suggestionsContainer.hidden,
-            display: this.suggestionsContainer.style.display,
-            innerHTML: this.suggestionsContainer.innerHTML
-        });
-    
-        // Add click handlers
-        this.suggestionsContainer.querySelectorAll('.suggestion-item')
-            .forEach((item) => {
-                item.addEventListener('click', async () => {
-                    const selectedText = item.querySelector('.suggestion-text').textContent;
-                    this.inputField.value = selectedText;
-                    this.suggestionsContainer.innerHTML = '';
-                    this.#updateButtonStates();
-                    await this.#performSearch(selectedText);
-                });
+            console.log('Filtered data:', {
+                generalSuggestions,
+                programResults,
+                staffResults
             });
     
-        console.log('Suggestions displayed in three columns');
+            // Generate the HTML
+            const suggestionHTML = `
+                <div class="suggestions-list" role="listbox">
+                    <div class="suggestions-column general-column">
+                        <div class="column-header">Suggestions</div>
+                        ${this.#renderSuggestions(generalSuggestions)}
+                    </div>
+                    
+                    <div class="suggestions-column programs-column">
+                        <div class="column-header">Programs</div>
+                        ${this.#renderResults(programResults, 'program')}
+                    </div>
+                    
+                    <div class="suggestions-column staff-column">
+                        <div class="column-header">Faculty & Staff</div>
+                        ${this.#renderResults(staffResults, 'staff')}
+                    </div>
+                </div>
+            `;
+    
+            // Update the DOM
+            this.suggestionsContainer.innerHTML = suggestionHTML;
+            this.suggestionsContainer.hidden = false;
+            console.log('Updated container:', this.suggestionsContainer.innerHTML);
+    
+        } catch (error) {
+            console.error('Display error:', error);
+            this.suggestionsContainer.innerHTML = '';
+        }
+        
         console.groupEnd();
     }
-
+    
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
