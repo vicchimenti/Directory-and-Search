@@ -463,7 +463,45 @@ class AutocompleteSearchManager {
         
         console.groupEnd();
     }
-    
+
+    /**
+     * Helper method to render suggestions
+     */
+    #renderSuggestions(suggestions) {
+        if (!suggestions?.length) {
+            return '<div class="no-results">No suggestions found</div>';
+        }
+        
+        return suggestions.map(suggestion => `
+            <div class="suggestion-item general-item" role="option">
+                <span class="suggestion-text">${suggestion.display || suggestion}</span>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Helper method to render results
+     */
+    #renderResults(results, type) {
+        if (!results?.length) {
+            return `<div class="no-results">No ${type === 'program' ? 'programs' : 'staff members'} found</div>`;
+        }
+        
+        return results.map(result => `
+            <div class="suggestion-item ${type}-item" role="option">
+                <span class="suggestion-text">${result.title || result.display || result}</span>
+                ${type === 'program' && result.metadata?.degree ? 
+                    `<span class="suggestion-metadata">${result.metadata.degree}</span>` : ''}
+                ${type === 'program' && result.metadata?.description ? 
+                    `<span class="suggestion-description">${result.metadata.description}</span>` : ''}
+                ${type === 'staff' && result.metadata?.department ? 
+                    `<span class="suggestion-metadata">${result.metadata.department}</span>` : ''}
+                ${type === 'staff' && result.metadata?.title ? 
+                    `<span class="suggestion-role">${result.metadata.title}</span>` : ''}
+            </div>
+        `).join('');
+    }
+
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
