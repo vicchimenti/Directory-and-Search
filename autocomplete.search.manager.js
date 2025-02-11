@@ -257,6 +257,16 @@ class AutocompleteSearchManager {
                 profile: this.config.profile
             });
 
+            // Add tab parameters for categorization
+            const hiddenConfig = this.form.querySelector('.search-config');
+            if (hiddenConfig) {
+                const tabInputs = hiddenConfig.querySelectorAll('input[name^="f.Tabs|"]');
+                tabInputs.forEach(input => {
+                    params.append(input.name, input.value);
+                    console.log(`Adding tab parameter: ${input.name} = ${input.value}`);
+                });
+            }
+
             const url = `${this.config.endpoints.suggest}?${params}`;
             console.log('Request URL:', url);
             console.log('Request Parameters:', Object.fromEntries(params));
