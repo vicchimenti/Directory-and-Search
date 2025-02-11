@@ -370,81 +370,75 @@ class AutocompleteSearchManager {
     #displaySuggestions(suggestions) {
         console.group('Displaying Suggestions');
         console.log('Raw suggestions:', suggestions);
-
+    
         if (!suggestions?.length) {
             this.suggestionsContainer.innerHTML = '';
             console.log('No suggestions to display');
             console.groupEnd();
             return;
         }
-
-        // Limit to 10 items max
-        const limitedSuggestions = suggestions.slice(0, 10);
-
-        // Enhanced categorization with data source handling
+    
+        // Categorize suggestions
         const categorizedSuggestions = {
             general: [],
             programs: [],
             staff: []
         };
-
-        limitedSuggestions.forEach(suggestion => {
+    
+        suggestions.forEach(suggestion => {
             const category = this.#identifyCategory(suggestion);
-            const mappedCategory = category === 'program' ? 'programs' : 
-                                   category === 'staff' ? 'staff' : 'general';
-            categorizedSuggestions[mappedCategory].push(suggestion);
+            categorizedSuggestions[category].push(suggestion);
         });
-
+    
         // Limit each category
-        const generalSuggestions = categorizedSuggestions.general;
+        const generalSuggestions = categorizedSuggestions.general.slice(0, 10);
         const programSuggestions = categorizedSuggestions.programs.slice(0, 5);
         const staffSuggestions = categorizedSuggestions.staff.slice(0, 5);
-
+    
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
-                <!-- Three-column layout -->
                 <div class="suggestions-columns">
                     <!-- General suggestions column -->
                     <div class="suggestions-column">
                         <div class="column-header">All Results</div>
                         ${generalSuggestions.map(suggestion => `
-                            <div class="suggestion-item" role="option" data-source="${suggestion.dataSource || 'general'}">
+                            <div class="suggestion-item" role="option" data-source="general">
                                 <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
-                                ${suggestion.metadata ? `<span class="suggestion-metadata">${suggestion.metadata}</span>` : ''}
+                                ${suggestion.metadata ? `<span class="suggestion-metadata">${JSON.stringify(suggestion.metadata)}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
-
+    
                     <!-- Programs column -->
                     <div class="suggestions-column">
                         <div class="column-header">Programs</div>
-                        ${programSuggestions.map(program => `
-                            <div class="suggestion-item program-item" role="option" data-source="${program.dataSource || program.type || 'program'}">
-                                <span class="suggestion-text">${program.display ?? program}</span>
+                        ${programSuggestions.map(suggestion => `
+                            <div class="suggestion-item program-item" role="option" data-source="program">
+                                <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
                                 <span class="suggestion-type">Program</span>
-                                ${program.metadata ? `<span class="suggestion-metadata">${program.metadata}</span>` : ''}
+                                ${suggestion.metadata ? `<span class="suggestion-metadata">${JSON.stringify(suggestion.metadata)}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
-
+    
                     <!-- Staff column -->
                     <div class="suggestions-column">
                         <div class="column-header">Faculty & Staff</div>
                         ${staffSuggestions.map(staff => `
-                            <div class="suggestion-item staff-item" role="option" data-source="${staff.dataSource || staff.type || 'staff'}">
+                            <div class="suggestion-item staff-item" role="option" data-source="staff">
                                 <span class="suggestion-text">${staff.display ?? staff}</span>
                                 <span class="suggestion-type">Staff</span>
-                                ${staff.metadata ? `<span class="suggestion-metadata">${staff.metadata}</span>` : ''}
+                                ${staff.metadata ? `<span class="suggestion-metadata">${JSON.stringify(staff.metadata)}</span>` : ''}
                             </div>
                         `).join('')}
                     </div>
                 </div>
             </div>
         `;
-
+    
         this.suggestionsContainer.innerHTML = suggestionHTML;
         this.suggestionsContainer.hidden = false;
-
+    
         // Add click handlers
         this.suggestionsContainer.querySelectorAll('.suggestion-item')
             .forEach((item) => {
@@ -456,10 +450,12 @@ class AutocompleteSearchManager {
                     await this.#performSearch(selectedText);
                 });
             });
-
+    
         console.log('Suggestions displayed');
         console.groupEnd();
     }
+
+
 
     /**
      * Handles keyboard navigation within suggestions.
