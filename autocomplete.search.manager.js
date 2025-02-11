@@ -44,7 +44,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.5.0
+ * @version 1.5.1
  * @lastModified 2025-02-11
  */
 
@@ -576,7 +576,7 @@ class AutocompleteSearchManager {
                 break;
         }
     }
-    
+
     /**
      * Handles clicks outside the autocomplete component.
      * Closes the suggestions dropdown when clicking elsewhere.
