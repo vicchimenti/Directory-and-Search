@@ -79,7 +79,7 @@ class AutocompleteSearchManager {
                 search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search'
             },
             sourceMapping: {
-                program: ['program-main', 'academic', 'degree'],
+                programs: ['program-main', 'academic', 'degree'],
                 staff: ['Faculty & Staff', 'faculty', 'directory'],
                 general: ['general', 'default']
             },
