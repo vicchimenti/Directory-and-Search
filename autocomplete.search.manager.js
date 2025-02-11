@@ -383,29 +383,39 @@ class AutocompleteSearchManager {
         console.group('Displaying Suggestions');
         console.log('Raw suggestions:', suggestions);
         console.log('Search results:', results);
-
+        console.log('Suggestions container:', this.suggestionsContainer);
+    
+        if (!this.suggestionsContainer) {
+            console.error('Suggestions container not found');
+            console.groupEnd();
+            return;
+        }
+    
         if (!suggestions?.length && !results?.length) {
             this.suggestionsContainer.innerHTML = '';
             console.log('No suggestions or results to display');
             console.groupEnd();
             return;
         }
-
+    
         // Get general suggestions (excluding programs and staff)
         const generalSuggestions = suggestions
             .filter(suggestion => this.#identifyCategory(suggestion) === 'general')
             .slice(0, this.config.maxResults);
-
+        console.log('Filtered general suggestions:', generalSuggestions);
+    
         // Get program-specific content
         const programResults = results
             .filter(result => result.metadata?.tabs?.includes('program-main'))
             .slice(0, Math.floor(this.config.maxResults / 2));
-
+        console.log('Filtered program results:', programResults);
+    
         // Get staff-specific content
         const staffResults = results
             .filter(result => result.metadata?.tabs?.includes('Faculty & Staff'))
             .slice(0, Math.floor(this.config.maxResults / 2));
-
+        console.log('Filtered staff results:', staffResults);
+    
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
                 <div class="suggestions-column general-column">
@@ -454,10 +464,22 @@ class AutocompleteSearchManager {
                 </div>
             </div>
         `;
-
+    
+        console.log('Generated HTML:', suggestionHTML);
+        
+        // Set the HTML content
         this.suggestionsContainer.innerHTML = suggestionHTML;
+        
+        // Ensure the container is visible
         this.suggestionsContainer.hidden = false;
-
+        this.suggestionsContainer.style.display = 'block';
+        
+        console.log('Container after update:', {
+            hidden: this.suggestionsContainer.hidden,
+            display: this.suggestionsContainer.style.display,
+            innerHTML: this.suggestionsContainer.innerHTML
+        });
+    
         // Add click handlers
         this.suggestionsContainer.querySelectorAll('.suggestion-item')
             .forEach((item) => {
@@ -469,11 +491,11 @@ class AutocompleteSearchManager {
                     await this.#performSearch(selectedText);
                 });
             });
-
+    
         console.log('Suggestions displayed in three columns');
         console.groupEnd();
     }
-
+    
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
