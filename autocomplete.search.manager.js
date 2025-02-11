@@ -354,34 +354,84 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Displays suggestions in a single column layout.
+     * Displays suggestions in a three-column layout: general suggestions, programs, and staff.
      * 
      * @private
      * @param {Array} suggestions - Array of suggestion objects
+     * @param {Array} results - Array of search results
      */
-    #displaySuggestions(suggestions) {
+    #displaySuggestions(suggestions, results = []) {
         console.group('Displaying Suggestions');
         console.log('Raw suggestions:', suggestions);
+        console.log('Search results:', results);
 
-        if (!suggestions?.length) {
+        if (!suggestions?.length && !results?.length) {
             this.suggestionsContainer.innerHTML = '';
-            console.log('No suggestions to display');
+            console.log('No suggestions or results to display');
             console.groupEnd();
             return;
         }
 
-        // Limit to maximum number of suggestions
-        const limitedSuggestions = suggestions.slice(0, this.config.maxResults);
+        // Get general suggestions (excluding programs and staff)
+        const generalSuggestions = suggestions
+            .filter(suggestion => this.#identifyCategory(suggestion) === 'general')
+            .slice(0, this.config.maxResults);
+
+        // Get program-specific content
+        const programResults = results
+            .filter(result => result.metadata?.tabs?.includes('program-main'))
+            .slice(0, Math.floor(this.config.maxResults / 2));
+
+        // Get staff-specific content
+        const staffResults = results
+            .filter(result => result.metadata?.tabs?.includes('Faculty & Staff'))
+            .slice(0, Math.floor(this.config.maxResults / 2));
 
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
-                <div class="suggestions-column">
+                <div class="suggestions-column general-column">
                     <div class="column-header">Suggestions</div>
-                    ${limitedSuggestions.map(suggestion => `
-                        <div class="suggestion-item" role="option">
-                            <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
-                        </div>
-                    `).join('')}
+                    ${generalSuggestions.length ? `
+                        ${generalSuggestions.map(suggestion => `
+                            <div class="suggestion-item general-item" role="option">
+                                <span class="suggestion-text">${suggestion.display ?? suggestion}</span>
+                            </div>
+                        `).join('')}
+                    ` : '<div class="no-results">No suggestions found</div>'}
+                </div>
+                
+                <div class="suggestions-column programs-column">
+                    <div class="column-header">Programs</div>
+                    ${programResults.length ? `
+                        ${programResults.map(result => `
+                            <div class="suggestion-item program-item" role="option">
+                                <span class="suggestion-text">${result.title}</span>
+                                ${result.metadata?.degree ? `
+                                    <span class="suggestion-metadata">${result.metadata.degree}</span>
+                                ` : ''}
+                                ${result.metadata?.description ? `
+                                    <span class="suggestion-description">${result.metadata.description}</span>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    ` : '<div class="no-results">No programs found</div>'}
+                </div>
+                
+                <div class="suggestions-column staff-column">
+                    <div class="column-header">Faculty & Staff</div>
+                    ${staffResults.length ? `
+                        ${staffResults.map(result => `
+                            <div class="suggestion-item staff-item" role="option">
+                                <span class="suggestion-text">${result.title}</span>
+                                ${result.metadata?.department ? `
+                                    <span class="suggestion-metadata">${result.metadata.department}</span>
+                                ` : ''}
+                                ${result.metadata?.title ? `
+                                    <span class="suggestion-role">${result.metadata.title}</span>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    ` : '<div class="no-results">No staff members found</div>'}
                 </div>
             </div>
         `;
@@ -401,10 +451,10 @@ class AutocompleteSearchManager {
                 });
             });
 
-        console.log('Suggestions displayed');
+        console.log('Suggestions displayed in three columns');
         console.groupEnd();
     }
-
+    
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
