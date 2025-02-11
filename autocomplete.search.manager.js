@@ -233,51 +233,70 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Fetches suggestions from the Funnelback API.
+     * Fetches both suggestions and initial search results from the Funnelback API.
      * 
      * @private
      * @param {string} query - The search query
      */
     async #fetchSuggestions(query) {
-        console.group(`Fetching suggestions for: "${query}"`);
-        console.time('suggestionsFetch');
+        console.group(`Fetching suggestions and results for: "${query}"`);
+        console.time('fetchTotal');
         
         try {
-            const params = new URLSearchParams({
+            // Fetch suggestions
+            const suggestParams = new URLSearchParams({
                 collection: this.config.collection,
                 partial_query: query,
                 show: this.config.maxResults,
                 profile: this.config.profile
             });
 
-            // Add tab parameters for categorization
+            // Fetch initial results
+            const searchParams = new URLSearchParams({
+                collection: this.config.collection,
+                query: query,
+                profile: this.config.profile,
+                show: this.config.maxResults * 2, // Double for programs and staff
+                format: 'json'    // Request JSON format for easier processing
+            });
+
+            // Add tab parameters for both requests
             const hiddenConfig = this.form.querySelector('.search-config');
             if (hiddenConfig) {
                 const tabInputs = hiddenConfig.querySelectorAll('input[name^="f.Tabs|"]');
                 tabInputs.forEach(input => {
-                    params.append(input.name, input.value);
-                    console.log(`Adding tab parameter: ${input.name} = ${input.value}`);
+                    suggestParams.append(input.name, input.value);
+                    searchParams.append(input.name, input.value);
                 });
             }
 
-            const url = `${this.config.endpoints.suggest}?${params}`;
-            console.log('Request URL:', url);
-            console.log('Request Parameters:', Object.fromEntries(params));
+            // Make both requests concurrently
+            const [suggestResponse, searchResponse] = await Promise.all([
+                fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
+                fetch(`${this.config.endpoints.search}?${searchParams}`)
+            ]);
 
-            const response = await fetch(url);
-            console.log('Response Status:', response.status);
-            
-            if (!response.ok) throw new Error(`Suggestions failed: ${response.status}`);
+            console.log('Suggestion Response Status:', suggestResponse.status);
+            console.log('Search Response Status:', searchResponse.status);
 
-            const suggestions = await response.json();
+            if (!suggestResponse.ok) throw new Error(`Suggestions failed: ${suggestResponse.status}`);
+            if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
+
+            const [suggestions, searchResults] = await Promise.all([
+                suggestResponse.json(),
+                searchResponse.json()
+            ]);
+
             console.log('Suggestions received:', suggestions);
-            
-            this.#displaySuggestions(suggestions);
+            console.log('Search results received:', searchResults);
+
+            // Pass both suggestions and results to display method
+            this.#displaySuggestions(suggestions, searchResults.results);
         } catch (error) {
-            console.error('Suggestion fetch error:', error);
+            console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
         } finally {
-            console.timeEnd('suggestionsFetch');
+            console.timeEnd('fetchTotal');
             console.groupEnd();
         }
     }
@@ -454,7 +473,7 @@ class AutocompleteSearchManager {
         console.log('Suggestions displayed in three columns');
         console.groupEnd();
     }
-    
+
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
