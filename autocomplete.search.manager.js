@@ -44,7 +44,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.5.1
+ * @version 1.5.2
  * @lastModified 2025-02-11
  */
 
@@ -495,7 +495,7 @@ class AutocompleteSearchManager {
         console.log('Suggestions displayed in three columns');
         console.groupEnd();
     }
-    
+
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
