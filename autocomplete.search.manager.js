@@ -257,7 +257,8 @@ class AutocompleteSearchManager {
                 query: query,
                 profile: this.config.profile,
                 show: this.config.maxResults * 2,
-                format: 'json'
+                form: 'partial',     // Request partial results
+                type: '.json'        // Ensure JSON response
             });
     
             // Add tab parameters for both requests
@@ -270,42 +271,38 @@ class AutocompleteSearchManager {
                 });
             }
     
+            console.log('Request parameters:', {
+                suggest: Object.fromEntries(suggestParams),
+                search: Object.fromEntries(searchParams)
+            });
+    
             // Make both requests concurrently
             const [suggestResponse, searchResponse] = await Promise.all([
                 fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
                 fetch(`${this.config.endpoints.search}?${searchParams}`)
             ]);
     
-            // Log raw responses for debugging
-            const suggestText = await suggestResponse.text();
-            const searchText = await searchResponse.text();
-            
-            console.log('Raw suggest response:', suggestText);
-            console.log('Raw search response:', searchText);
+            if (!suggestResponse.ok) throw new Error(`Suggestions failed: ${suggestResponse.status}`);
+            if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
     
             // Parse the responses
-            let suggestions, searchResults;
-            try {
-                suggestions = JSON.parse(suggestText);
-                searchResults = JSON.parse(searchText);
-            } catch (e) {
-                console.error('JSON parse error:', e);
-                console.log('Suggest text:', suggestText);
-                console.log('Search text:', searchText);
-                throw e;
-            }
+            const [suggestions, searchResults] = await Promise.all([
+                suggestResponse.json(),
+                searchResponse.json()
+            ]);
     
-            // Extract the actual suggestions array
-            const suggestionArray = suggestions?.suggestions || [];
-            const resultsArray = searchResults?.response?.resultPacket?.results || [];
-    
-            console.log('Processed data:', {
-                suggestionArray,
-                resultsArray
+            console.log('Raw responses:', {
+                suggestions: suggestions,
+                searchResults: searchResults
             });
+    
+            // Extract the actual suggestions array and search results
+            const suggestionArray = Array.isArray(suggestions) ? suggestions : suggestions.suggestions || [];
+            const resultsArray = searchResults?.results || searchResults?.response?.resultPacket?.results || [];
     
             // Update the display
             this.#displaySuggestions(suggestionArray, resultsArray);
+    
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
