@@ -270,44 +270,41 @@ class AutocompleteSearchManager {
                 });
             }
     
-            console.log('Request parameters:', {
-                suggest: Object.fromEntries(suggestParams),
-                search: Object.fromEntries(searchParams)
-            });
-    
             // Make both requests concurrently
             const [suggestResponse, searchResponse] = await Promise.all([
                 fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
                 fetch(`${this.config.endpoints.search}?${searchParams}`)
             ]);
     
-            console.log('Response status:', {
-                suggestions: suggestResponse.status,
-                search: searchResponse.status
+            // Log raw responses for debugging
+            const suggestText = await suggestResponse.text();
+            const searchText = await searchResponse.text();
+            
+            console.log('Raw suggest response:', suggestText);
+            console.log('Raw search response:', searchText);
+    
+            // Parse the responses
+            let suggestions, searchResults;
+            try {
+                suggestions = JSON.parse(suggestText);
+                searchResults = JSON.parse(searchText);
+            } catch (e) {
+                console.error('JSON parse error:', e);
+                console.log('Suggest text:', suggestText);
+                console.log('Search text:', searchText);
+                throw e;
+            }
+    
+            // Extract the actual suggestions array
+            const suggestionArray = suggestions?.suggestions || [];
+            const resultsArray = searchResults?.response?.resultPacket?.results || [];
+    
+            console.log('Processed data:', {
+                suggestionArray,
+                resultsArray
             });
     
-            if (!suggestResponse.ok) throw new Error(`Suggestions failed: ${suggestResponse.status}`);
-            if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
-    
-            const [suggestions, searchResults] = await Promise.all([
-                suggestResponse.json(),
-                searchResponse.json()
-            ]);
-    
-            // Log the exact structure of responses
-            console.log('Raw suggestion response:', JSON.stringify(suggestions, null, 2));
-            console.log('Raw search response:', JSON.stringify(searchResults, null, 2));
-    
-            // Check if suggestions is an array or needs to be accessed differently
-            const suggestionArray = Array.isArray(suggestions) ? suggestions : suggestions.suggestions;
-            const resultsArray = searchResults.results || [];
-    
-            console.log('Processed arrays:', {
-                suggestions: suggestionArray,
-                results: resultsArray
-            });
-    
-            // Pass both suggestions and results to display method
+            // Update the display
             this.#displaySuggestions(suggestionArray, resultsArray);
         } catch (error) {
             console.error('Fetch error:', error);
