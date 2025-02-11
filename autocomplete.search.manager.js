@@ -51,7 +51,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.3.10
+ * @version 1.4.0
  * @lastModified 2025-02-11
  */
 
