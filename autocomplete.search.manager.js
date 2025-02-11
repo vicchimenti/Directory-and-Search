@@ -345,7 +345,7 @@ class AutocompleteSearchManager {
     #identifyCategory(suggestion) {
         // Check for tab-based categorization first
         if (suggestion.metadata && suggestion.metadata.tabs) {
-            if (suggestion.metadata.tabs.includes('program-main')) return 'program';
+            if (suggestion.metadata.tabs.includes('program-main')) return 'programs';
             if (suggestion.metadata.tabs.includes('Faculty & Staff')) return 'staff';
         }
     
@@ -353,7 +353,7 @@ class AutocompleteSearchManager {
         const source = (suggestion.dataSource || suggestion.type || '').toLowerCase();
         for (const [category, sources] of Object.entries(this.config.sourceMapping)) {
             if (sources.includes(source)) {
-                return category;
+                return category === 'program' ? 'programs' : category;
             }
         }
         
