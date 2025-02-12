@@ -44,8 +44,8 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.5.10
- * @lastModified 2025-02-11
+ * @version 1.5.11
+ * @lastModified 2025-02-12
  */
 
 class AutocompleteSearchManager {
