@@ -410,8 +410,8 @@ class AutocompleteSearchManager {
                     this.#updateButtonStates();
                     this.#performSearch(selectedText);
                 } else if (url) {
-                    // Navigate to the URL for staff and program results
-                    window.location.href = url;
+                    // Open the URL in a new tab with security attributes
+                    window.open(url, '_blank', 'noopener,noreferrer');
                 }
             });
         });
