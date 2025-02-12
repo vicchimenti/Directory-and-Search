@@ -249,23 +249,11 @@ class AutocompleteSearchManager {
      * @param {string} query - The search query
      */
     async #fetchSuggestions(query) {
-        console.group(`Fetching suggestions and results for: "${query}" (length: ${query.length})`);
-        console.time('fetchTotal');
-        
         try {
-            // Basic parameters
             const suggestParams = new URLSearchParams({
                 collection: this.config.collection,
                 partial_query: query,
                 profile: this.config.profile
-            });
-    
-            const searchParams = new URLSearchParams({
-                collection: this.config.collection,
-                query: query,
-                profile: this.config.profile,
-                form: 'partial',
-                format: 'json'
             });
     
             // Add tab parameters
@@ -274,59 +262,16 @@ class AutocompleteSearchManager {
                 const tabInputs = hiddenConfig.querySelectorAll('input[name^="f.Tabs|"]');
                 tabInputs.forEach(input => {
                     suggestParams.append(input.name, input.value);
-                    searchParams.append(input.name, input.value);
                 });
             }
     
-            const [suggestResponse, searchResponse] = await Promise.all([
-                fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
-                fetch(`${this.config.endpoints.search}?${searchParams}`)
-            ]);
+            const response = await fetch(`${this.config.endpoints.suggest}?${suggestParams}`);
+            const suggestions = await response.json();
     
-            const [suggestText, searchText] = await Promise.all([
-                suggestResponse.text(),
-                searchResponse.text()
-            ]);
-    
-            console.log('Response lengths:', {
-                suggest: suggestText.length,
-                search: searchText.length
-            });
-    
-            let suggestions, searchResults;
-            try {
-                suggestions = JSON.parse(suggestText);
-                searchResults = JSON.parse(searchText);
-            } catch (e) {
-                console.error('Parse error:', e);
-                throw e;
-            }
-
-
-            // Extract arrays with more specific error checking
-            const suggestionArray = Array.isArray(suggestions) ? suggestions : [];
-            console.log('Raw suggestions:', suggestions);
-            console.log('Processed suggestions:', suggestionArray);
-
-            // For search results, log and extract
-            const resultsArray = searchResults?.results || [];
-            console.log('Raw search results:', searchResults);
-            console.log('Processed results:', resultsArray);
-    
-            console.log('Data for display:', {
-                suggestions: suggestionArray.length,
-                results: resultsArray.length
-            });
-    
-            // Update display
-            this.#displaySuggestions(suggestionArray, resultsArray);
-    
+            this.#displaySuggestions(suggestions);
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
-        } finally {
-            console.timeEnd('fetchTotal');
-            console.groupEnd();
         }
     }
 
