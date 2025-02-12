@@ -400,23 +400,33 @@ class AutocompleteSearchManager {
         // Add click handlers
         this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
             item.addEventListener('click', () => {
+                const selectedText = item.querySelector('.suggestion-text').textContent;
                 const type = item.dataset.type;
                 const url = item.dataset.url;
+
+                console.group('Suggestion Click Interaction');
+                console.log('Interaction Type:', 'mouse click');
+                console.log('Selected Item Type:', type);
+                console.log('Selected Text:', selectedText);
+                console.log('Associated URL:', url || 'none');
                 
-                if (type === 'suggestion') {
-                    const selectedText = item.querySelector('.suggestion-text').textContent;
-                    this.inputField.value = selectedText;
-                    this.suggestionsContainer.innerHTML = '';
-                    this.#updateButtonStates();
-                    this.#performSearch(selectedText);
-                } else if (url) {
-                    // Open the URL in a new tab with security attributes
+                this.inputField.value = selectedText;
+                this.suggestionsContainer.innerHTML = '';
+                this.#updateButtonStates();
+                
+                // Always perform the search first
+                console.log('Initiating proxy search request');
+                this.#performSearch(selectedText);
+                
+                // If there's a URL, open it in a new tab as a fallback
+                if (url) {
+                    console.log('Opening direct URL as fallback');
                     window.open(url, '_blank', 'noopener,noreferrer');
                 }
+                console.groupEnd();
             });
         });
     }
-
 
     /**
      * Handles keyboard navigation within suggestions.
