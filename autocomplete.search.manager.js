@@ -319,18 +319,15 @@ class AutocompleteSearchManager {
                     return data;
                 });
 
-            console.log('Total articles searched:', allArticles.length);
-            console.log('Staff matches found before limit:', staffResults.length);
-            console.log('Program matches found before limit:', programResults.length);
-
-            console.log('Final Staff Results Count:', staffResults.length);
-            console.log('Final Program Results Count:', programResults.length);
-            console.groupEnd();
-
-            console.group('Results Extraction');
-            console.log('Staff Results:', staffResults);
-            console.log('Program Results:', programResults);
-            console.groupEnd();
+                console.log('Total articles searched:', allArticles.length);
+                console.log('Staff matches found:', staffResults.length);
+                console.log('Program matches found:', programResults.length);
+                console.groupEnd();
+    
+                console.group('Results Extraction');
+                console.log('Staff Results:', staffResults);
+                console.log('Program Results:', programResults);
+                console.groupEnd();
 
             this.#displaySuggestions(suggestions, staffResults, programResults);
         } catch (error) {
