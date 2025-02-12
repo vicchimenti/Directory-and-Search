@@ -495,26 +495,25 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Helper method to render results
+     * Helper method to render search results with proper text extraction
      */
     #renderResults(results, type) {
         if (!results?.length) {
             return `<div class="no-results">No ${type === 'program' ? 'programs' : 'staff members'} found</div>`;
         }
         
-        return results.map(result => `
-            <div class="suggestion-item ${type}-item" role="option">
-                <span class="suggestion-text">${result.title || result.display || result}</span>
-                ${type === 'program' && result.metadata?.degree ? 
-                    `<span class="suggestion-metadata">${result.metadata.degree}</span>` : ''}
-                ${type === 'program' && result.metadata?.description ? 
-                    `<span class="suggestion-description">${result.metadata.description}</span>` : ''}
-                ${type === 'staff' && result.metadata?.department ? 
-                    `<span class="suggestion-metadata">${result.metadata.department}</span>` : ''}
-                ${type === 'staff' && result.metadata?.title ? 
-                    `<span class="suggestion-role">${result.metadata.title}</span>` : ''}
-            </div>
-        `).join('');
+        return results.map(result => {
+            // Extract meaningful text from the result
+            const title = result.title || result.display || '';
+            const metadata = result.metadata || {};
+            
+            return `
+                <div class="suggestion-item ${type}-item" role="option">
+                    <span class="suggestion-text">${title}</span>
+                    ${type === 'program' ? this.#renderProgramMetadata(metadata) : this.#renderStaffMetadata(metadata)}
+                </div>
+            `;
+        }).join('');
     }
 
     /**
