@@ -312,32 +312,6 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Identifies the category for a given suggestion based on its data source.
-     * Uses the sourceMapping configuration to determine the appropriate category.
-     * 
-     * @private
-     * @param {Object} suggestion - The suggestion object to categorize
-     * @returns {string} The category name ('program', 'staff', or 'general')
-     */
-    #identifyCategory(suggestion) {
-        // Check for tab-based categorization first
-        if (suggestion.metadata && suggestion.metadata.tabs) {
-            if (suggestion.metadata.tabs.includes('program-main')) return 'programs';
-            if (suggestion.metadata.tabs.includes('Faculty & Staff')) return 'staff';
-        }
-    
-        // Fallback to source-based categorization
-        const source = (suggestion.dataSource || suggestion.type || '').toLowerCase();
-        for (const [category, sources] of Object.entries(this.config.sourceMapping)) {
-            if (sources.includes(source)) {
-                return category === 'program' ? 'programs' : category;
-            }
-        }
-        
-        return 'general';
-    }
-
-    /**
      * Displays suggestions in a three-column layout: general suggestions, programs, and staff.
      * 
      * @private
