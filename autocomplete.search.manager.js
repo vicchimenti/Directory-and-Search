@@ -240,10 +240,10 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Fetches search suggestions and results for all columns
-     * @private
-     * @param {string} query - The search query
-     */
+    * Fetches search suggestions and results for all columns
+    * @private
+    * @param {string} query - The search query
+    */
     async #fetchSuggestions(query) {
         try {
             // Fetch suggestions
@@ -273,23 +273,51 @@ class AutocompleteSearchManager {
             const parser = new DOMParser();
             const doc = parser.parseFromString(searchResults, 'text/html');
 
-            // Extract staff profiles (adjust selectors based on your HTML structure)
-            const staffResults = Array.from(doc.querySelectorAll('.staff-profile-result'))
-                .slice(0, this.config.staffLimit)
-                .map(element => ({
-                    title: element.querySelector('.profile-name')?.textContent,
-                    role: element.querySelector('.profile-title')?.textContent,
-                    url: element.querySelector('a')?.href
-                }));
+            // Check for tab indicators in hidden inputs
+            const isStaffTab = doc.querySelector('input[name="f.Tabs|seattleu-ds-staff"]') !== null;
+            const isProgramTab = doc.querySelector('input[name="f.Tabs|programMain"]') !== null;
 
-            // Extract program results (adjust selectors based on your HTML structure)
-            const programResults = Array.from(doc.querySelectorAll('.program-result'))
-                .slice(0, this.config.programLimit)
-                .map(element => ({
-                    title: element.querySelector('.program-title')?.textContent,
-                    description: element.querySelector('.program-description')?.textContent,
-                    url: element.querySelector('a')?.href
-                }));
+            console.group('Tab Detection');
+            console.log('Staff Tab Present:', isStaffTab);
+            console.log('Program Tab Present:', isProgramTab);
+            console.groupEnd();
+
+            // Initialize results arrays
+            let staffResults = [];
+            let programResults = [];
+
+            // Extract staff profiles
+            if (isStaffTab) {
+                staffResults = Array.from(doc.querySelectorAll('article.peopleData'))
+                    .slice(0, this.config.staffLimit)
+                    .map(element => ({
+                        title: element.querySelector('.listing-item__title-link')?.textContent?.trim(),
+                        role: element.querySelector('.listing-item__subtitle')?.textContent?.trim(),
+                        url: element.querySelector('.listing-item__title-link')?.getAttribute('data-live-url'),
+                        image: element.querySelector('.listing-item__image')?.getAttribute('src')
+                    }));
+            }
+
+            // Extract program results
+            if (isProgramTab) {
+                programResults = Array.from(doc.querySelectorAll('article.programData'))
+                    .slice(0, this.config.programLimit)
+                    .map(element => ({
+                        title: element.querySelector('.listing-item__title-link')?.textContent?.trim(),
+                        description: element.querySelector('.listing-item__summary')?.textContent?.trim(),
+                        url: element.querySelector('.listing-item__title-link')?.getAttribute('data-live-url')
+                    }));
+            }
+
+            console.group('Results Extraction');
+            console.log('Staff Results:', staffResults);
+            console.log('Program Results:', programResults);
+            console.groupEnd();
+
+            console.group('Results Extraction');
+            console.log('Staff Results:', staffResults);
+            console.log('Program Results:', programResults);
+            console.groupEnd();
 
             this.#displaySuggestions(suggestions, staffResults, programResults);
         } catch (error) {
@@ -297,7 +325,7 @@ class AutocompleteSearchManager {
             this.suggestionsContainer.innerHTML = '';
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
