@@ -517,6 +517,27 @@ class AutocompleteSearchManager {
     }
 
     /**
+     * Helper method to render program-specific metadata
+     */
+    #renderProgramMetadata(metadata) {
+        return `
+            ${metadata.degree ? `<span class="suggestion-metadata">${metadata.degree}</span>` : ''}
+            ${metadata.description ? `<span class="suggestion-description">${metadata.description}</span>` : ''}
+        `;
+    }
+
+    /**
+     * Helper method to render staff-specific metadata
+     */
+    #renderStaffMetadata(metadata) {
+        return `
+            ${metadata.department ? `<span class="suggestion-metadata">${metadata.department}</span>` : ''}
+            ${metadata.title ? `<span class="suggestion-role">${metadata.title}</span>` : ''}
+        `;
+    }
+
+
+    /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
      * Handles navigation across columns.
