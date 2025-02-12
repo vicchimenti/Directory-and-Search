@@ -63,7 +63,11 @@ class AutocompleteSearchManager {
 
         this.config = {
             inputId: 'autocomplete-concierge-inputField',
-            collection: 'seattleu~sp-search',
+            collections: {
+                general: 'seattleu~sp-search',
+                staff: 'seattleu~ds-staff',
+                programs: 'seattleu~ds-programs'
+            },
             profile: '_default',
             maxResults: 10,
             minLength: 3,
@@ -71,7 +75,9 @@ class AutocompleteSearchManager {
             programLimit: 5,
             endpoints: {
                 suggest: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
-                search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search'
+                search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search',
+                suggestPeople: 'https://funnelback-proxy.vercel.app/proxy/suggestPeople',
+                suggestPrograms: 'https://funnelback-proxy.vercel.app/proxy/suggestPrograms'
             },
             ...config
         };
