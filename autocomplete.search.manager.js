@@ -314,11 +314,6 @@ class AutocompleteSearchManager {
             console.log('Program Results:', programResults);
             console.groupEnd();
 
-            console.group('Results Extraction');
-            console.log('Staff Results:', staffResults);
-            console.log('Program Results:', programResults);
-            console.groupEnd();
-
             this.#displaySuggestions(suggestions, staffResults, programResults);
         } catch (error) {
             console.error('Fetch error:', error);
