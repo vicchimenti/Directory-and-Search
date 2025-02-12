@@ -353,75 +353,36 @@ class AutocompleteSearchManager {
      * @param {Array} suggestions - Array of suggestion objects
      * @param {Array} results - Array of search results
      */
-    #displaySuggestions(suggestions, results = []) {
-        console.group('Displaying Suggestions');
-        console.log('Container element:', this.suggestionsContainer);
-        console.log('Raw suggestions:', suggestions);
-        console.log('Raw results:', results);
-    
-        // Early return if container is missing
-        if (!this.suggestionsContainer) {
-            console.error('Suggestions container not found');
-            console.groupEnd();
-            return;
-        }
-    
-        // Early return if no data
-        if (!suggestions?.length && !results?.length) {
-            console.log('No data to display');
+    #displaySuggestions(suggestions) {
+        if (!this.suggestionsContainer || !suggestions?.length) {
             this.suggestionsContainer.innerHTML = '';
-            console.groupEnd();
             return;
         }
     
-        try {
-            // Get general suggestions
-            const generalSuggestions = Array.isArray(suggestions) ? 
-                suggestions.filter(s => this.#identifyCategory(s) === 'general') : [];
+        const suggestionHTML = `
+            <div class="suggestions-list" role="listbox">
+                ${suggestions.map(suggestion => `
+                    <div class="suggestion-item" role="option">
+                        <span class="suggestion-text">${suggestion.display}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     
-            // Get program and staff results
-            const programResults = Array.isArray(results) ?
-                results.filter(r => r.metadata?.tabs?.includes('program-main')) : [];
-            const staffResults = Array.isArray(results) ?
-                results.filter(r => r.metadata?.tabs?.includes('Faculty & Staff')) : [];
+        this.suggestionsContainer.innerHTML = suggestionHTML;
+        this.suggestionsContainer.hidden = false;
     
-            console.log('Filtered data:', {
-                generalSuggestions,
-                programResults,
-                staffResults
+        // Add click handlers
+        this.suggestionsContainer.querySelectorAll('.suggestion-item')
+            .forEach((item) => {
+                item.addEventListener('click', () => {
+                    const selectedText = item.querySelector('.suggestion-text').textContent;
+                    this.inputField.value = selectedText;
+                    this.suggestionsContainer.innerHTML = '';
+                    this.#updateButtonStates();
+                    this.#performSearch(selectedText);
+                });
             });
-    
-            // Generate the HTML
-            const suggestionHTML = `
-                <div class="suggestions-list" role="listbox">
-                    <div class="suggestions-column general-column">
-                        <div class="column-header">Suggestions</div>
-                        ${this.#renderSuggestions(generalSuggestions)}
-                    </div>
-                    
-                    <div class="suggestions-column programs-column">
-                        <div class="column-header">Programs</div>
-                        ${this.#renderResults(programResults, 'program')}
-                    </div>
-                    
-                    <div class="suggestions-column staff-column">
-                        <div class="column-header">Faculty & Staff</div>
-                        ${this.#renderResults(staffResults, 'staff')}
-                    </div>
-                </div>
-            `;
-    
-            // Update the DOM
-            this.suggestionsContainer.innerHTML = suggestionHTML;
-            this.suggestionsContainer.hidden = false;
-            console.log('Updated container:', this.suggestionsContainer.innerHTML);
-    
-        } catch (error) {
-            console.error('Display error:', error);
-            this.suggestionsContainer.innerHTML = '';
-        }
-        
-        console.groupEnd();
     }
 
     /**
