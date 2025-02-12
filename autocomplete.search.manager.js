@@ -276,16 +276,16 @@ class AutocompleteSearchManager {
             console.group('Content Parsing');
             
             // Get all article elements first
-            const articles = Array.from(doc.querySelectorAll('article.listing-item'));
-            console.log('Total articles found:', articles.length);
+            const allArticles = Array.from(doc.querySelectorAll('article.listing-item'));
+            console.log('Total articles found:', allArticles.length);
             
-            // Log class names of all articles for debugging
-            articles.forEach((article, index) => {
-                console.log(`Article ${index} classes:`, article.className);
+            // Log first few articles for debugging
+            allArticles.slice(0, 10).forEach((article, index) => {
+                console.log(`Sample Article ${index} classes:`, article.className);
             });
 
-            // Filter and map staff results
-            const staffResults = articles
+            // Filter and map staff results - get all matches first, then slice
+            const staffResults = allArticles
                 .filter(article => 
                     article.classList.contains('listing-item--people') || 
                     article.classList.contains('peopleData')
@@ -302,8 +302,8 @@ class AutocompleteSearchManager {
                     return data;
                 });
 
-            // Filter and map program results
-            const programResults = articles
+            // Filter and map program results - get all matches first, then slice
+            const programResults = allArticles
                 .filter(article => 
                     article.classList.contains('listing-item--program') || 
                     article.classList.contains('programData')
@@ -318,6 +318,10 @@ class AutocompleteSearchManager {
                     console.log('Mapped program data:', data);
                     return data;
                 });
+
+            console.log('Total articles searched:', allArticles.length);
+            console.log('Staff matches found before limit:', staffResults.length);
+            console.log('Program matches found before limit:', programResults.length);
 
             console.log('Final Staff Results Count:', staffResults.length);
             console.log('Final Program Results Count:', programResults.length);
