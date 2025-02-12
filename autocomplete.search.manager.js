@@ -344,45 +344,79 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Displays suggestions in a single-column layout.
-     * 
+     * Displays suggestions in a three-column layout
      * @private
      * @param {Array} suggestions - Array of suggestion objects
+     * @param {Array} staffResults - Array of staff profile results
+     * @param {Array} programResults - Array of program results
      */
-    #displaySuggestions(suggestions) {
-        if (!this.suggestionsContainer || !suggestions?.length) {
-            this.suggestionsContainer.innerHTML = '';
+    #displaySuggestions(suggestions, staffResults, programResults) {
+        if (!this.suggestionsContainer) {
             return;
         }
-    
+
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
                 <div class="suggestions-column">
                     <div class="column-header">Suggestions</div>
                     ${suggestions.map(suggestion => `
-                        <div class="suggestion-item" role="option">
+                        <div class="suggestion-item" role="option" data-type="suggestion">
                             <span class="suggestion-text">${suggestion.display || ''}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="suggestions-column">
+                    <div class="column-header">Faculty & Staff</div>
+                    ${staffResults.map(staff => `
+                        <div class="suggestion-item" role="option" data-type="staff" data-url="${staff.url || ''}">
+                            <div class="staff-suggestion">
+                                <span class="suggestion-text">${staff.title || ''}</span>
+                                ${staff.role ? `<span class="staff-role">${staff.role}</span>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="suggestions-column">
+                    <div class="column-header">Programs</div>
+                    ${programResults.map(program => `
+                        <div class="suggestion-item" role="option" data-type="program" data-url="${program.url || ''}">
+                            <div class="program-suggestion">
+                                <span class="suggestion-text">${program.title || ''}</span>
+                                ${program.description ? `
+                                    <span class="program-description">${program.description}</span>
+                                ` : ''}
+                            </div>
                         </div>
                     `).join('')}
                 </div>
             </div>
         `;
-    
+
         this.suggestionsContainer.innerHTML = suggestionHTML;
         this.suggestionsContainer.hidden = false;
-    
+
         // Add click handlers
-        this.suggestionsContainer.querySelectorAll('.suggestion-item')
-            .forEach((item) => {
-                item.addEventListener('click', () => {
+        this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
+            item.addEventListener('click', () => {
+                const type = item.dataset.type;
+                const url = item.dataset.url;
+                
+                if (type === 'suggestion') {
                     const selectedText = item.querySelector('.suggestion-text').textContent;
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
                     this.#updateButtonStates();
                     this.#performSearch(selectedText);
-                });
+                } else if (url) {
+                    // Navigate to the URL for staff and program results
+                    window.location.href = url;
+                }
             });
+        });
     }
+
 
     /**
      * Handles keyboard navigation within suggestions.
