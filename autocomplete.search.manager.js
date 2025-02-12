@@ -562,6 +562,9 @@ class AutocompleteSearchManager {
                 if (activeItem) {
                     event.preventDefault();
                     const selectedText = activeItem.querySelector('.suggestion-text').textContent;
+                    // Missing type and url extraction
+                    // Missing logging
+                    // Missing URL handling
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
                     this.#updateButtonStates();
