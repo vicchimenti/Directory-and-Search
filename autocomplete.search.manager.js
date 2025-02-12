@@ -44,7 +44,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.6.2
+ * @version 1.6.3
  * @lastModified 2025-02-12
  */
 
@@ -325,7 +325,7 @@ class AutocompleteSearchManager {
             this.suggestionsContainer.innerHTML = '';
         }
     }
-    
+
     /**
      * Performs a search using the Funnelback API.
      * 
