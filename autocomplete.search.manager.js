@@ -257,13 +257,13 @@ class AutocompleteSearchManager {
             });
     
             // Add tab parameters
-            const hiddenConfig = this.form.querySelector('.search-config');
-            if (hiddenConfig) {
-                const tabInputs = hiddenConfig.querySelectorAll('input[name^="f.Tabs|"]');
-                tabInputs.forEach(input => {
-                    suggestParams.append(input.name, input.value);
-                });
-            }
+            // const hiddenConfig = this.form.querySelector('.search-config');
+            // if (hiddenConfig) {
+            //     const tabInputs = hiddenConfig.querySelectorAll('input[name^="f.Tabs|"]');
+            //     tabInputs.forEach(input => {
+            //         suggestParams.append(input.name, input.value);
+            //     });
+            // }
     
             const response = await fetch(`${this.config.endpoints.suggest}?${suggestParams}`);
             const suggestions = await response.json();
