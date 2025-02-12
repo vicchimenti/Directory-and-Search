@@ -238,7 +238,7 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Fetches both suggestions and initial search results from the Funnelback API.
+     * Fetches search suggestions from the Funnelback API.
      * 
      * @private
      * @param {string} query - The search query
