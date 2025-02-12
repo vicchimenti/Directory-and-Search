@@ -273,41 +273,55 @@ class AutocompleteSearchManager {
             const parser = new DOMParser();
             const doc = parser.parseFromString(searchResults, 'text/html');
 
-            // Check for tab indicators in hidden inputs
-            const isStaffTab = doc.querySelector('input[name="f.Tabs|seattleu-ds-staff"]') !== null;
-            const isProgramTab = doc.querySelector('input[name="f.Tabs|programMain"]') !== null;
+            console.group('Content Parsing');
+            
+            // Get all article elements first
+            const articles = Array.from(doc.querySelectorAll('article.listing-item'));
+            console.log('Total articles found:', articles.length);
+            
+            // Log class names of all articles for debugging
+            articles.forEach((article, index) => {
+                console.log(`Article ${index} classes:`, article.className);
+            });
 
-            console.group('Tab Detection');
-            console.log('Staff Tab Present:', isStaffTab);
-            console.log('Program Tab Present:', isProgramTab);
-            console.groupEnd();
-
-            // Initialize results arrays
-            let staffResults = [];
-            let programResults = [];
-
-            // Extract staff profiles
-            if (isStaffTab) {
-                staffResults = Array.from(doc.querySelectorAll('article.peopleData'))
-                    .slice(0, this.config.staffLimit)
-                    .map(element => ({
+            // Filter and map staff results
+            const staffResults = articles
+                .filter(article => 
+                    article.classList.contains('listing-item--people') || 
+                    article.classList.contains('peopleData')
+                )
+                .slice(0, this.config.staffLimit)
+                .map(element => {
+                    const data = {
                         title: element.querySelector('.listing-item__title-link')?.textContent?.trim(),
                         role: element.querySelector('.listing-item__subtitle')?.textContent?.trim(),
                         url: element.querySelector('.listing-item__title-link')?.getAttribute('data-live-url'),
                         image: element.querySelector('.listing-item__image')?.getAttribute('src')
-                    }));
-            }
+                    };
+                    console.log('Mapped staff data:', data);
+                    return data;
+                });
 
-            // Extract program results
-            if (isProgramTab) {
-                programResults = Array.from(doc.querySelectorAll('article.programData'))
-                    .slice(0, this.config.programLimit)
-                    .map(element => ({
+            // Filter and map program results
+            const programResults = articles
+                .filter(article => 
+                    article.classList.contains('listing-item--program') || 
+                    article.classList.contains('programData')
+                )
+                .slice(0, this.config.programLimit)
+                .map(element => {
+                    const data = {
                         title: element.querySelector('.listing-item__title-link')?.textContent?.trim(),
                         description: element.querySelector('.listing-item__summary')?.textContent?.trim(),
                         url: element.querySelector('.listing-item__title-link')?.getAttribute('data-live-url')
-                    }));
-            }
+                    };
+                    console.log('Mapped program data:', data);
+                    return data;
+                });
+
+            console.log('Final Staff Results Count:', staffResults.length);
+            console.log('Final Program Results Count:', programResults.length);
+            console.groupEnd();
 
             console.group('Results Extraction');
             console.log('Staff Results:', staffResults);
