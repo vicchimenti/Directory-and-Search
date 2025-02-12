@@ -593,4 +593,5 @@ document.addEventListener('DOMContentLoaded', () => {
     AutocompleteSearchManager.bindToElements();
 });
 
+// Export the class
 export default AutocompleteSearchManager;
