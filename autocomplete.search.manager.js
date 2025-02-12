@@ -67,6 +67,8 @@ class AutocompleteSearchManager {
             profile: '_default',
             maxResults: 10,
             minLength: 3,
+            staffLimit: 3,
+            programLimit: 5,
             endpoints: {
                 suggest: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
                 search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search'
