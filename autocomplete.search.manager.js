@@ -240,23 +240,58 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Fetches search suggestions from the Funnelback API.
-     * 
+     * Fetches search suggestions and results for all columns
      * @private
      * @param {string} query - The search query
      */
     async #fetchSuggestions(query) {
         try {
+            // Fetch suggestions
             const suggestParams = new URLSearchParams({
                 collection: this.config.collection,
                 partial_query: query,
                 profile: this.config.profile
             });
-       
-            const response = await fetch(`${this.config.endpoints.suggest}?${suggestParams}`);
-            const suggestions = await response.json();
-    
-            this.#displaySuggestions(suggestions);
+            
+            // Fetch actual search results for staff and programs
+            const searchParams = new URLSearchParams({
+                query: query,
+                collection: this.config.collection,
+                profile: this.config.profile,
+                form: 'partial'
+            });
+
+            const [suggestResponse, searchResponse] = await Promise.all([
+                fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
+                fetch(`${this.config.endpoints.search}?${searchParams}`)
+            ]);
+
+            const suggestions = await suggestResponse.json();
+            const searchResults = await searchResponse.text();
+
+            // Parse the search results HTML to extract staff and program results
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(searchResults, 'text/html');
+
+            // Extract staff profiles (adjust selectors based on your HTML structure)
+            const staffResults = Array.from(doc.querySelectorAll('.staff-profile-result'))
+                .slice(0, this.config.staffLimit)
+                .map(element => ({
+                    title: element.querySelector('.profile-name')?.textContent,
+                    role: element.querySelector('.profile-title')?.textContent,
+                    url: element.querySelector('a')?.href
+                }));
+
+            // Extract program results (adjust selectors based on your HTML structure)
+            const programResults = Array.from(doc.querySelectorAll('.program-result'))
+                .slice(0, this.config.programLimit)
+                .map(element => ({
+                    title: element.querySelector('.program-title')?.textContent,
+                    description: element.querySelector('.program-description')?.textContent,
+                    url: element.querySelector('a')?.href
+                }));
+
+            this.#displaySuggestions(suggestions, staffResults, programResults);
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
