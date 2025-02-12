@@ -395,49 +395,6 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Helper method to render search results with proper text extraction
-     */
-    #renderResults(results, type) {
-        if (!results?.length) {
-            return `<div class="no-results">No ${type === 'program' ? 'programs' : 'staff members'} found</div>`;
-        }
-        
-        return results.map(result => {
-            // Extract meaningful text from the result
-            const title = result.title || result.display || '';
-            const metadata = result.metadata || {};
-            
-            return `
-                <div class="suggestion-item ${type}-item" role="option">
-                    <span class="suggestion-text">${title}</span>
-                    ${type === 'program' ? this.#renderProgramMetadata(metadata) : this.#renderStaffMetadata(metadata)}
-                </div>
-            `;
-        }).join('');
-    }
-
-    /**
-     * Helper method to render program-specific metadata
-     */
-    #renderProgramMetadata(metadata) {
-        return `
-            ${metadata.degree ? `<span class="suggestion-metadata">${metadata.degree}</span>` : ''}
-            ${metadata.description ? `<span class="suggestion-description">${metadata.description}</span>` : ''}
-        `;
-    }
-
-    /**
-     * Helper method to render staff-specific metadata
-     */
-    #renderStaffMetadata(metadata) {
-        return `
-            ${metadata.department ? `<span class="suggestion-metadata">${metadata.department}</span>` : ''}
-            ${metadata.title ? `<span class="suggestion-role">${metadata.title}</span>` : ''}
-        `;
-    }
-
-
-    /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
      * Handles navigation across columns.
