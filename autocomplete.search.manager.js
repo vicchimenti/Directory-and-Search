@@ -275,21 +275,8 @@ class AutocompleteSearchManager {
 
             console.group('Content Parsing');
             
-            // Get all article elements first
-            const allArticles = Array.from(doc.querySelectorAll('article.listing-item'));
-            console.log('Total articles found:', allArticles.length);
-            
-            // Log first few articles for debugging
-            allArticles.slice(0, 10).forEach((article, index) => {
-                console.log(`Sample Article ${index} classes:`, article.className);
-            });
-
-            // Filter and map staff results - get all matches first, then slice
-            const staffResults = allArticles
-                .filter(article => 
-                    article.classList.contains('listing-item--people') || 
-                    article.classList.contains('peopleData')
-                )
+            // Get all articles based on their list view context
+            const staffResults = Array.from(doc.querySelectorAll('.listing--list-view article.listing-item--people'))
                 .slice(0, this.config.staffLimit)
                 .map(element => {
                     const data = {
@@ -302,12 +289,7 @@ class AutocompleteSearchManager {
                     return data;
                 });
 
-            // Filter and map program results - get all matches first, then slice
-            const programResults = allArticles
-                .filter(article => 
-                    article.classList.contains('listing-item--program') || 
-                    article.classList.contains('programData')
-                )
+            const programResults = Array.from(doc.querySelectorAll('article.listing-item.listing-item--program'))
                 .slice(0, this.config.programLimit)
                 .map(element => {
                     const data = {
@@ -319,15 +301,15 @@ class AutocompleteSearchManager {
                     return data;
                 });
 
-                console.log('Total articles searched:', allArticles.length);
-                console.log('Staff matches found:', staffResults.length);
-                console.log('Program matches found:', programResults.length);
-                console.groupEnd();
-    
-                console.group('Results Extraction');
-                console.log('Staff Results:', staffResults);
-                console.log('Program Results:', programResults);
-                console.groupEnd();
+            console.log('Total articles searched:', allArticles.length);
+            console.log('Staff matches found:', staffResults.length);
+            console.log('Program matches found:', programResults.length);
+            console.groupEnd();
+
+            console.group('Results Extraction');
+            console.log('Staff Results:', staffResults);
+            console.log('Program Results:', programResults);
+            console.groupEnd();
 
             this.#displaySuggestions(suggestions, staffResults, programResults);
         } catch (error) {
