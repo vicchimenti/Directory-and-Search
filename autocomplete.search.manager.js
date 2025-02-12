@@ -262,13 +262,15 @@ class AutocompleteSearchManager {
             const peopleParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.staff,
-                profile: this.config.profile
+                profile: this.config.profile,
+                form: 'partial'
             });
 
             const programParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.programs,
-                profile: this.config.profile
+                profile: this.config.profile,
+                form: 'partial'
             });
 
             const [generalResponse, peopleResponse, programResponse] = await Promise.all([
