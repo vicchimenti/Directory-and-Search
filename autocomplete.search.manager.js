@@ -252,71 +252,54 @@ class AutocompleteSearchManager {
     */
     async #fetchSuggestions(query) {
         try {
-            // Fetch suggestions
-            const suggestParams = new URLSearchParams({
-                collection: this.config.collection,
-                partial_query: query,
-                profile: this.config.profile
-            });
-            
-            // Fetch actual search results for staff and programs
-            const searchParams = new URLSearchParams({
+            const genericSearchParams = new URLSearchParams({
                 query: query,
-                collection: this.config.collection,
+                collection: this.config.collections.general,
                 profile: this.config.profile,
                 form: 'partial'
             });
 
-            const [suggestResponse, searchResponse] = await Promise.all([
-                fetch(`${this.config.endpoints.suggest}?${suggestParams}`),
-                fetch(`${this.config.endpoints.search}?${searchParams}`)
+            const peopleParams = new URLSearchParams({
+                partial_query: query,
+                collection: this.config.collections.staff,
+                profile: this.config.profile
+            });
+
+            const programParams = new URLSearchParams({
+                partial_query: query,
+                collection: this.config.collections.programs,
+                profile: this.config.profile
+            });
+
+            const [generalResponse, peopleResponse, programResponse] = await Promise.all([
+                fetch(`${this.config.endpoints.search}?${genericSearchParams}`),
+                fetch(`${this.config.endpoints.suggestPeople}?${peopleParams}`),
+                fetch(`${this.config.endpoints.suggestPrograms}?${programParams}`)
             ]);
 
-            const suggestions = await suggestResponse.json();
-            const searchResults = await searchResponse.text();
+            const generalSuggestions = await generalResponse.json();
+            const peopleSuggestions = await peopleResponse.json();
+            const programSuggestions = await programResponse.json();
 
-            // Parse the search results HTML to extract staff and program results
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(searchResults, 'text/html');
+            const staffResults = peopleSuggestions.map(person => ({
+                title: person.display,
+                role: person.metadata?.role || 'Faculty/Staff',
+                url: person.metadata?.url,
+                image: person.metadata?.image
+            }));
 
-            console.group('Content Parsing');
-            
-            // Get all articles based on their list view context
-            const staffResults = Array.from(doc.querySelectorAll('.listing--list-view article.listing-item--people'))
-                .slice(0, this.config.staffLimit)
-                .map(element => {
-                    const data = {
-                        title: element.querySelector('.listing-item__title-link')?.textContent?.trim(),
-                        role: element.querySelector('.listing-item__subtitle')?.textContent?.trim(),
-                        url: element.querySelector('.listing-item__title-link')?.getAttribute('data-live-url'),
-                        image: element.querySelector('.listing-item__image')?.getAttribute('src')
-                    };
-                    console.log('Mapped staff data:', data);
-                    return data;
-                });
+            const programResults = programSuggestions.map(program => ({
+                title: program.display,
+                description: program.metadata?.description || '',
+                url: program.metadata?.url
+            }));
 
-            const programResults = Array.from(doc.querySelectorAll('article.listing-item.listing-item--program'))
-                .slice(0, this.config.programLimit)
-                .map(element => {
-                    const data = {
-                        title: element.querySelector('.listing-item__title-link')?.textContent?.trim(),
-                        description: element.querySelector('.listing-item__summary')?.textContent?.trim(),
-                        url: element.querySelector('.listing-item__title-link')?.getAttribute('data-live-url')
-                    };
-                    console.log('Mapped program data:', data);
-                    return data;
-                });
-
+            console.group('Staff and Program Matches');
             console.log('Staff matches found:', staffResults.length);
             console.log('Program matches found:', programResults.length);
             console.groupEnd();
 
-            console.group('Results Extraction');
-            console.log('Staff Results:', staffResults);
-            console.log('Program Results:', programResults);
-            console.groupEnd();
-
-            this.#displaySuggestions(suggestions, staffResults, programResults);
+            this.#displaySuggestions(generalSuggestions, staffResults, programResults);
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
