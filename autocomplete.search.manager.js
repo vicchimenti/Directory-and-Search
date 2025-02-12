@@ -348,21 +348,6 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Helper method to render suggestions
-     */
-    #renderSuggestions(suggestions) {
-        if (!suggestions?.length) {
-            return '<div class="no-results">No suggestions found</div>';
-        }
-        
-        return suggestions.map(suggestion => `
-            <div class="suggestion-item general-item" role="option">
-                <span class="suggestion-text">${suggestion.display || suggestion}</span>
-            </div>
-        `).join('');
-    }
-
-    /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
      * Handles navigation across columns.
