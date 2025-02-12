@@ -371,8 +371,15 @@ class AutocompleteSearchManager {
                     ${staffResults.map(staff => `
                         <div class="suggestion-item" role="option" data-type="staff" data-url="${staff.url || ''}">
                             <div class="staff-suggestion">
-                                <span class="suggestion-text">${staff.title || ''}</span>
-                                ${staff.role ? `<span class="staff-role">${staff.role}</span>` : ''}
+                                ${staff.image ? `
+                                    <div class="staff-image">
+                                        <img src="${staff.image}" alt="${staff.title}" class="staff-thumbnail">
+                                    </div>
+                                ` : ''}
+                                <div class="staff-info">
+                                    <span class="suggestion-text">${staff.title || ''}</span>
+                                    ${staff.role ? `<span class="staff-role">${staff.role}</span>` : ''}
+                                </div>
                             </div>
                         </div>
                     `).join('')}
@@ -427,6 +434,7 @@ class AutocompleteSearchManager {
             });
         });
     }
+
 
     /**
      * Handles keyboard navigation within suggestions.
