@@ -44,7 +44,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.5.9
+ * @version 1.5.10
  * @lastModified 2025-02-11
  */
 
@@ -387,7 +387,7 @@ class AutocompleteSearchManager {
                 });
             });
     }
-    
+
     /**
      * Helper method to render suggestions
      */
