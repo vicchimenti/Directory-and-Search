@@ -307,11 +307,10 @@ class AutocompleteSearchManager {
     }
 
     /**
-     * Displays suggestions in a three-column layout: general suggestions, programs, and staff.
+     * Displays suggestions in a single-column layout.
      * 
      * @private
      * @param {Array} suggestions - Array of suggestion objects
-     * @param {Array} results - Array of search results
      */
     #displaySuggestions(suggestions) {
         if (!this.suggestionsContainer || !suggestions?.length) {
