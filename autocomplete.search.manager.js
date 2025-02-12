@@ -361,11 +361,14 @@ class AutocompleteSearchManager {
     
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
-                ${suggestions.map(suggestion => `
-                    <div class="suggestion-item" role="option">
-                        <span class="suggestion-text">${suggestion.display}</span>
-                    </div>
-                `).join('')}
+                <div class="suggestions-column">
+                    <div class="column-header">Suggestions</div>
+                    ${suggestions.map(suggestion => `
+                        <div class="suggestion-item" role="option">
+                            <span class="suggestion-text">${suggestion.display}</span>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
         `;
     
@@ -384,7 +387,7 @@ class AutocompleteSearchManager {
                 });
             });
     }
-
+    
     /**
      * Helper method to render suggestions
      */
