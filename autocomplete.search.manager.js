@@ -562,13 +562,29 @@ class AutocompleteSearchManager {
                 if (activeItem) {
                     event.preventDefault();
                     const selectedText = activeItem.querySelector('.suggestion-text').textContent;
-                    // Missing type and url extraction
-                    // Missing logging
-                    // Missing URL handling
+                    const type = activeItem.dataset.type;
+                    const url = activeItem.dataset.url;
+            
+                    console.group('Suggestion Keyboard Interaction');
+                    console.log('Interaction Type:', 'keyboard enter');
+                    console.log('Selected Item Type:', type);
+                    console.log('Selected Text:', selectedText);
+                    console.log('Associated URL:', url || 'none');
+                    
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
                     this.#updateButtonStates();
+                    
+                    // Always perform the search first
+                    console.log('Initiating proxy search request');
                     this.#performSearch(selectedText);
+                    
+                    // If there's a URL, open it in a new tab as a fallback
+                    if (url) {
+                        console.log('Opening direct URL as fallback');
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                    }
+                    console.groupEnd();
                 }
                 break;
     
