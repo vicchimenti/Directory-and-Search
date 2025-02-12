@@ -277,7 +277,7 @@ class AutocompleteSearchManager {
                 fetch(`${this.config.endpoints.suggestPrograms}?${programParams}`)
             ]);
 
-            const generalSuggestions = await generalResponse.json();
+            const generalSuggestions = Array.isArray(await generalResponse.json()) ? await generalResponse.json() : [];
             const peopleSuggestions = await peopleResponse.json();
             const programSuggestions = await programResponse.json();
 
