@@ -213,23 +213,31 @@ class AutocompleteSearchManager {
     #handleInput(event) {
         console.group('Input Event');
         const query = event.target.value.trim();
-        console.log('Input Value:', query, 'Length:', query.length);
+        console.log(`Input Value: "${query}" (length: ${query.length})`);
         
         this.#updateButtonStates();
         clearTimeout(this.debounceTimeout);
         
         if (query.length < this.config.minLength) {
-            console.log(`Query too short (${query.length} < ${this.config.minLength})`);
+            console.log(`Query too short (${query.length} < ${this.config.minLength}), clearing suggestions`);
             this.suggestionsContainer.innerHTML = '';
             console.groupEnd();
             return;
         }
     
-        // Set a shorter debounce time for better responsiveness
-        this.debounceTimeout = setTimeout(() => {
-            console.log('Debounce complete, fetching suggestions for:', query);
+        // Immediate check for exact length match
+        if (query.length === this.config.minLength) {
+            console.log('Exact minimum length match, fetching immediately');
             this.#fetchSuggestions(query);
-        }, 200);  // Reduced from 300ms for better responsiveness
+            console.groupEnd();
+            return;
+        }
+    
+        // Debounce for longer queries
+        console.log('Setting debounce timer for query');
+        this.debounceTimeout = setTimeout(() => {
+            this.#fetchSuggestions(query);
+        }, 200);
         
         console.groupEnd();
     }
