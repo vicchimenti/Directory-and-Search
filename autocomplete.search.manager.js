@@ -301,7 +301,6 @@ class AutocompleteSearchManager {
                     return data;
                 });
 
-            console.log('Total articles searched:', allArticles.length);
             console.log('Staff matches found:', staffResults.length);
             console.log('Program matches found:', programResults.length);
             console.groupEnd();
