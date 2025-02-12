@@ -7,13 +7,13 @@
  * immediate search results display.
  * 
  * The manager provides a streamlined, single-column layout for displaying search
- * suggestions, supporting multiple data sources and suggestion types.
+ * suggestions optimized for quick selection and a focused user experience.
  * 
  * Features:
  * - Real-time suggestions with smart filtering
- * - Data source integration
+ * - Streamlined search integration
  * - Clean, unified suggestions display
- * - Metadata display support
+ * - Efficient data handling
  * - Debounced API calls to prevent request flooding
  * - Keyboard navigation support (up/down arrows, enter, escape)
  * - Click selection support
@@ -44,7 +44,7 @@
  * });
  * 
  * @author Victor Chimenti
- * @version 1.5.11
+ * @version 1.5.12
  * @lastModified 2025-02-12
  */
 
