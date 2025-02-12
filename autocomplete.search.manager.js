@@ -324,7 +324,7 @@ class AutocompleteSearchManager {
                     <div class="column-header">Suggestions</div>
                     ${suggestions.map(suggestion => `
                         <div class="suggestion-item" role="option">
-                            <span class="suggestion-text">${suggestion.display}</span>
+                            <span class="suggestion-text">${suggestion.display || ''}</span>
                         </div>
                     `).join('')}
                 </div>
