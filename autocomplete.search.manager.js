@@ -556,11 +556,12 @@ class AutocompleteSearchManager {
                     const type = activeItem.dataset.type;
                     const url = activeItem.dataset.url;
             
-                    console.group('Suggestion Keyboard Interaction');
-                    console.log('Interaction Type:', 'keyboard enter');
-                    console.log('Selected Item Type:', type);
-                    console.log('Selected Text:', selectedText);
-                    console.log('Associated URL:', url || 'none');
+                    console.log('Suggestion Keyboard:', {
+                        type: 'keyboard enter',
+                        itemType: type,
+                        text: selectedText,
+                        url: url || 'none'
+                    });
                     
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
@@ -575,7 +576,6 @@ class AutocompleteSearchManager {
                         console.log('Opening direct URL as fallback');
                         window.open(url, '_blank', 'noopener,noreferrer');
                     }
-                    console.groupEnd();
                 }
                 break;
     
