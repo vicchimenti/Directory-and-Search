@@ -488,7 +488,7 @@ class AutocompleteSearchManager {
             });
         });
     }
-    
+
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
