@@ -12,11 +12,12 @@
     z-index: 1000;
     max-height: 80vh;
     overflow-y: auto;
+    visibility: hidden;
 }
 
 /* Show and style when has content */
-#autocomplete-suggestions:empty {
-    display: none;
+#autocomplete-suggestions:has(*) {
+    visibility: visible;
 }
 
 /* Add this to ensure proper positioning context */
