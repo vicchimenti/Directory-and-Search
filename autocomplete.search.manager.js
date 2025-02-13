@@ -270,16 +270,14 @@ class AutocompleteSearchManager {
                 query: query,
                 collection: this.config.collections.staff,
                 profile: this.config.profile,
-                form: 'json',
-                num_ranks: this.config.staffLimit
+                form: 'partial'
             });
     
             const programParams = new URLSearchParams({
                 query: query,
                 collection: this.config.collections.programs,
                 profile: this.config.profile,
-                form: 'json',
-                num_ranks: this.config.programLimit
+                form: 'partial'
             });
     
             console.log('Request Parameters:', {
@@ -303,8 +301,8 @@ class AutocompleteSearchManager {
             // Parse responses with error handling
             const [suggestions, peopleData, programData] = await Promise.all([
                 suggestResponse.ok ? suggestResponse.json() : [],
-                peopleResponse.ok ? peopleResponse.json() : { response: { resultPacket: { results: [] } } },
-                programResponse.ok ? programResponse.json() : { response: { resultPacket: { results: [] } } }
+                peopleResponse.ok ? peopleResponse.text() : '',
+                programResponse.ok ? programResponse.text() : ''
             ]);
     
             console.log('Raw Response Data:', {
@@ -313,24 +311,27 @@ class AutocompleteSearchManager {
                 programs: programData?.response?.resultPacket?.results?.length || 0
             });
     
-            // Transform the people search results
-            const staffResults = peopleData?.response?.resultPacket?.results?.map(result => ({
-                title: result.title,
-                role: result.metaData?.role || 'Faculty/Staff',
-                url: result.liveUrl || '',
-                image: result.metaData?.thumbnail || '',
-                department: result.metaData?.department || '',
-                email: result.metaData?.email || ''
-            })) || [];
+            // Create a temporary container to parse the HTML responses
+            const tempContainer = document.createElement('div');
+            
+            // Parse people results
+            tempContainer.innerHTML = peopleData;
+            const staffResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(result => ({
+                title: result.querySelector('.result-title')?.textContent?.trim() || '',
+                role: result.querySelector('.result-role')?.textContent?.trim() || 'Faculty/Staff',
+                url: result.querySelector('a')?.href || '',
+                image: result.querySelector('img')?.src || '',
+                department: result.querySelector('.result-department')?.textContent?.trim() || ''
+            }));
     
-            // Transform the program search results
-            const programResults = programData?.response?.resultPacket?.results?.map(result => ({
-                title: result.title,
-                description: result.metaData?.description || '',
-                url: result.liveUrl || '',
-                level: result.metaData?.level || '',
-                department: result.metaData?.department || ''
-            })) || [];
+            // Parse program results
+            tempContainer.innerHTML = programData;
+            const programResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(result => ({
+                title: result.querySelector('.result-title')?.textContent?.trim() || '',
+                description: result.querySelector('.result-description')?.textContent?.trim() || '',
+                url: result.querySelector('a')?.href || '',
+                department: result.querySelector('.result-department')?.textContent?.trim() || ''
+            }));
     
             console.log('Processed Results:', {
                 staff: staffResults.length,
