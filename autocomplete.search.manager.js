@@ -214,6 +214,7 @@ class AutocompleteSearchManager {
      * @param {InputEvent} event - The input event
      */
     #handleInput(event) {
+        // Removed group, using simple logs
         console.log('Input Event');
         const query = event.target.value.trim();
         console.log(`Input Value: "${query}" (length: ${query.length})`);
@@ -239,7 +240,6 @@ class AutocompleteSearchManager {
         this.debounceTimeout = setTimeout(() => {
             this.#fetchSuggestions(query);
         }, 200);
-        
     }
 
     /**
