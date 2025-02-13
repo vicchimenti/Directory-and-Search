@@ -440,12 +440,13 @@ class AutocompleteSearchManager {
                 const type = item.dataset.type;
                 const url = item.dataset.url;
 
-                console.group('Suggestion Click Interaction');
-                console.log('Interaction Type:', 'mouse click');
-                console.log('Selected Item Type:', type);
-                console.log('Selected Text:', selectedText);
-                console.log('Associated URL:', url || 'none');
-                
+                console.log('Suggestion Click:', {
+                    type: 'mouse click',
+                    itemType: type,
+                    text: selectedText,
+                    url: url || 'none'
+                });
+             
                 this.inputField.value = selectedText;
                 this.suggestionsContainer.innerHTML = '';
                 this.#updateButtonStates();
@@ -459,7 +460,6 @@ class AutocompleteSearchManager {
                     console.log('Opening direct URL as fallback');
                     window.open(url, '_blank', 'noopener,noreferrer');
                 }
-                console.groupEnd();
             });
         });
     }
