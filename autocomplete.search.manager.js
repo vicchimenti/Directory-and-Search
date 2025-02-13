@@ -252,62 +252,85 @@ class AutocompleteSearchManager {
     */
     async #fetchSuggestions(query) {
         try {
-            const genericSearchParams = new URLSearchParams({
-                query: query,
+            // Separate parameters for each collection
+            const generalParams = new URLSearchParams({
+                partial_query: query,
                 collection: this.config.collections.general,
-                profile: this.config.profile,
-                form: 'partial'
+                profile: this.config.profile
             });
 
             const peopleParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.staff,
-                profile: this.config.profile,
-                form: 'partial'
+                profile: this.config.profile
             });
 
             const programParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.programs,
-                profile: this.config.profile,
-                form: 'partial'
+                profile: this.config.profile
             });
 
-            const [generalResponse, peopleResponse, programResponse] = await Promise.all([
-                fetch(`${this.config.endpoints.search}?${genericSearchParams}`),
+            console.group('API Requests');
+            console.log('General params:', Object.fromEntries(generalParams));
+            console.log('People params:', Object.fromEntries(peopleParams));
+            console.log('Program params:', Object.fromEntries(programParams));
+
+            const [suggestResponse, peopleResponse, programResponse] = await Promise.all([
+                fetch(`${this.config.endpoints.suggest}?${generalParams}`),
                 fetch(`${this.config.endpoints.suggestPeople}?${peopleParams}`),
                 fetch(`${this.config.endpoints.suggestPrograms}?${programParams}`)
             ]);
 
-            const generalSuggestions = Array.isArray(await generalResponse.json()) ? await generalResponse.json() : [];
-            const peopleSuggestions = await peopleResponse.json();
-            const programSuggestions = await programResponse.json();
+            // Add error checking
+            if (!suggestResponse.ok) throw new Error(`Suggest request failed: ${suggestResponse.status}`);
+            if (!peopleResponse.ok) throw new Error(`People suggest request failed: ${peopleResponse.status}`);
+            if (!programResponse.ok) throw new Error(`Program suggest request failed: ${programResponse.status}`);
 
-            const staffResults = peopleSuggestions.map(person => ({
-                title: person.display,
-                role: person.metadata?.role || 'Faculty/Staff',
-                url: person.metadata?.url,
-                image: person.metadata?.image
-            }));
+            // Parse responses with error handling
+            const [suggestions, people, programs] = await Promise.all([
+                suggestResponse.json().catch(() => []),
+                peopleResponse.json().catch(() => []),
+                programResponse.json().catch(() => [])
+            ]);
 
-            const programResults = programSuggestions.map(program => ({
-                title: program.display,
-                description: program.metadata?.description || '',
-                url: program.metadata?.url
-            }));
+            console.log('Responses received:', {
+                suggestions: suggestions?.length || 0,
+                people: people?.length || 0,
+                programs: programs?.length || 0
+            });
 
-            console.group('Staff and Program Matches');
-            console.log('Staff matches found:', staffResults.length);
-            console.log('Program matches found:', programResults.length);
+            // Transform the results
+            const staffResults = (people || [])
+                .slice(0, this.config.staffLimit)
+                .map(person => ({
+                    title: person.display,
+                    role: person.metadata?.role || 'Faculty/Staff',
+                    url: person.metadata?.url,
+                    image: person.metadata?.image
+                }));
+
+            const programResults = (programs || [])
+                .slice(0, this.config.programLimit)
+                .map(program => ({
+                    title: program.display,
+                    description: program.metadata?.description || '',
+                    url: program.metadata?.url
+                }));
+
+            console.log('Processed results:', {
+                staff: staffResults.length,
+                programs: programResults.length
+            });
             console.groupEnd();
 
-            this.#displaySuggestions(generalSuggestions, staffResults, programResults);
+            this.#displaySuggestions(suggestions || [], staffResults, programResults);
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
