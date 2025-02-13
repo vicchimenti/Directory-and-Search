@@ -316,22 +316,29 @@ class AutocompleteSearchManager {
             
             // Parse people results
             tempContainer.innerHTML = peopleData;
-            const staffResults = Array.from(tempContainer.querySelectorAll('.result')).map(result => ({
-                title: result.querySelector('h3')?.textContent?.trim() || '',
-                role: result.querySelector('.metadata')?.textContent?.trim() || 'Faculty/Staff',
-                url: result.querySelector('a')?.getAttribute('href') || '',
-                image: result.querySelector('img')?.getAttribute('src') || '',
-                department: result.querySelector('.department')?.textContent?.trim() || ''
-            })).slice(0, this.config.staffLimit);
+            const staffResults = Array.from(tempContainer.querySelectorAll('.result-title')).map(result => {
+                const resultItem = result.closest('.result-item');
+                return {
+                    title: result.textContent?.trim() || '',
+                    metadata: resultItem?.querySelector('.metadata')?.textContent?.trim() || '',
+                    url: resultItem?.querySelector('a')?.href || '',
+                    image: resultItem?.querySelector('img')?.src || '',
+                    department: resultItem?.querySelector('.department')?.textContent?.trim() || '',
+                    role: resultItem?.querySelector('.role')?.textContent?.trim() || ''
+                };
+            }).slice(0, this.config.staffLimit);
     
             // Parse program results
             tempContainer.innerHTML = programData;
-            const programResults = Array.from(tempContainer.querySelectorAll('.result')).map(result => ({
-                title: result.querySelector('h3')?.textContent?.trim() || '',
-                description: result.querySelector('.summary')?.textContent?.trim() || '',
-                url: result.querySelector('a')?.getAttribute('href') || '',
-                department: result.querySelector('.department')?.textContent?.trim() || ''
-            })).slice(0, this.config.programLimit);
+            const programResults = Array.from(tempContainer.querySelectorAll('.result-title')).map(result => {
+                const resultItem = result.closest('.result-item');
+                return {
+                    title: result.textContent?.trim() || '',
+                    description: resultItem?.querySelector('.description')?.textContent?.trim() || '',
+                    url: resultItem?.querySelector('a')?.href || '',
+                    department: resultItem?.querySelector('.department')?.textContent?.trim() || ''
+                };
+            }).slice(0, this.config.programLimit);
     
             console.log('Processed Results:', {
                 staff: staffResults.length,

@@ -67,22 +67,29 @@ async #fetchSuggestions(query) {
         
         // Parse people results
         tempContainer.innerHTML = peopleData;
-        const staffResults = Array.from(tempContainer.querySelectorAll('.result')).map(result => ({
-            title: result.querySelector('h3')?.textContent?.trim() || '',
-            role: result.querySelector('.metadata')?.textContent?.trim() || 'Faculty/Staff',
-            url: result.querySelector('a')?.getAttribute('href') || '',
-            image: result.querySelector('img')?.getAttribute('src') || '',
-            department: result.querySelector('.department')?.textContent?.trim() || ''
-        })).slice(0, this.config.staffLimit);
+        const staffResults = Array.from(tempContainer.querySelectorAll('.result-title')).map(result => {
+            const resultItem = result.closest('.result-item');
+            return {
+                title: result.textContent?.trim() || '',
+                metadata: resultItem?.querySelector('.metadata')?.textContent?.trim() || '',
+                url: resultItem?.querySelector('a')?.href || '',
+                image: resultItem?.querySelector('img')?.src || '',
+                department: resultItem?.querySelector('.department')?.textContent?.trim() || '',
+                role: resultItem?.querySelector('.role')?.textContent?.trim() || ''
+            };
+        }).slice(0, this.config.staffLimit);
 
         // Parse program results
         tempContainer.innerHTML = programData;
-        const programResults = Array.from(tempContainer.querySelectorAll('.result')).map(result => ({
-            title: result.querySelector('h3')?.textContent?.trim() || '',
-            description: result.querySelector('.summary')?.textContent?.trim() || '',
-            url: result.querySelector('a')?.getAttribute('href') || '',
-            department: result.querySelector('.department')?.textContent?.trim() || ''
-        })).slice(0, this.config.programLimit);
+        const programResults = Array.from(tempContainer.querySelectorAll('.result-title')).map(result => {
+            const resultItem = result.closest('.result-item');
+            return {
+                title: result.textContent?.trim() || '',
+                description: resultItem?.querySelector('.description')?.textContent?.trim() || '',
+                url: resultItem?.querySelector('a')?.href || '',
+                department: resultItem?.querySelector('.department')?.textContent?.trim() || ''
+            };
+        }).slice(0, this.config.programLimit);
 
         console.log('Processed Results:', {
             staff: staffResults.length,
@@ -100,51 +107,51 @@ async #fetchSuggestions(query) {
     }
 }
 
-#displaySuggestions(suggestions, staffResults, programResults) {
+async #displaySuggestions(suggestions, staffResults, programResults) {
     if (!this.suggestionsContainer) {
         return;
     }
 
     const suggestionHTML = `
-        <div class="suggestions-list" role="listbox">
-            <div class="suggestions-column">
-                <div class="column-header">Suggestions</div>
+        <div class="suggestions-list grid grid-cols-3 gap-4 w-full p-4" role="listbox">
+            <div class="suggestions-column border-r border-gray-200 pr-4">
+                <div class="column-header font-semibold text-lg mb-3">Suggestions</div>
                 ${suggestions.map(suggestion => `
-                    <div class="suggestion-item" role="option" data-type="suggestion">
+                    <div class="suggestion-item hover:bg-gray-100 p-2 rounded cursor-pointer" role="option" data-type="suggestion">
                         <span class="suggestion-text">${suggestion.display || ''}</span>
                     </div>
                 `).join('')}
             </div>
             
-            <div class="suggestions-column">
-                <div class="column-header">Faculty & Staff</div>
+            <div class="suggestions-column border-r border-gray-200 px-4">
+                <div class="column-header font-semibold text-lg mb-3">Faculty & Staff</div>
                 ${staffResults.map(staff => `
-                    <div class="suggestion-item" role="option" data-type="staff" data-url="${staff.url || ''}">
-                        <div class="staff-suggestion">
+                    <div class="suggestion-item hover:bg-gray-100 p-2 rounded cursor-pointer" role="option" data-type="staff" data-url="${staff.url || ''}">
+                        <div class="staff-suggestion flex items-start gap-3">
                             ${staff.image ? `
-                                <div class="staff-image">
-                                    <img src="${staff.image}" alt="${staff.title}" class="staff-thumbnail">
+                                <div class="staff-image w-12 h-12 flex-shrink-0">
+                                    <img src="${staff.image}" alt="${staff.title}" class="staff-thumbnail rounded-full w-full h-full object-cover">
                                 </div>
                             ` : ''}
-                            <div class="staff-info">
-                                <span class="suggestion-text">${staff.title || ''}</span>
-                                ${staff.role ? `<span class="staff-role">${staff.role}</span>` : ''}
-                                ${staff.department ? `<span class="staff-department">${staff.department}</span>` : ''}
+                            <div class="staff-info flex-grow">
+                                <span class="suggestion-text font-medium block">${staff.title || ''}</span>
+                                <span class="staff-role text-sm text-gray-600 block">${staff.metadata || staff.role || ''}</span>
+                                ${staff.department ? `<span class="staff-department text-sm text-gray-500 block">${staff.department}</span>` : ''}
                             </div>
                         </div>
                     </div>
                 `).join('')}
             </div>
 
-            <div class="suggestions-column">
-                <div class="column-header">Programs</div>
+            <div class="suggestions-column pl-4">
+                <div class="column-header font-semibold text-lg mb-3">Programs</div>
                 ${programResults.map(program => `
-                    <div class="suggestion-item" role="option" data-type="program" data-url="${program.url || ''}">
+                    <div class="suggestion-item hover:bg-gray-100 p-2 rounded cursor-pointer" role="option" data-type="program" data-url="${program.url || ''}">
                         <div class="program-suggestion">
-                            <span class="suggestion-text">${program.title || ''}</span>
-                            ${program.department ? `<span class="program-department">${program.department}</span>` : ''}
+                            <span class="suggestion-text font-medium block">${program.title || ''}</span>
+                            ${program.department ? `<span class="program-department text-sm text-gray-600 block">${program.department}</span>` : ''}
                             ${program.description ? `
-                                <span class="program-description">${program.description}</span>
+                                <span class="program-description text-sm text-gray-500 mt-1 block">${program.description}</span>
                             ` : ''}
                         </div>
                     </div>
