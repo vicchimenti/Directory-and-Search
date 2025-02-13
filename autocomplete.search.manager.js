@@ -214,7 +214,7 @@ class AutocompleteSearchManager {
      * @param {InputEvent} event - The input event
      */
     #handleInput(event) {
-        console.group('Input Event');
+        console.log('Input Event');
         const query = event.target.value.trim();
         console.log(`Input Value: "${query}" (length: ${query.length})`);
         
@@ -240,7 +240,6 @@ class AutocompleteSearchManager {
             this.#fetchSuggestions(query);
         }, 200);
         
-        console.groupEnd();
     }
 
     /**
