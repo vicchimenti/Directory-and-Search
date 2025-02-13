@@ -651,10 +651,12 @@ class AutocompleteSearchManager {
                     general: element.dataset.collection || 'seattleu~sp-search',
                     staff: element.dataset.staffCollection || 'seattleu~ds-staff',
                     programs: element.dataset.programsCollection || 'seattleu~ds-programs'
-                },
+                },        
                 profile: element.dataset.profile || '_default',
                 maxResults: parseInt(element.dataset.maxResults, 10) || 10,
-                minLength: parseInt(element.dataset.minLength, 10) || 3
+                minLength: parseInt(element.dataset.minLength, 10) || 3,
+                staffLimit: parseInt(element.dataset.staffLimit, 10) || 3,
+                programLimit: parseInt(element.dataset.programLimit, 10) || 5
             };
             new AutocompleteSearchManager(config);
         });
