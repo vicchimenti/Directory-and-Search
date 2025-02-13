@@ -268,7 +268,7 @@ class AutocompleteSearchManager {
                 profile: this.config.profile
             });
 
-            console.group('API Requests');
+            console.log('API Requests');
             console.log('General params:', Object.fromEntries(generalParams));
             console.log('People params:', Object.fromEntries(peopleParams));
             console.log('Program params:', Object.fromEntries(programParams));
@@ -319,7 +319,6 @@ class AutocompleteSearchManager {
                 staff: staffResults.length,
                 programs: programResults.length
             });
-            console.groupEnd();
 
             this.#displaySuggestions(suggestions || [], staffResults, programResults);
         } catch (error) {
