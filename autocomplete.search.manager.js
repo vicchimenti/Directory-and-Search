@@ -314,41 +314,25 @@ class AutocompleteSearchManager {
             
             // Parse people results
             tempContainer.innerHTML = peopleData;
-            console.log('People DOM Structure:', {
-                container: tempContainer.innerHTML.substring(0, 500),
-                resultItems: tempContainer.querySelectorAll('.result-item').length,
-                resultTitles: tempContainer.querySelectorAll('.result-title').length,
-                resultMetadata: tempContainer.querySelectorAll('.result-metadata').length
-            });
+            const searchResults = tempContainer.querySelector('#search-results');
+            const staffResults = Array.from(searchResults?.querySelectorAll('li[data-fb-result]') || [])
+                .map(resultItem => {
+                    const anchor = resultItem.querySelector('a[href]');
+                    const titleText = anchor?.getAttribute('title') || anchor?.textContent || '';
+                    const namePart = titleText.split('|')[0].trim();
     
-            const staffResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(resultItem => {
-                const result = {
-                    title: resultItem.querySelector('.result-title')?.textContent?.trim() || '',
-                    metadata: resultItem.querySelector('.result-metadata')?.textContent?.trim() || '',
-                    department: resultItem.querySelector('.result-department')?.textContent?.trim() || ''
-                };
-                console.log('Processed Staff Item:', result);
-                return result;
-            }).slice(0, this.config.staffLimit);
+                    return {
+                        title: namePart,
+                        metadata: 'Faculty/Staff',
+                        department: ''
+                    };
+                })
+                .slice(0, this.config.staffLimit);
+                
+            console.log('Processed Staff Results:', staffResults);
     
-            // Parse program results
-            tempContainer.innerHTML = programData;
-            console.log('Program DOM Structure:', {
-                container: tempContainer.innerHTML.substring(0, 500),
-                resultItems: tempContainer.querySelectorAll('.result-item').length,
-                resultTitles: tempContainer.querySelectorAll('.result-title').length,
-                resultDescriptions: tempContainer.querySelectorAll('.result-description').length
-            });
-    
-            const programResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(resultItem => {
-                const result = {
-                    title: resultItem.querySelector('.result-title')?.textContent?.trim() || '',
-                    description: resultItem.querySelector('.result-description')?.textContent?.trim() || '',
-                    department: resultItem.querySelector('.result-department')?.textContent?.trim() || ''
-                };
-                console.log('Processed Program Item:', result);
-                return result;
-            }).slice(0, this.config.programLimit);
+            // For now, return empty array for programs until we handle those
+            const programResults = [];
     
             console.log('Processed Results:', {
                 suggestions: suggestions.length,
@@ -366,7 +350,7 @@ class AutocompleteSearchManager {
             console.groupEnd();
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
