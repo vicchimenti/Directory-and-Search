@@ -213,7 +213,7 @@ class AutocompleteSearchManager {
      * @private
      * @param {InputEvent} event - The input event
      */
-    #handleInput(event) {
+    async #handleInput(event) {
         // Removed group, using simple logs
         console.log('Input Event');
         const query = event.target.value.trim();
@@ -401,11 +401,11 @@ class AutocompleteSearchManager {
      * @param {Array} staffResults - Array of staff profile results
      * @param {Array} programResults - Array of program results
      */
-    #displaySuggestions(suggestions, staffResults, programResults) {
+    async #displaySuggestions(suggestions, staffResults, programResults) {
         if (!this.suggestionsContainer) {
             return;
         }
-
+    
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
                 <div class="suggestions-column">
@@ -431,20 +431,18 @@ class AutocompleteSearchManager {
                                     <span class="suggestion-text">${staff.title || ''}</span>
                                     ${staff.role ? `<span class="staff-role">${staff.role}</span>` : ''}
                                     ${staff.department ? `<span class="staff-department">${staff.department}</span>` : ''}
-                                    ${staff.email ? `<span class="staff-email">${staff.email}</span>` : ''}
                                 </div>
                             </div>
                         </div>
                     `).join('')}
                 </div>
-
+    
                 <div class="suggestions-column">
                     <div class="column-header">Programs</div>
                     ${programResults.map(program => `
                         <div class="suggestion-item" role="option" data-type="program" data-url="${program.url || ''}">
                             <div class="program-suggestion">
                                 <span class="suggestion-text">${program.title || ''}</span>
-                                ${program.level ? `<span class="program-level">${program.level}</span>` : ''}
                                 ${program.department ? `<span class="program-department">${program.department}</span>` : ''}
                                 ${program.description ? `
                                     <span class="program-description">${program.description}</span>
@@ -455,17 +453,17 @@ class AutocompleteSearchManager {
                 </div>
             </div>
         `;
-
+    
         this.suggestionsContainer.innerHTML = suggestionHTML;
         this.suggestionsContainer.hidden = false;
-
-        // Add click handlers
+    
+        // Add click handlers for all suggestion items
         this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
             item.addEventListener('click', () => {
                 const selectedText = item.querySelector('.suggestion-text').textContent;
                 const type = item.dataset.type;
                 const url = item.dataset.url;
-
+    
                 console.log('Suggestion Click:', {
                     type: 'mouse click',
                     itemType: type,
@@ -489,7 +487,7 @@ class AutocompleteSearchManager {
             });
         });
     }
-    
+
     /**
      * Handles keyboard navigation within suggestions.
      * Supports arrow keys, enter, and escape.
