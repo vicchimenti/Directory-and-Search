@@ -414,49 +414,51 @@ class AutocompleteSearchManager {
         }
     
         const suggestionHTML = `
-            <div class="suggestions-list grid grid-cols-3 gap-4 w-full p-4" role="listbox">
-                <div class="suggestions-column border-r border-gray-200 pr-4">
-                    <div class="column-header font-semibold text-lg mb-3">Suggestions</div>
-                    ${suggestions.map(suggestion => `
-                        <div class="suggestion-item hover:bg-gray-100 p-2 rounded cursor-pointer" role="option" data-type="suggestion">
-                            <span class="suggestion-text">${suggestion.display || ''}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div class="suggestions-column border-r border-gray-200 px-4">
-                    <div class="column-header font-semibold text-lg mb-3">Faculty & Staff</div>
-                    ${staffResults.map(staff => `
-                        <div class="suggestion-item hover:bg-gray-100 p-2 rounded cursor-pointer" role="option" data-type="staff" data-url="${staff.url || ''}">
-                            <div class="staff-suggestion flex items-start gap-3">
-                                ${staff.image ? `
-                                    <div class="staff-image w-12 h-12 flex-shrink-0">
-                                        <img src="${staff.image}" alt="${staff.title}" class="staff-thumbnail rounded-full w-full h-full object-cover">
+            <div class="suggestions-list">
+                <div class="suggestions-columns">
+                    <div class="suggestions-column">
+                        <div class="column-header">Suggestions</div>
+                        ${suggestions.map(suggestion => `
+                            <div class="suggestion-item" role="option" data-type="suggestion">
+                                <span class="suggestion-text">${suggestion.display || ''}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="suggestions-column">
+                        <div class="column-header">Faculty & Staff</div>
+                        ${staffResults.map(staff => `
+                            <div class="suggestion-item staff-item" role="option" data-type="staff">
+                                <div class="staff-suggestion">
+                                    ${staff.image ? `
+                                        <div class="staff-image">
+                                            <img src="${staff.image}" alt="${staff.title}" class="staff-thumbnail">
+                                        </div>
+                                    ` : ''}
+                                    <div class="staff-info">
+                                        <span class="suggestion-text">${staff.title || ''}</span>
+                                        <span class="staff-role">${staff.metadata || staff.role || ''}</span>
+                                        ${staff.department ? `<span class="staff-department suggestion-type">${staff.department}</span>` : ''}
                                     </div>
-                                ` : ''}
-                                <div class="staff-info flex-grow">
-                                    <span class="suggestion-text font-medium block">${staff.title || ''}</span>
-                                    <span class="staff-role text-sm text-gray-600 block">${staff.metadata || staff.role || ''}</span>
-                                    ${staff.department ? `<span class="staff-department text-sm text-gray-500 block">${staff.department}</span>` : ''}
                                 </div>
                             </div>
-                        </div>
-                    `).join('')}
-                </div>
+                        `).join('')}
+                    </div>
     
-                <div class="suggestions-column pl-4">
-                    <div class="column-header font-semibold text-lg mb-3">Programs</div>
-                    ${programResults.map(program => `
-                        <div class="suggestion-item hover:bg-gray-100 p-2 rounded cursor-pointer" role="option" data-type="program" data-url="${program.url || ''}">
-                            <div class="program-suggestion">
-                                <span class="suggestion-text font-medium block">${program.title || ''}</span>
-                                ${program.department ? `<span class="program-department text-sm text-gray-600 block">${program.department}</span>` : ''}
-                                ${program.description ? `
-                                    <span class="program-description text-sm text-gray-500 mt-1 block">${program.description}</span>
-                                ` : ''}
+                    <div class="suggestions-column">
+                        <div class="column-header">Programs</div>
+                        ${programResults.map(program => `
+                            <div class="suggestion-item program-item" role="option" data-type="program">
+                                <div class="program-suggestion">
+                                    <span class="suggestion-text">${program.title || ''}</span>
+                                    ${program.department ? `<span class="suggestion-type">${program.department}</span>` : ''}
+                                    ${program.description ? `
+                                        <span class="program-description">${program.description}</span>
+                                    ` : ''}
+                                </div>
                             </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
                 </div>
             </div>
         `;
@@ -469,28 +471,20 @@ class AutocompleteSearchManager {
             item.addEventListener('click', () => {
                 const selectedText = item.querySelector('.suggestion-text').textContent;
                 const type = item.dataset.type;
-                const url = item.dataset.url;
     
                 console.log('Suggestion Click:', {
                     type: 'mouse click',
                     itemType: type,
-                    text: selectedText,
-                    url: url || 'none'
+                    text: selectedText
                 });
             
                 this.inputField.value = selectedText;
                 this.suggestionsContainer.innerHTML = '';
                 this.#updateButtonStates();
                 
-                // Always perform the search first
-                console.log('Initiating proxy search request');
+                // Perform the search
+                console.log('Initiating search request');
                 this.#performSearch(selectedText);
-                
-                // If there's a URL, open it in a new tab as a fallback
-                if (url) {
-                    console.log('Opening direct URL as fallback');
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                }
             });
         });
     }
