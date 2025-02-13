@@ -344,7 +344,7 @@ class AutocompleteSearchManager {
 
         const params = new URLSearchParams({
             query: query,
-            collection: this.config.collection,
+            collection: this.config.collections.general,
             profile: this.config.profile,
             form: 'partial'
         });
