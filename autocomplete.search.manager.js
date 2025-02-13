@@ -348,7 +348,7 @@ class AutocompleteSearchManager {
             console.groupEnd();
         }
     }
-    
+
     /**
      * Performs a search using the Funnelback API.
      * 
@@ -405,7 +405,7 @@ class AutocompleteSearchManager {
         if (!this.suggestionsContainer) {
             return;
         }
-    
+
         const suggestionHTML = `
             <div class="suggestions-list" role="listbox">
                 <div class="suggestions-column">
@@ -437,7 +437,7 @@ class AutocompleteSearchManager {
                         </div>
                     `).join('')}
                 </div>
-    
+
                 <div class="suggestions-column">
                     <div class="column-header">Programs</div>
                     ${programResults.map(program => `
@@ -455,24 +455,24 @@ class AutocompleteSearchManager {
                 </div>
             </div>
         `;
-    
+
         this.suggestionsContainer.innerHTML = suggestionHTML;
         this.suggestionsContainer.hidden = false;
-    
+
         // Add click handlers
         this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
             item.addEventListener('click', () => {
                 const selectedText = item.querySelector('.suggestion-text').textContent;
                 const type = item.dataset.type;
                 const url = item.dataset.url;
-    
+
                 console.log('Suggestion Click:', {
                     type: 'mouse click',
                     itemType: type,
                     text: selectedText,
                     url: url || 'none'
                 });
-             
+            
                 this.inputField.value = selectedText;
                 this.suggestionsContainer.innerHTML = '';
                 this.#updateButtonStates();
