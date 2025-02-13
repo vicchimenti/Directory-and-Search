@@ -249,8 +249,17 @@ class AutocompleteSearchManager {
     */
     async #fetchSuggestions(query) {
         console.group('Fetch Suggestions');
+        console.time('fetchSuggestions');
+        
         try {
-            // Separate parameters for each collection
+            // Basic validation
+            if (!query || query.length < this.config.minLength) {
+                console.log('Query too short, skipping fetch');
+                this.suggestionsContainer.innerHTML = '';
+                return;
+            }
+    
+            // Prepare parameters for each request type
             const generalParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.general,
@@ -258,15 +267,19 @@ class AutocompleteSearchManager {
             });
     
             const peopleParams = new URLSearchParams({
-                partial_query: query,
+                query: query,
                 collection: this.config.collections.staff,
-                profile: this.config.profile
+                profile: this.config.profile,
+                form: 'json',
+                num_ranks: this.config.staffLimit
             });
     
             const programParams = new URLSearchParams({
-                partial_query: query,
+                query: query,
                 collection: this.config.collections.programs,
-                profile: this.config.profile
+                profile: this.config.profile,
+                form: 'json',
+                num_ranks: this.config.programLimit
             });
     
             console.log('Request Parameters:', {
@@ -275,6 +288,7 @@ class AutocompleteSearchManager {
                 program: Object.fromEntries(programParams)
             });
     
+            // Fetch all results concurrently
             const [suggestResponse, peopleResponse, programResponse] = await Promise.all([
                 fetch(`${this.config.endpoints.suggest}?${generalParams}`),
                 fetch(`${this.config.endpoints.suggestPeople}?${peopleParams}`),
@@ -282,55 +296,58 @@ class AutocompleteSearchManager {
             ]);
     
             // Add error checking
-            if (!suggestResponse.ok) throw new Error(`Suggest request failed: ${suggestResponse.status}`);
-            if (!peopleResponse.ok) throw new Error(`People suggest request failed: ${peopleResponse.status}`);
-            if (!programResponse.ok) throw new Error(`Program suggest request failed: ${programResponse.status}`);
+            if (!suggestResponse.ok) console.warn(`Suggest request failed: ${suggestResponse.status}`);
+            if (!peopleResponse.ok) console.warn(`People search request failed: ${peopleResponse.status}`);
+            if (!programResponse.ok) console.warn(`Program search request failed: ${programResponse.status}`);
     
             // Parse responses with error handling
-            const [suggestions, people, programs] = await Promise.all([
-                suggestResponse.json().catch(() => []),
-                peopleResponse.json().catch(() => []),
-                programResponse.json().catch(() => [])
+            const [suggestions, peopleData, programData] = await Promise.all([
+                suggestResponse.ok ? suggestResponse.json() : [],
+                peopleResponse.ok ? peopleResponse.json() : { response: { resultPacket: { results: [] } } },
+                programResponse.ok ? programResponse.json() : { response: { resultPacket: { results: [] } } }
             ]);
     
-            console.log('Response Summary:', {
+            console.log('Raw Response Data:', {
                 suggestions: suggestions?.length || 0,
-                people: people?.length || 0,
-                programs: programs?.length || 0
+                people: peopleData?.response?.resultPacket?.results?.length || 0,
+                programs: programData?.response?.resultPacket?.results?.length || 0
             });
     
-            // Transform the results
-            const staffResults = (people || [])
-                .slice(0, this.config.staffLimit)
-                .map(person => ({
-                    title: person.display,
-                    role: person.metadata?.role || 'Faculty/Staff',
-                    url: person.metadata?.url,
-                    image: person.metadata?.image
-                }));
+            // Transform the people search results
+            const staffResults = peopleData?.response?.resultPacket?.results?.map(result => ({
+                title: result.title,
+                role: result.metaData?.role || 'Faculty/Staff',
+                url: result.liveUrl || '',
+                image: result.metaData?.thumbnail || '',
+                department: result.metaData?.department || '',
+                email: result.metaData?.email || ''
+            })) || [];
     
-            const programResults = (programs || [])
-                .slice(0, this.config.programLimit)
-                .map(program => ({
-                    title: program.display,
-                    description: program.metadata?.description || '',
-                    url: program.metadata?.url
-                }));
+            // Transform the program search results
+            const programResults = programData?.response?.resultPacket?.results?.map(result => ({
+                title: result.title,
+                description: result.metaData?.description || '',
+                url: result.liveUrl || '',
+                level: result.metaData?.level || '',
+                department: result.metaData?.department || ''
+            })) || [];
     
             console.log('Processed Results:', {
                 staff: staffResults.length,
                 programs: programResults.length
             });
     
+            // Display the results
             this.#displaySuggestions(suggestions || [], staffResults, programResults);
         } catch (error) {
             console.error('Fetch error:', error);
             this.suggestionsContainer.innerHTML = '';
         } finally {
+            console.timeEnd('fetchSuggestions');
             console.groupEnd();
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
