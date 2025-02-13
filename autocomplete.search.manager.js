@@ -224,7 +224,6 @@ class AutocompleteSearchManager {
         if (query.length < this.config.minLength) {
             console.log(`Query too short (${query.length} < ${this.config.minLength}), clearing suggestions`);
             this.suggestionsContainer.innerHTML = '';
-            console.groupEnd();
             return;
         }
     
@@ -232,7 +231,6 @@ class AutocompleteSearchManager {
         if (query.length === this.config.minLength) {
             console.log('Exact minimum length match, fetching immediately');
             this.#fetchSuggestions(query);
-            console.groupEnd();
             return;
         }
     
