@@ -243,6 +243,28 @@ class AutocompleteSearchManager {
     }
 
     /**
+     * Helper function to clean text of HTML tags and extra whitespace
+     * @private
+     */
+        #cleanTextContent(text) {
+            const temp = document.createElement('div');
+            temp.innerHTML = text;
+            return temp.textContent.trim();
+        }
+    
+    /**
+     * Extracts clean title from pipe-separated string
+     * @private
+     */
+    #extractCleanTitle(titleText) {
+        // First clean any HTML tags from the entire text
+        const cleanText = this.#cleanTextContent(titleText);
+        // Then split by pipe and take first part
+        const firstPart = cleanText.split('|')[0];
+        return firstPart.trim();
+    }
+
+    /**
     * Fetches search suggestions and results for all columns
     * @private
     * @param {string} query - The search query
