@@ -298,49 +298,60 @@ class AutocompleteSearchManager {
             if (!peopleResponse.ok) console.warn(`People search request failed: ${peopleResponse.status}`);
             if (!programResponse.ok) console.warn(`Program search request failed: ${programResponse.status}`);
     
-            // Parse JSON response for general suggestions
+            // Parse responses
             const suggestions = suggestResponse.ok ? await suggestResponse.json() : [];
-            
-            // Parse HTML responses for people and programs
             const peopleData = peopleResponse.ok ? await peopleResponse.text() : '';
             const programData = programResponse.ok ? await programResponse.text() : '';
-            
-            console.log('Raw Response Data:', {
-                suggestions: suggestions || [],
-                peopleHtml: peopleData?.length || 0,
-                programHtml: programData?.length || 0
-            });
+    
+            // Log raw HTML responses before parsing
+            console.group('Raw HTML Responses');
+            console.log('People HTML Response:', peopleData);
+            console.log('Program HTML Response:', programData);
+            console.groupEnd();
     
             // Create a temporary container to parse the HTML responses
             const tempContainer = document.createElement('div');
             
             // Parse people results
             tempContainer.innerHTML = peopleData;
-            const staffResults = Array.from(tempContainer.querySelectorAll('.result-title')).map(result => {
-                const resultItem = result.closest('.result-item');
-                return {
-                    title: result.textContent?.trim() || '',
-                    metadata: resultItem?.querySelector('.metadata')?.textContent?.trim() || '',
-                    url: resultItem?.querySelector('a')?.href || '',
-                    image: resultItem?.querySelector('img')?.src || '',
-                    department: resultItem?.querySelector('.department')?.textContent?.trim() || '',
-                    role: resultItem?.querySelector('.role')?.textContent?.trim() || ''
+            console.log('People DOM Structure:', {
+                container: tempContainer.innerHTML.substring(0, 500),
+                resultItems: tempContainer.querySelectorAll('.result-item').length,
+                resultTitles: tempContainer.querySelectorAll('.result-title').length,
+                resultMetadata: tempContainer.querySelectorAll('.result-metadata').length
+            });
+    
+            const staffResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(resultItem => {
+                const result = {
+                    title: resultItem.querySelector('.result-title')?.textContent?.trim() || '',
+                    metadata: resultItem.querySelector('.result-metadata')?.textContent?.trim() || '',
+                    department: resultItem.querySelector('.result-department')?.textContent?.trim() || ''
                 };
+                console.log('Processed Staff Item:', result);
+                return result;
             }).slice(0, this.config.staffLimit);
     
             // Parse program results
             tempContainer.innerHTML = programData;
-            const programResults = Array.from(tempContainer.querySelectorAll('.result-title')).map(result => {
-                const resultItem = result.closest('.result-item');
-                return {
-                    title: result.textContent?.trim() || '',
-                    description: resultItem?.querySelector('.description')?.textContent?.trim() || '',
-                    url: resultItem?.querySelector('a')?.href || '',
-                    department: resultItem?.querySelector('.department')?.textContent?.trim() || ''
+            console.log('Program DOM Structure:', {
+                container: tempContainer.innerHTML.substring(0, 500),
+                resultItems: tempContainer.querySelectorAll('.result-item').length,
+                resultTitles: tempContainer.querySelectorAll('.result-title').length,
+                resultDescriptions: tempContainer.querySelectorAll('.result-description').length
+            });
+    
+            const programResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(resultItem => {
+                const result = {
+                    title: resultItem.querySelector('.result-title')?.textContent?.trim() || '',
+                    description: resultItem.querySelector('.result-description')?.textContent?.trim() || '',
+                    department: resultItem.querySelector('.result-department')?.textContent?.trim() || ''
                 };
+                console.log('Processed Program Item:', result);
+                return result;
             }).slice(0, this.config.programLimit);
     
             console.log('Processed Results:', {
+                suggestions: suggestions.length,
                 staff: staffResults.length,
                 programs: programResults.length
             });
@@ -355,7 +366,7 @@ class AutocompleteSearchManager {
             console.groupEnd();
         }
     }
-    
+        
     /**
      * Performs a search using the Funnelback API.
      * 
