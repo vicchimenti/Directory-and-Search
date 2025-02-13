@@ -107,7 +107,7 @@ async #fetchSuggestions(query) {
     }
 }
 
-#displaySuggestions(suggestions, staffResults, programResults) {
+async #displaySuggestions(suggestions, staffResults, programResults) {
     if (!this.suggestionsContainer) {
         return;
     }
