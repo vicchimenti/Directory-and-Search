@@ -298,17 +298,17 @@ class AutocompleteSearchManager {
             if (!peopleResponse.ok) console.warn(`People search request failed: ${peopleResponse.status}`);
             if (!programResponse.ok) console.warn(`Program search request failed: ${programResponse.status}`);
     
-            // Parse responses with error handling
-            const [suggestions, peopleData, programData] = await Promise.all([
-                suggestResponse.ok ? suggestResponse.json() : [],
-                peopleResponse.ok ? peopleResponse.text() : '',
-                programResponse.ok ? programResponse.text() : ''
-            ]);
-    
+            // Parse JSON response for general suggestions
+            const suggestions = suggestResponse.ok ? await suggestResponse.json() : [];
+            
+            // Parse HTML responses for people and programs
+            const peopleData = peopleResponse.ok ? await peopleResponse.text() : '';
+            const programData = programResponse.ok ? await programResponse.text() : '';
+            
             console.log('Raw Response Data:', {
-                suggestions: suggestions?.length || 0,
-                people: peopleData?.response?.resultPacket?.results?.length || 0,
-                programs: programData?.response?.resultPacket?.results?.length || 0
+                suggestions: suggestions || [],
+                peopleHtml: peopleData?.length || 0,
+                programHtml: programData?.length || 0
             });
     
             // Create a temporary container to parse the HTML responses
@@ -316,22 +316,22 @@ class AutocompleteSearchManager {
             
             // Parse people results
             tempContainer.innerHTML = peopleData;
-            const staffResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(result => ({
-                title: result.querySelector('.result-title')?.textContent?.trim() || '',
-                role: result.querySelector('.result-role')?.textContent?.trim() || 'Faculty/Staff',
-                url: result.querySelector('a')?.href || '',
-                image: result.querySelector('img')?.src || '',
-                department: result.querySelector('.result-department')?.textContent?.trim() || ''
-            }));
+            const staffResults = Array.from(tempContainer.querySelectorAll('.result')).map(result => ({
+                title: result.querySelector('h3')?.textContent?.trim() || '',
+                role: result.querySelector('.metadata')?.textContent?.trim() || 'Faculty/Staff',
+                url: result.querySelector('a')?.getAttribute('href') || '',
+                image: result.querySelector('img')?.getAttribute('src') || '',
+                department: result.querySelector('.department')?.textContent?.trim() || ''
+            })).slice(0, this.config.staffLimit);
     
             // Parse program results
             tempContainer.innerHTML = programData;
-            const programResults = Array.from(tempContainer.querySelectorAll('.result-item')).map(result => ({
-                title: result.querySelector('.result-title')?.textContent?.trim() || '',
-                description: result.querySelector('.result-description')?.textContent?.trim() || '',
-                url: result.querySelector('a')?.href || '',
-                department: result.querySelector('.result-department')?.textContent?.trim() || ''
-            }));
+            const programResults = Array.from(tempContainer.querySelectorAll('.result')).map(result => ({
+                title: result.querySelector('h3')?.textContent?.trim() || '',
+                description: result.querySelector('.summary')?.textContent?.trim() || '',
+                url: result.querySelector('a')?.getAttribute('href') || '',
+                department: result.querySelector('.department')?.textContent?.trim() || ''
+            })).slice(0, this.config.programLimit);
     
             console.log('Processed Results:', {
                 staff: staffResults.length,
@@ -348,7 +348,7 @@ class AutocompleteSearchManager {
             console.groupEnd();
         }
     }
-
+    
     /**
      * Performs a search using the Funnelback API.
      * 
