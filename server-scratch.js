@@ -2,19 +2,10 @@
  * @fileoverview Suggestion Handler for Funnelback Search Integration (People)
  * 
  * Handles autocomplete suggestion requests for faculty and staff searches with
- * structured logging for Vercel serverless environment. Returns detailed information
- * including affiliation, college, department, and position data.
- * 
- * Features:
- * - CORS handling for Seattle University domain
- * - Structured JSON logging for Vercel
- * - Request/Response tracking with detailed headers
- * - Enhanced response format with rich metadata
- * - Title cleaning and formatting
- * - Comprehensive error handling with detailed logging
+ * structured logging for Vercel serverless environment.
  * 
  * @author Victor Chimenti
- * @version 2.0.2
+ * @version 2.0.3
  * @license MIT
  */
 
@@ -27,12 +18,6 @@ const os = require('os');
  * @param {string} level - Log level ('info', 'warn', 'error')
  * @param {string} message - Main log message/action
  * @param {Object} data - Additional data to include in log
- * @param {Object} [data.query] - Query parameters
- * @param {Object} [data.headers] - Request headers
- * @param {number} [data.status] - HTTP status code
- * @param {string} [data.processingTime] - Request processing duration
- * @param {string} [data.responseContent] - Preview of response content
- * @param {Object} [data.error] - Error details if applicable
  */
 function logEvent(level, message, data = {}) {
     const serverInfo = {
@@ -79,16 +64,12 @@ function logEvent(level, message, data = {}) {
 
     const logEntry = {
         service: 'suggest-people',
-        logVersion: '2.0.2',
+        logVersion: '2.0.3',
         timestamp: new Date().toISOString(),
         event: {
             level,
             action: message,
-            query: data.query ? {
-                searchTerm: data.query.query || '',
-                collection: data.query.collection,
-                profile: data.query.profile
-            } : null,
+            query: data.query || null,
             response: data.status ? {
                 status: data.status,
                 processingTime: data.processingTime,
@@ -108,30 +89,6 @@ function logEvent(level, message, data = {}) {
     console.log(JSON.stringify(logEntry));
 }
 
-/**
- * Cleans a title string by removing HTML tags and taking only the first part before any pipe character
- * 
- * @param {string} title - The raw title string to clean
- * @returns {string} The cleaned title
- */
-function cleanTitle(title = '') {
-    return title
-        .split('|')[0]                    // Get first part before pipe
-        .replace(/<\/?[^>]+(>|$)/g, '')   // Remove HTML tags
-        .trim();                          // Remove extra whitespace
-}
-
-/**
- * Handler for suggestion requests to Funnelback search service
- * 
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters from the request
- * @param {string} [req.query.query] - Search query string
- * @param {Object} req.headers - Request headers
- * @param {string} req.method - HTTP method of the request
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
 async function handler(req, res) {
     const startTime = Date.now();
     const requestId = req.headers['x-vercel-id'] || Date.now().toString();
@@ -149,70 +106,55 @@ async function handler(req, res) {
 
     try {
         const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.json';
-        const queryParams = { 
-            form: 'partial',
-            profile: '_default',
-            query: req.query.query,
-            'f.Tabs|seattleu|ds-staff': 'Faculty & Staff',
-            collection: 'seattleu~sp-search',
-            num_ranks: 5
-        };
+        
+        // Keep params for logging
+        const params = new URLSearchParams();
+        params.append('form', 'partial');
+        params.append('profile', '_default');
+        params.append('query', req.query.query);
+        params.append('f.Tabs|seattleu|Eds-staff', 'Faculty & Staff');
+        params.append('collection', 'seattleu~sp-search');
+        params.append('num_ranks', '5');
 
-        // Log detailed request info
+        // Use correctly encoded queryString for request
+        const queryString = [
+            'form=partial',
+            'profile=_default',
+            `query=${encodeURIComponent(req.query.query)}`,
+            'f.Tabs%7Cseattleu%7CEds-staff=Faculty+%26+Staff',
+            'collection=seattleu~sp-search',
+            'num_ranks=5'
+        ].join('&');
+
+        const url = `${funnelbackUrl}?${queryString}`;
+
+        // Log request details
         logEvent('debug', 'Outgoing request details', {
             service: 'suggest-people',
-            url: `${funnelbackUrl}?${new URLSearchParams(queryParams)}`,
-            query: queryParams,
+            url: url,
+            query: Object.fromEntries(params),
             headers: req.headers
         });
 
-        // Log the actual URL we're hitting
-        console.log('Funnelback URL:', `${funnelbackUrl}?${new URLSearchParams(queryParams)}`);
-
-        const response = await axios.get(funnelbackUrl, {
-            params: queryParams,
+        const response = await axios.get(url, {
             headers: {
                 'Accept': 'application/json',
                 'X-Forwarded-For': userIp
             }
         });
 
-        // Log raw response for debugging
-        logEvent('debug', 'Raw Funnelback response', {
-            service: 'suggest-people',
-            query: queryParams,
-            status: response.status,
-            processingTime: `${Date.now() - startTime}ms`,
-            responseContent: JSON.stringify(response.data),
-            headers: req.headers,
-        });
-
-        // Extract and format results
-        const results = response.data?.response?.resultPacket?.results || [];
-        
-        // Clean and format the results
-        const formattedResults = results.map(result => ({
-            ...result,
-            title: cleanTitle(result.title),
-            profileUrl: result.liveUrl || '',
-            college: result.listMetadata?.college?.[0] || '',
-            image: result.listMetadata?.image?.[0] || '',
-            affiliation: result.listMetadata?.affiliation?.[0] || '',
-            department: result.listMetadata?.peopleDepartment?.[0] || '',
-            position: result.listMetadata?.peoplePosition?.[0] || ''
-        }));
-
         // Log the successful response
         logEvent('info', 'Response received', {
             service: 'suggest-people',
-            query: queryParams,
+            query: Object.fromEntries(params),
             status: response.status,
             processingTime: `${Date.now() - startTime}ms`,
-            responseContent: JSON.stringify(formattedResults).substring(0, 500) + '...',
+            responseContent: JSON.stringify(response.data).substring(0, 500) + '...',
             headers: req.headers,
         });
 
-        // Set JSON content type header and send response
+        // Format and send response
+        const formattedResults = response.data?.response?.resultPacket?.results || [];
         res.setHeader('Content-Type', 'application/json');
         res.send(formattedResults);
 
@@ -232,7 +174,6 @@ async function handler(req, res) {
             headers: req.headers
         });
         
-        // Send error response
         res.status(error.response?.status || 500).json({
             error: 'Error fetching results',
             message: error.message,
@@ -242,8 +183,3 @@ async function handler(req, res) {
 }
 
 module.exports = handler;
-
-
-https://dxp-us-search.funnelback.squiz.cloud/s/search.json?form=partial&profile=_default&query=education+abr&f.Tabs%7Cseattleu%7Cds-staff=Faculty+%26+Staff&collection=seattleu%7Esp-search&numranks=5
-
-https://dxp-us-search.funnelback.squiz.cloud/s/search.json?query=all&collection=seattleu%7Esp-search&profile=_default&num_ranks=2000&form=partial
