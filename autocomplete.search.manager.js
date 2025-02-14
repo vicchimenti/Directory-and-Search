@@ -312,17 +312,25 @@ class AutocompleteSearchManager {
             const peopleData = peopleResponse.ok ? await peopleResponse.json() : [];
             const programData = programResponse.ok ? await programResponse.json() : { metadata: {}, programs: [] };
 
+            console.log('DEBUG - Raw people data from server:', peopleData);
+
             // Process staff results from JSON response - limit to 3 items
             const staffResults = (peopleData || [])
-                .map(person => ({
-                    title: person.title || '',
-                    metadata: person.affiliation || person.position || 'Faculty/Staff',
-                    department: person.department || person.college || '',
-                    url: person.profileUrl || '',
-                    image: person.image || null
-                }))
+                .map(person => {
+                    // Determine role and department with fallbacks
+                    const role = person.position || person.affiliation || null;
+                    const deptInfo = person.department || person.college || null;
+                    
+                    return {
+                        title: person.title || '',
+                        metadata: role,
+                        department: deptInfo,
+                        url: person.url || '#',
+                        image: person.image || null
+                    };
+                })
                 .filter(staff => staff.title)
-                .slice(0, 3); // Hard limit to 3 suggestions regardless of server response
+                .slice(0, 3);  // Hard limit to 3 suggestions
 
             console.log('Processed Results Count:', {
                 suggestions: suggestions.length,
