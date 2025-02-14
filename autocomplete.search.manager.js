@@ -441,8 +441,8 @@ class AutocompleteSearchManager {
                     <div class="suggestions-column">
                         <div class="column-header">Faculty & Staff</div>
                         ${staffResults.map(staff => `
-                            <div class="suggestion-item staff-item" role="option" data-type="staff" data-url="${staff.url || ''}" title="Click to view profile">
-                                <a href="${staff.url || '#'}" class="staff-link" ${staff.url ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                            <div class="suggestion-item staff-item" role="option" data-type="staff" data-url="${staff.url}" title="Click to view profile">
+                                <a href="${staff.url}" class="staff-link" ${staff.url && staff.url !== '#' ? 'target="_blank" rel="noopener noreferrer"' : ''}>
                                     <div class="staff-suggestion">
                                         ${staff.image ? `
                                             <div class="staff-image">
@@ -451,7 +451,7 @@ class AutocompleteSearchManager {
                                         ` : ''}
                                         <div class="staff-info">
                                             <span class="suggestion-text">${staff.title || ''}</span>
-                                            <span class="staff-role">${staff.metadata || ''}</span>
+                                            ${staff.metadata ? `<span class="staff-role">${staff.metadata}</span>` : ''}
                                             ${staff.department ? `<span class="staff-department suggestion-type">${staff.department}</span>` : ''}
                                         </div>
                                     </div>
