@@ -6,11 +6,14 @@
  * as users type in the search input field and handles suggestion selection with
  * immediate search results display.
  * 
- * The manager provides a streamlined, single-column layout for displaying search
+ * The manager provides a streamlined, three-column layout for displaying search
  * suggestions optimized for quick selection and a focused user experience.
+ * Programs are handled through a dedicated JSON endpoint for improved performance
+ * and data structure.
  * 
  * Features:
  * - Real-time suggestions with smart filtering
+ * - JSON-based program data integration
  * - Streamlined search integration
  * - Clean, unified suggestions display
  * - Efficient data handling
@@ -35,17 +38,9 @@
  * @property {number} [maxResults=10] - Maximum number of suggestions to show
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
  * 
- * @example
- * const autocomplete = new AutocompleteSearchManager({
- *   inputId: 'my-search-input',
- *   collection: 'my-collection',
- *   maxResults: 5,
- *   minLength: 2
- * });
- * 
  * @author Victor Chimenti
- * @version 1.9.1
- * @lastModified 2025-02-13
+ * @version 2.0.0
+ * @lastModified 2025-02-14
  */
 
 class AutocompleteSearchManager {
@@ -269,6 +264,13 @@ class AutocompleteSearchManager {
     * @private
     * @param {string} query - The search query
     */
+    /**
+     * Fetches search suggestions and results for all columns.
+     * Programs are fetched via JSON endpoint for improved performance.
+     * 
+     * @private
+     * @param {string} query - The search query
+     */
     async #fetchSuggestions(query) {
         console.group('Fetch Suggestions');
         console.time('fetchSuggestions');
@@ -298,8 +300,7 @@ class AutocompleteSearchManager {
             const programParams = new URLSearchParams({
                 query: query,
                 collection: this.config.collections.programs,
-                profile: this.config.profile,
-                form: 'partial'
+                profile: this.config.profile
             });
 
             // Fetch all results concurrently
@@ -316,11 +317,10 @@ class AutocompleteSearchManager {
             // Parse responses
             const suggestions = suggestResponse.ok ? await suggestResponse.json() : [];
             const peopleData = peopleResponse.ok ? await peopleResponse.text() : '';
-            const programData = programResponse.ok ? await programResponse.text() : '';
+            const programData = programResponse.ok ? await programResponse.json() : { programs: [] };
 
+            // Parse people results (HTML parsing remains the same)
             const tempContainer = document.createElement('div');
-            
-            // Parse people results
             tempContainer.innerHTML = peopleData;
             const peopleSearchResults = tempContainer.querySelector('#search-results');
             const staffResults = Array.from(peopleSearchResults?.querySelectorAll('li[data-fb-result]') || [])
@@ -329,12 +329,6 @@ class AutocompleteSearchManager {
                     if (!anchor) return null;
                     
                     const titleText = anchor.textContent || '';
-                    console.log('Processing staff item:', { 
-                        originalText: titleText,
-                        afterHTMLClean: this.#cleanTextContent(titleText),
-                        finalTitle: this.#extractCleanTitle(titleText)
-                    });
-
                     return {
                         title: this.#extractCleanTitle(titleText),
                         metadata: 'Faculty/Staff',
@@ -344,28 +338,15 @@ class AutocompleteSearchManager {
                 .filter(Boolean)
                 .slice(0, this.config.staffLimit);
 
-            // Parse program results
-            tempContainer.innerHTML = programData;
-            const programSearchResults = tempContainer.querySelector('#search-results');
-            const programResults = Array.from(programSearchResults?.querySelectorAll('li[data-fb-result]') || [])
-                .map(resultItem => {
-                    const anchor = resultItem.querySelector('a');
-                    if (!anchor) return null;
-                    
-                    const titleText = anchor.textContent || '';
-                    console.log('Processing program item:', { 
-                        originalText: titleText,
-                        afterHTMLClean: this.#cleanTextContent(titleText),
-                        finalTitle: this.#extractCleanTitle(titleText)
-                    });
-
-                    return {
-                        title: this.#extractCleanTitle(titleText),
-                        metadata: 'Program',
-                        department: ''
-                    };
-                })
-                .filter(Boolean)
+            // Process program results from JSON
+            const programResults = programData.programs
+                .map(program => ({
+                    title: program.title,  // Already cleaned by backend
+                    metadata: program.details.type || 'Program',
+                    department: program.details.school || '',
+                    url: program.url || null,
+                    description: program.description || null
+                }))
                 .slice(0, this.config.programLimit);
 
             // Display results
