@@ -206,6 +206,26 @@
     border-radius: 3px;
 }
 
+/* Button Icons */
+/* Search Button Icon Visibility */
+.clear-search-button:not(.hidden) svg,
+#on-page-search-button:not(:disabled) svg {
+    opacity: 1;
+    visibility: visible;
+}
+
+.clear-search-button.hidden svg,
+#on-page-search-button:disabled svg {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Add transition for smooth visibility changes */
+.clear-search-button svg,
+#on-page-search-button svg {
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .suggestions-columns {
