@@ -14,7 +14,7 @@
  * - Comprehensive error handling with detailed logging
  * 
  * @author Victor Chimenti
- * @version 1.4.0
+ * @version 2.0.0
  * @license MIT
  */
 
@@ -79,7 +79,7 @@ function logEvent(level, message, data = {}) {
 
     const logEntry = {
         service: 'suggest-people',
-        logVersion: 'v3',
+        logVersion: '2.0.0',
         timestamp: new Date().toISOString(),
         event: {
             level,
