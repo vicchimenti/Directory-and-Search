@@ -47,7 +47,7 @@
  * Note: Staff suggestions are fixed at 3 items
  * 
  * @author Victor Chimenti
- * @version 2.1.0
+ * @version 3.0.0
  * @lastModified 2025-02-14
  */
 
