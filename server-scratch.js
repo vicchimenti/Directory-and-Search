@@ -1,0 +1,243 @@
+/**
+ * @fileoverview Suggestion Handler for Funnelback Search Integration (Programs)
+ * 
+ * Handles autocomplete suggestion requests for the "seattleu~ds-programs" collection.
+ * Provides real-time search suggestions for academic programs with
+ * structured logging for Vercel serverless environment. Implements JSON endpoint
+ * integration for enhanced response handling and data structure.
+ * 
+ * Features:
+ * - JSON endpoint integration with Funnelback
+ * - CORS handling for Seattle University domain
+ * - Structured JSON logging for Vercel with detailed program metadata
+ * - Request/Response tracking with detailed headers
+ * - Query parameter tracking
+ * - Comprehensive error handling with detailed logging
+ * - Enhanced response preview with program-specific fields
+ * 
+ * @author Victor Chimenti
+ * @version 1.3.4
+ * @license MIT
+ */
+
+const axios = require('axios');
+const os = require('os');
+
+/**
+ * Creates a standardized log entry for Vercel environment with enhanced program metadata
+ * 
+ * @param {string} level - Log level ('info', 'warn', 'error')
+ * @param {string} message - Main log message/action
+ * @param {Object} data - Additional data to include in log
+ * @param {Object} [data.query] - Query parameters
+ * @param {Object} [data.headers] - Request headers
+ * @param {number} [data.status] - HTTP status code
+ * @param {string} [data.processingTime] - Request processing duration
+ * @param {Object} [data.responseContent] - Response content with program data
+ * @param {string} [data.error] - Error message if applicable
+ */
+function logEvent(level, message, data = {}) {
+    const userIp = data.headers?.['x-forwarded-for'] || 
+                   data.headers?.['x-real-ip'] || 
+                   data.headers?.['x-vercel-proxied-for'] || 
+                   'unknown';
+
+    // Format server info more concisely
+    const serverInfo = {
+        host: os.hostname(),
+        platform: `${os.platform()}-${os.arch()}`,
+        resources: {
+            cpus: os.cpus().length,
+            memory: `${Math.round(os.totalmem() / 1024 / 1024 / 1024)}GB`
+        }
+    };
+
+    // Format location data if available
+    const locationInfo = data.headers ? {
+        city: decodeURIComponent(data.headers['x-vercel-ip-city'] || ''),
+        region: data.headers['x-vercel-ip-country-region'],
+        country: data.headers['x-vercel-ip-country'],
+        timezone: data.headers['x-vercel-ip-timezone'],
+        coordinates: {
+            lat: data.headers['x-vercel-ip-latitude'],
+            long: data.headers['x-vercel-ip-longitude']
+        }
+    } : null;
+
+    // Format query parameters more concisely
+    const queryInfo = data.query ? {
+        searchTerm: data.query.query || '',
+        collection: 'seattleu~ds-programs',
+        profile: data.query.profile || '_default',
+        form: data.query.form || 'simple'
+    } : null;
+
+    // Format request metadata
+    const requestMeta = data.headers ? {
+        origin: data.headers.origin,
+        referer: data.headers.referer,
+        userAgent: data.headers['user-agent'],
+        deploymentUrl: data.headers['x-vercel-deployment-url'],
+        vercelId: data.headers['x-vercel-id']
+    } : null;
+
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        service: 'suggest-programs',
+        version: '1.3.4',
+        level,
+        message,
+        userIp,
+        request: {
+            query: queryInfo,
+            meta: requestMeta
+        },
+        location: locationInfo,
+        server: serverInfo,
+        performance: data.processingTime ? {
+            duration: data.processingTime,
+            status: data.status
+        } : null
+    };
+
+    // For errors, add error information
+    if (level === 'error' && data.error) {
+        logEntry.error = {
+            message: data.error,
+            status: data.status || 500
+        };
+    }
+
+    // For successful responses with content
+    if (data.responseContent) {
+        let responsePreview;
+        if (typeof data.responseContent === 'object' && data.responseContent.results) {
+            // Extract first 5 results with specific fields
+            responsePreview = {
+                totalMatches: data.responseContent.totalMatches,
+                currStart: data.responseContent.currStart,
+                currEnd: data.responseContent.currEnd,
+                firstFiveResults: data.responseContent.results.slice(0, 5).map(result => ({
+                    rank: result.rank,
+                    title: result.title,
+                    liveUrl: result.liveUrl,
+                    listMetadata: {
+                        programCredentialType: result.listMetadata?.programCredentialType,
+                        provider: result.listMetadata?.provider,
+                        credits: result.listMetadata?.credits,
+                        areaOfStudy: result.listMetadata?.areaOfStudy,
+                        category: result.listMetadata?.category,
+                        programMode: result.listMetadata?.programMode
+                    }
+                }))
+            };
+        } else {
+            responsePreview = typeof data.responseContent === 'string'
+                ? data.responseContent.substring(0, 500) + '...'
+                : JSON.stringify(data.responseContent).substring(0, 500) + '...';
+        }
+
+        logEntry.response = {
+            preview: responsePreview,
+            contentType: typeof data.responseContent
+        };
+    }
+
+    // Clean up null values for cleaner logs
+    Object.keys(logEntry).forEach(key => {
+        if (logEntry[key] === null || logEntry[key] === undefined) {
+            delete logEntry[key];
+        }
+    });
+
+    console.log(JSON.stringify(logEntry, null, process.env.NODE_ENV === 'development' ? 2 : 0));
+}
+
+/**
+ * Handler for program search requests to Funnelback search service
+ * Processes requests through JSON endpoint and returns structured program data
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters from the request
+ * @param {Object} req.headers - Request headers
+ * @param {string} req.method - HTTP method of the request
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+async function handler(req, res) {
+    const startTime = Date.now();
+    const requestId = req.headers['x-vercel-id'] || Date.now().toString();
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    try {
+        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.json';
+        const queryParams = { 
+            ...req.query, 
+            collection: 'seattleu~ds-programs',
+            profile: '_default'
+        };
+        
+        // Log the request
+        logEvent('info', 'Programs search request received', {
+            query: queryParams,
+            headers: req.headers
+        });
+
+        // Make the request with explicit JSON headers
+        const response = await axios.get(funnelbackUrl, {
+            params: queryParams,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-Forwarded-For': userIp
+            }
+        });
+
+        // Verify we received JSON response
+        if (!response.headers['content-type']?.includes('application/json')) {
+            throw new Error('Invalid response format from Funnelback');
+        }
+
+        // Log the successful response
+        logEvent('info', 'Programs search completed', {
+            query: queryParams,
+            status: response.status,
+            processingTime: `${Date.now() - startTime}ms`,
+            responseContent: response.data,
+            headers: req.headers
+        });
+
+        // Set JSON content type in response
+        res.setHeader('Content-Type', 'application/json');
+        res.send(response.data);
+    } catch (error) {
+        // Enhanced error handling for JSON-specific issues
+        const errorResponse = {
+            error: true,
+            message: error.message,
+            status: error.response?.status || 500
+        };
+
+        logEvent('error', 'Programs search failed', {
+            query: req.query,
+            error: error.message,
+            status: errorResponse.status,
+            processingTime: `${Date.now() - startTime}ms`,
+            headers: req.headers
+        });
+        
+        res.status(errorResponse.status).json(errorResponse);
+    }
+}
+
+module.exports = handler;
