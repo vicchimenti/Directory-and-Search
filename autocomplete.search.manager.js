@@ -39,7 +39,7 @@
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
  * 
  * @author Victor Chimenti
- * @version 2.0.0
+ * @version 2.0.1
  * @lastModified 2025-02-14
  */
 
