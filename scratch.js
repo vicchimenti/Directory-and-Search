@@ -414,3 +414,292 @@ class AutocompleteSearchManager {
         console.group('Displaying Suggestions');
         console.log('Suggestion Counts:', {
             general: suggestions.length,
+            staff: staffResults.length,
+            programs: programResults.length
+        });
+    
+        const suggestionHTML = `
+            <div class="suggestions-list">
+                <div class="suggestions-columns">
+                    <div class="suggestions-column">
+                        <div class="column-header">Suggestions</div>
+                        ${suggestions.map(suggestion => `
+                            <div class="suggestion-item" role="option" data-type="suggestion">
+                                <span class="suggestion-text">${suggestion.display || ''}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="suggestions-column">
+                        <div class="column-header">Faculty & Staff</div>
+                        ${staffResults.map(staff => `
+                            <div class="suggestion-item staff-item" role="option" data-type="staff" data-url="${staff.url || ''}" title="Click to view profile">
+                                <a href="${staff.url || '#'}" class="staff-link" ${staff.url ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                                    <div class="staff-suggestion">
+                                        ${staff.image ? `
+                                            <div class="staff-image">
+                                                <img src="${staff.image}" alt="${staff.title}" class="staff-thumbnail" loading="lazy">
+                                            </div>
+                                        ` : ''}
+                                        <div class="staff-info">
+                                            <span class="suggestion-text">${staff.title || ''}</span>
+                                            <span class="staff-role">${staff.metadata || ''}</span>
+                                            ${staff.department ? `<span class="staff-department suggestion-type">${staff.department}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        `).join('')}
+                    </div>
+    
+                    <div class="suggestions-column">
+                        <div class="column-header">Programs</div>
+                        ${programResults.map(program => `
+                            <div class="suggestion-item program-item" role="option" data-type="program">
+                                <div class="program-suggestion">
+                                    <span class="suggestion-text">${program.title || ''}</span>
+                                    ${program.department ? `<span class="suggestion-type">${program.department}</span>` : ''}
+                                    ${program.description ? `
+                                        <span class="program-description">${program.description}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    
+        this.suggestionsContainer.innerHTML = suggestionHTML;
+        this.suggestionsContainer.hidden = false;
+        console.log('Suggestions rendered to DOM');
+    
+        // Add click handlers for all suggestion items
+        this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
+            item.addEventListener('click', (event) => {
+                const selectedText = item.querySelector('.suggestion-text').textContent;
+                const type = item.dataset.type;
+                const url = item.dataset.url;
+    
+                console.log('Suggestion Click:', {
+                    type: 'mouse click',
+                    itemType: type,
+                    text: selectedText,
+                    url: url || 'none'
+                });
+            
+                this.inputField.value = selectedText;
+                this.suggestionsContainer.innerHTML = '';
+                this.#updateButtonStates();
+                
+                // For staff items with URLs, let the link handle navigation
+                if (type === 'staff' && url && event.target.closest('a')) {
+                    // Let the default link behavior handle it
+                    return;
+                }
+                
+                // For other items, perform search
+                event.preventDefault();
+                console.log('Initiating search request');
+                this.#performSearch(selectedText);
+            });
+        });
+        
+        console.groupEnd();
+    }
+
+    /**
+     * Handles keyboard navigation within suggestions.
+     * Supports arrow keys, enter, and escape.
+     * 
+     * @private
+     * @param {KeyboardEvent} event - The keyboard event
+     */
+    #handleKeydown(event) {
+        const columns = this.suggestionsContainer.querySelectorAll('.suggestions-column');
+        const activeItem = this.suggestionsContainer.querySelector('.suggestion-item.active');
+        let currentColumn, currentIndex;
+    
+        if (activeItem) {
+            currentColumn = activeItem.closest('.suggestions-column');
+            currentIndex = Array.from(currentColumn.querySelectorAll('.suggestion-item'))
+                .indexOf(activeItem);
+        }
+    
+        switch (event.key) {
+            case 'ArrowDown':
+                event.preventDefault();
+                if (!activeItem) {
+                    // Select first item in first column with items
+                    for (const column of columns) {
+                        const firstItem = column.querySelector('.suggestion-item');
+                        if (firstItem) {
+                            firstItem.classList.add('active');
+                            break;
+                        }
+                    }
+                } else {
+                    const columnItems = currentColumn.querySelectorAll('.suggestion-item');
+                    if (currentIndex < columnItems.length - 1) {
+                        // Move down within column
+                        activeItem.classList.remove('active');
+                        columnItems[currentIndex + 1].classList.add('active');
+                    }
+                }
+                break;
+    
+            case 'ArrowUp':
+                event.preventDefault();
+                if (activeItem) {
+                    const columnItems = currentColumn.querySelectorAll('.suggestion-item');
+                    if (currentIndex > 0) {
+                        // Move up within column
+                        activeItem.classList.remove('active');
+                        columnItems[currentIndex - 1].classList.add('active');
+                    }
+                }
+                break;
+    
+            case 'ArrowRight':
+                event.preventDefault();
+                if (activeItem) {
+                    const nextColumn = currentColumn.nextElementSibling;
+                    if (nextColumn) {
+                        const nextColumnItems = nextColumn.querySelectorAll('.suggestion-item');
+                        if (nextColumnItems.length > 0) {
+                            // Move to next column, try to maintain similar position
+                            activeItem.classList.remove('active');
+                            const nextIndex = Math.min(currentIndex, nextColumnItems.length - 1);
+                            nextColumnItems[nextIndex].classList.add('active');
+                        }
+                    }
+                }
+                break;
+    
+            case 'ArrowLeft':
+                event.preventDefault();
+                if (activeItem) {
+                    const prevColumn = currentColumn.previousElementSibling;
+                    if (prevColumn) {
+                        const prevColumnItems = prevColumn.querySelectorAll('.suggestion-item');
+                        if (prevColumnItems.length > 0) {
+                            // Move to previous column, try to maintain similar position
+                            activeItem.classList.remove('active');
+                            const prevIndex = Math.min(currentIndex, prevColumnItems.length - 1);
+                            prevColumnItems[prevIndex].classList.add('active');
+                        }
+                    }
+                }
+                break;
+    
+            case 'Enter':
+                if (activeItem) {
+                    event.preventDefault();
+                    const selectedText = activeItem.querySelector('.suggestion-text').textContent;
+                    const type = activeItem.dataset.type;
+                    const url = activeItem.dataset.url;
+            
+                    console.log('Suggestion Keyboard:', {
+                        type: 'keyboard enter',
+                        itemType: type,
+                        text: selectedText,
+                        url: url || 'none'
+                    });
+                    
+                    this.inputField.value = selectedText;
+                    this.suggestionsContainer.innerHTML = '';
+                    this.#updateButtonStates();
+                    
+                    if (type === 'staff' && url) {
+                        // For staff items with URLs, open in new tab
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                    } else {
+                        // For other items, perform search
+                        console.log('Initiating search request');
+                        this.#performSearch(selectedText);
+                    }
+                }
+                break;
+    
+            case 'Escape':
+                this.suggestionsContainer.innerHTML = '';
+                this.inputField.blur();
+                break;
+        }
+    }
+
+    /**
+     * Handles clicks outside the autocomplete component.
+     * 
+     * @private
+     * @param {MouseEvent} event - The click event
+     */
+    #handleClickOutside(event) {
+        if (!this.inputField.contains(event.target) && 
+            !this.suggestionsContainer.contains(event.target)) {
+            this.suggestionsContainer.innerHTML = '';
+        }
+    }
+
+    /**
+     * Updates the UI to reflect loading state.
+     * 
+     * @private
+     * @param {boolean} isLoading - Whether the component is in a loading state
+     */
+    #updateLoadingState(isLoading) {
+        this.submitButton?.classList.toggle('loading', isLoading);
+        this.inputField.disabled = isLoading;
+        if (this.clearButton) {
+            this.clearButton.disabled = isLoading;
+        }
+    }
+
+    /**
+     * Displays an error message in the results container.
+     * 
+     * @private
+     * @param {string} message - The error message to display
+     */
+    #showError(message) {
+        if (this.resultsContainer) {
+            this.resultsContainer.innerHTML = `
+                <div class="error-message">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Initializes autocomplete functionality on all matching elements.
+     * 
+     * @static
+     */
+    static bindToElements() {
+        const elements = document.querySelectorAll('[data-autocomplete]');
+        elements.forEach(element => {
+            const config = {
+                inputId: element.id,
+                collections: {
+                    general: element.dataset.collection || 'seattleu~sp-search',
+                    staff: element.dataset.staffCollection || 'seattleu~ds-staff',
+                    programs: element.dataset.programsCollection || 'seattleu~ds-programs'
+                },        
+                profile: element.dataset.profile || '_default',
+                maxResults: parseInt(element.dataset.maxResults, 10) || 10,
+                minLength: parseInt(element.dataset.minLength, 10) || 3,
+                programLimit: parseInt(element.dataset.programLimit, 10) || 5
+            };
+            new AutocompleteSearchManager(config);
+        });
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    AutocompleteSearchManager.bindToElements();
+});
+
+// Export the class
+export default AutocompleteSearchManager;
