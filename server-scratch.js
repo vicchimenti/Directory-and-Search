@@ -5,7 +5,7 @@
  * structured logging for Vercel serverless environment.
  * 
  * @author Victor Chimenti
- * @version 2.0.3
+ * @version 2.1.2
  * @license MIT
  */
 
@@ -64,7 +64,7 @@ function logEvent(level, message, data = {}) {
 
     const logEntry = {
         service: 'suggest-people',
-        logVersion: '2.0.3',
+        logVersion: '2.1.2',
         timestamp: new Date().toISOString(),
         event: {
             level,
