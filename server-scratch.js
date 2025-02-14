@@ -155,7 +155,7 @@ async function handler(req, res) {
             query: req.query.query,
             'f.Tabs|seattleu|ds-staff': 'Faculty & Staff',
             collection: 'seattleu~sp-search',
-            numranks: 5
+            num_ranks: 5
         };
 
         // Log detailed request info
@@ -242,3 +242,8 @@ async function handler(req, res) {
 }
 
 module.exports = handler;
+
+
+https://dxp-us-search.funnelback.squiz.cloud/s/search.json?form=partial&profile=_default&query=education+abr&f.Tabs%7Cseattleu%7Cds-staff=Faculty+%26+Staff&collection=seattleu%7Esp-search&numranks=5
+
+https://dxp-us-search.funnelback.squiz.cloud/s/search.json?query=all&collection=seattleu%7Esp-search&profile=_default&num_ranks=2000&form=partial
