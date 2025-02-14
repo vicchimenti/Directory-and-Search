@@ -619,11 +619,11 @@ class AutocompleteSearchManager {
                     this.suggestionsContainer.innerHTML = '';
                     this.#updateButtonStates();
                     
-                    if (type === 'staff' && url) {
-                        // For staff items with URLs, open in new tab
+                    // For staff and program items with URLs, open in new tab
+                    if ((type === 'staff' || type === 'program') && url) {
                         window.open(url, '_blank', 'noopener,noreferrer');
                     } else {
-                        // For other items, perform search
+                        // For all other cases, perform search
                         console.log('Initiating search request');
                         this.#performSearch(selectedText);
                     }
