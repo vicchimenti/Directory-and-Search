@@ -317,7 +317,7 @@ class AutocompleteSearchManager {
             // Parse responses
             const suggestions = suggestResponse.ok ? await suggestResponse.json() : [];
             const peopleData = peopleResponse.ok ? await peopleResponse.text() : '';
-            const programData = programResponse.ok ? await programResponse.json() : { programs: [] };
+            const programData = programResponse.ok ? await programResponse.json() : { metadata: {}, programs: [] };
 
             // Parse people results (HTML parsing remains the same)
             const tempContainer = document.createElement('div');
@@ -338,16 +338,18 @@ class AutocompleteSearchManager {
                 .filter(Boolean)
                 .slice(0, this.config.staffLimit);
 
-            // Process program results from JSON
-            const programResults = programData.programs
-                .map(program => ({
-                    title: program.title,  // Already cleaned by backend
-                    metadata: program.details.type || 'Program',
-                    department: program.details.school || '',
-                    url: program.url || null,
-                    description: program.description || null
-                }))
-                .slice(0, this.config.programLimit);
+                console.log('Program Response:', programData); // Debug log
+                const programResults = (programData.programs || [])
+                    .map(program => ({
+                        title: program.title,
+                        metadata: program.details?.type || 'Program',
+                        department: program.details?.school || '',
+                        url: program.url || null,
+                        description: program.description || null
+                    }))
+                    .slice(0, this.config.programLimit);
+                // Add more defensive checks
+                console.log('Processed Program Results:', programResults);
 
             // Display results
             this.#displaySuggestions(suggestions || [], staffResults, programResults);
