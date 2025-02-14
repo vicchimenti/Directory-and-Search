@@ -136,6 +136,18 @@
     text-overflow: ellipsis;
 }
 
+/* Program Link Styles */
+.program-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
+
+.program-link:hover {
+    text-decoration: none;
+}
+
 /* Program Specific Styles */
 .program-suggestion {
     width: 100%;
