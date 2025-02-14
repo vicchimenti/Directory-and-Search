@@ -463,14 +463,16 @@ class AutocompleteSearchManager {
                     <div class="suggestions-column">
                         <div class="column-header">Programs</div>
                         ${programResults.map(program => `
-                            <div class="suggestion-item program-item" role="option" data-type="program">
-                                <div class="program-suggestion">
-                                    <span class="suggestion-text">${program.title || ''}</span>
-                                    ${program.department ? `<span class="suggestion-type">${program.department}</span>` : ''}
-                                    ${program.description ? `
-                                        <span class="program-description">${program.description}</span>
-                                    ` : ''}
-                                </div>
+                            <div class="suggestion-item program-item" role="option" data-type="program" data-url="${program.url}" title="Click to view program">
+                                <a href="${program.url}" class="program-link" ${program.url ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                                    <div class="program-suggestion">
+                                        <span class="suggestion-text">${program.title || ''}</span>
+                                        ${program.department ? `<span class="suggestion-type">${program.department}</span>` : ''}
+                                        ${program.description ? `
+                                            <span class="program-description">${program.description}</span>
+                                        ` : ''}
+                                    </div>
+                                </a>
                             </div>
                         `).join('')}
                     </div>
@@ -500,13 +502,12 @@ class AutocompleteSearchManager {
                 this.suggestionsContainer.innerHTML = '';
                 this.#updateButtonStates();
                 
-                // For staff items with URLs, let the link handle navigation
-                if (type === 'staff' && url && event.target.closest('a')) {
-                    // Let the default link behavior handle it
+                // For staff and program items with URLs, let the link handle navigation
+                if ((type === 'staff' || type === 'program') && url && event.target.closest('a')) {
                     return;
                 }
                 
-                // For other items, perform search
+                // For all other cases, perform search
                 event.preventDefault();
                 console.log('Initiating search request');
                 this.#performSearch(selectedText);
