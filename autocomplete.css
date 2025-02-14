@@ -26,35 +26,6 @@
     width: 100%;
 }
 
-/* Button Styles */
-.clear-search-button,
-#on-page-search-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Ensure icons are always visible when buttons are shown */
-.clear-search-button:not(.hidden) svg,
-#on-page-search-button svg {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Only hide icon when clear button is hidden */
-.clear-search-button.hidden svg {
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* Button icon transitions */
-.clear-search-button svg,
-#on-page-search-button svg {
-    transition: opacity 0.15s ease;
-}
-
 /* Suggestions List */
 .suggestions-list {
     width: 100%;
@@ -233,6 +204,26 @@
 #autocomplete-suggestions::-webkit-scrollbar-thumb {
     background-color: #cbd5e1;
     border-radius: 3px;
+}
+
+/* Button Icons */
+/* Search Button Icon Visibility */
+.clear-search-button:not(.hidden) svg,
+#on-page-search-button:not(:disabled) svg {
+    opacity: 1;
+    visibility: visible;
+}
+
+.clear-search-button.hidden svg,
+#on-page-search-button:disabled svg {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Add transition for smooth visibility changes */
+.clear-search-button svg,
+#on-page-search-button svg {
+    transition: opacity 0.15s ease, visibility 0.15s ease;
 }
 
 /* Responsive Adjustments */
