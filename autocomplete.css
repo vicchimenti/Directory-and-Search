@@ -203,6 +203,11 @@
 }
 
 /* Scrollbar Styles */
+#autocomplete-suggestions {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
 #autocomplete-suggestions::-webkit-scrollbar {
     width: 6px;
 }
