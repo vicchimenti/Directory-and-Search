@@ -203,7 +203,7 @@
 }
 
 /* Scrollbar Styles */
-#autocomplete-suggestions {
+/* #autocomplete-suggestions {
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
 }
@@ -214,7 +214,7 @@
 
 #autocomplete-suggestions::-webkit-scrollbar-track {
     background: transparent;
-}
+} */
 
 #autocomplete-suggestions::-webkit-scrollbar-thumb {
     background-color: #cbd5e1;
