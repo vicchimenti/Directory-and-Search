@@ -223,16 +223,25 @@
 
 /* Button Icons */
 /* Search Button Icon Visibility */
-.clear-search-button:not(.hidden) svg,
-#on-page-search-button:not(:disabled) svg {
+.clear-search-button:not(.hidden) svg {
     opacity: 1;
     visibility: visible;
 }
 
-.clear-search-button.hidden svg,
-#on-page-search-button:disabled svg {
+/* Always show the search button icon */
+#on-page-search-button svg {
+    opacity: 1;
+    visibility: visible;
+}
+
+.clear-search-button.hidden svg {
     opacity: 0;
     visibility: hidden;
+}
+
+/* Optional: Style the disabled search button differently without hiding the icon */
+#on-page-search-button:disabled {
+    opacity: 0.7; /* Make the button slightly faded when disabled */
 }
 
 /* Add transition for smooth visibility changes */
@@ -240,6 +249,28 @@
 #on-page-search-button svg {
     transition: opacity 0.15s ease, visibility 0.15s ease;
 }
+
+/* legacy button styles
+*
+*/
+/* Search Button Icon Visibility */
+/* .clear-search-button:not(.hidden) svg,
+#on-page-search-button:not(:disabled) svg {
+    opacity: 1;
+    visibility: visible;
+} */
+
+/* .clear-search-button.hidden svg,
+#on-page-search-button:disabled svg {
+    opacity: 0;
+    visibility: hidden;
+} */
+
+/* Add transition for smooth visibility changes */
+/* .clear-search-button svg,
+#on-page-search-button svg {
+    transition: opacity 0.15s ease, visibility 0.15s ease;
+} */
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
