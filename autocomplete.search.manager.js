@@ -191,6 +191,8 @@ class AutocompleteSearchManager {
         
         if (!query) {
             console.log('Empty query, submission canceled');
+            // Maybe focus the input field to hint that user needs to enter something
+            this.inputField.focus();
             console.groupEnd();
             return;
         }
