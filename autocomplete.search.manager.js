@@ -47,8 +47,8 @@
  * Note: Staff suggestions are fixed at 3 items
  * 
  * @author Victor Chimenti
- * @version 3.1.0
- * @lastModified 2025-02-14
+ * @version 3.1.1
+ * @lastModified 2025-02-26
  */
 
 class AutocompleteSearchManager {
