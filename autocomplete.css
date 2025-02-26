@@ -223,7 +223,6 @@
 
 /* Button Icons */
 /* Search Button Icon Visibility */
-/* Modified to always show search button icon */
 .clear-search-button:not(.hidden) svg {
     opacity: 1;
     visibility: visible;
@@ -231,8 +230,8 @@
 
 /* Always show the search button icon regardless of disabled state */
 #on-page-search-button svg {
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important; /* Added !important to override any system styles */
+    visibility: visible !important; /* Added !important to override any system styles */
 }
 
 .clear-search-button.hidden svg {
@@ -240,9 +239,9 @@
     visibility: hidden;
 }
 
-/* Optional: Style the disabled search button differently without hiding the icon */
+/* Style for disabled state without hiding icon */
 #on-page-search-button:disabled {
-    opacity: 0.7; /* Make the button slightly faded when disabled */
+    opacity: 0.7; 
 }
 
 /* Add transition for smooth visibility changes */
