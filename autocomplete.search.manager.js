@@ -166,8 +166,10 @@ class AutocompleteSearchManager {
             this.clearButton.classList.toggle('hidden', !hasValue);
         }
         
+        // Don't disable the button, just add a class for styling
         if (this.submitButton) {
-            this.submitButton.disabled = !hasValue;
+            // this.submitButton.disabled = !hasValue; // Comment out this line
+            this.submitButton.classList.toggle('empty-query', !hasValue);
         }
     }
 
