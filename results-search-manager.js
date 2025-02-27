@@ -50,12 +50,23 @@ class ResultsSearchManager {
         console.log("setupResultsSearch");
         const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
+            // Ensure search button icon is visible
+            const searchIcon = onPageSearch.querySelector('svg');
+            if (searchIcon) {
+                searchIcon.style.opacity = '1';
+                searchIcon.style.visibility = 'visible';
+            }
+            
+            // Remove any classes that might hide the icon
+            onPageSearch.classList.remove('empty-query');
+            
+            // Then add the event listener
             onPageSearch.addEventListener('click', this.#handleResultsSearch);
         } else {
             console.warn('Search button not found in DOM');
         }
     }
-
+    
     /**
      * Handles search parameters from the URL.
      * If a query parameter exists, it populates the search field and performs the search.
