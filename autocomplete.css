@@ -125,6 +125,71 @@
     font-size: 0.75rem;
     color: #000;
     margin-top: 2px;
+}
+
+/* Loading State */
+.suggestions-loading {
+    padding: 16px;
+    text-align: center;
+    color: #64748b;
+}
+
+/* Empty State */
+.suggestions-empty {
+    padding: 16px;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+/* Keyboard Navigation Styles */
+.suggestion-item:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: -2px;
+    background-color: #f1f5f9;
+}
+
+/* Scrollbar Styles */
+#autocomplete-suggestions::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+}
+
+/* Search Button Icon - Always Visible */
+#on-page-search-button svg {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Style for loading state */
+#on-page-search-button.loading {
+    opacity: 0.7;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .suggestions-columns {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .suggestions-column {
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .suggestions-column:empty {
+        display: none;
+    }
+
+    .column-header {
+        position: static;
+        background: white;
+    }
+    
+    #autocomplete-suggestions {
+        max-height: 60vh;
+    }
+} 2px;
     font-weight: bold;
 }
 
