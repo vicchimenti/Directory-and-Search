@@ -430,6 +430,9 @@ class DynamicResultsManager {
         if (this.observer) {
             this.observer.disconnect();
         }
+        if (this.iconCheckInterval) {
+            clearInterval(this.iconCheckInterval);
+        }
         document.removeEventListener('click', this.#handleDynamicClick);
     }
  }
