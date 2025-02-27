@@ -57,6 +57,22 @@ class DynamicResultsManager {
             }
         }
     }
+
+    /**
+     * Ensures search button icon remains visible.
+     * @private
+     */
+    #ensureSearchButtonIconVisibility() {
+        const searchButton = document.getElementById('on-page-search-button');
+        if (searchButton) {
+            const searchIcon = searchButton.querySelector('svg');
+            if (searchIcon) {
+                searchIcon.style.opacity = '1';
+                searchIcon.style.visibility = 'visible';
+            }
+            searchButton.classList.remove('empty-query');
+        }
+    }
  
     /**
      * Initializes the MutationObserver to watch for DOM changes.
