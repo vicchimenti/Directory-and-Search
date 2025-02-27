@@ -50,10 +50,12 @@ class DynamicResultsManager {
                 document.addEventListener('DOMContentLoaded', () => {
                     this.#setupDynamicListeners();
                     this.#startObserving();
+                    this.#ensureSearchButtonIconVisibility();
                 });
             } else {
                 this.#setupDynamicListeners();
                 this.#startObserving();
+                this.#ensureSearchButtonIconVisibility();
             }
         }
     }
