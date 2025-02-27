@@ -677,3 +677,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export the class
 export default AutocompleteSearchManager;
+
+// Icon Gaurd
+// This script ensures that the search icon is always visible
+// even if the parent button has a visibility:hidden style
+// or the icon itself is set to opacity:0
+// This is useful for accessibility and user experience
+function ensureSearchIconVisibility() {
+    const searchButton = document.getElementById('on-page-search-button');
+    if (searchButton) {
+      const searchIcon = searchButton.querySelector('svg');
+      if (searchIcon && (getComputedStyle(searchIcon).visibility !== 'visible' || 
+                        getComputedStyle(searchIcon).opacity === '0')) {
+        searchIcon.style.opacity = '1';
+        searchIcon.style.visibility = 'visible';
+      }
+    }
+  }
+  
+  // Run immediately
+  ensureSearchIconVisibility();
+  
+  // Then check periodically (every 500ms)
+  const iconGuard = setInterval(ensureSearchIconVisibility, 500);
+  
+  // Optional: Stop checking after 5 seconds if you don't want it running forever
+  setTimeout(() => clearInterval(iconGuard), 5000);
