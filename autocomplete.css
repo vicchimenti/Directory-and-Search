@@ -220,6 +220,11 @@ button[id="on-page-search-button"] svg {
   visibility: visible !important;
 }
 
+#on-page-search-button.icon-visible svg.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .suggestions-columns {
