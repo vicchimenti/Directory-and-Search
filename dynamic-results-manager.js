@@ -84,10 +84,20 @@ class DynamicResultsManager {
     #initializeObserver() {
         this.observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
+                // Skip mutations that might affect the search button
+                if (mutation.target && 
+                    (mutation.target.id === 'on-page-search-button' || 
+                     mutation.target.closest('#on-page-search-button'))) {
+                    return;
+                }
+                
                 if (mutation.type === 'childList') {
                     this.#attachEventListenersToNewContent(mutation.addedNodes);
                 }
             });
+            
+            // After processing mutations, ensure search button icon remains visible
+            this.#ensureSearchButtonIconVisibility();
         });
     }
  
