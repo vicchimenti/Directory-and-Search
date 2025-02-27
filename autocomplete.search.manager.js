@@ -47,8 +47,8 @@
  * Note: Staff suggestions are fixed at 3 items
  * 
  * @author Victor Chimenti
- * @version 3.1.1
- * @lastModified 2025-02-26
+ * @version 3.2.1
+ * @lastModified 2025-02-27
  */
 
 class AutocompleteSearchManager {
@@ -99,14 +99,12 @@ class AutocompleteSearchManager {
             return;
         }
 
-        // Get existing elements
-        this.clearButton = this.form.querySelector('.clear-search-button');
+        // Get existing elements (removed clearButton reference)
         this.submitButton = this.form.querySelector('#on-page-search-button');
         this.suggestionsContainer = document.getElementById('autocomplete-suggestions');
         this.resultsContainer = document.getElementById('results');
 
         console.log('DOM Elements:', {
-            clearButton: this.clearButton ? '✓' : '✗',
             submitButton: this.submitButton ? '✓' : '✗',
             suggestionsContainer: this.suggestionsContainer ? '✓' : '✗',
             resultsContainer: this.resultsContainer ? '✓' : '✗'
@@ -132,44 +130,11 @@ class AutocompleteSearchManager {
         this.inputField.addEventListener('keydown', this.#handleKeydown.bind(this));
         this.form.addEventListener('submit', this.#handleFormSubmit.bind(this));
         
-        if (this.clearButton) {
-            this.clearButton.addEventListener('click', () => this.#clearSearch());
-        }
-
         document.addEventListener('click', this.#handleClickOutside.bind(this));
-        this.#updateButtonStates();
-    }
-
-    /**
-     * Clears the search input and resets the UI state.
-     * 
-     * @private
-     */
-    #clearSearch() {
-        console.log('Clearing search');
-        this.inputField.value = '';
-        this.suggestionsContainer.innerHTML = '';
-        this.inputField.focus();
-        this.#updateButtonStates();
-    }
-
-    /**
-     * Updates the visibility and state of clear and submit buttons
-     * based on input field value.
-     * 
-     * @private
-     */
-    #updateButtonStates() {
-        const hasValue = this.inputField.value.trim().length > 0;
         
-        if (this.clearButton) {
-            this.clearButton.classList.toggle('hidden', !hasValue);
-        }
-        
-        // Don't disable the button, just add a class for styling
+        // Ensure search button is always active and visible at initialization
         if (this.submitButton) {
-            // this.submitButton.disabled = !hasValue; // Comment out this line
-            this.submitButton.classList.toggle('empty-query', !hasValue);
+            this.submitButton.classList.remove('empty-query');
         }
     }
 
@@ -191,7 +156,7 @@ class AutocompleteSearchManager {
         
         if (!query) {
             console.log('Empty query, submission canceled');
-            // Maybe focus the input field to hint that user needs to enter something
+            // Focus the input field to hint that user needs to enter something
             this.inputField.focus();
             console.groupEnd();
             return;
@@ -224,7 +189,6 @@ class AutocompleteSearchManager {
         const query = event.target.value.trim();
         console.log(`Input Value: "${query}" (length: ${query.length})`);
         
-        this.#updateButtonStates();
         clearTimeout(this.debounceTimeout);
         
         if (query.length < this.config.minLength) {
@@ -504,7 +468,6 @@ class AutocompleteSearchManager {
             
                 this.inputField.value = selectedText;
                 this.suggestionsContainer.innerHTML = '';
-                this.#updateButtonStates();
                 
                 // For staff and program items with URLs, let the link handle navigation
                 if ((type === 'staff' || type === 'program') && url && event.target.closest('a')) {
@@ -621,7 +584,6 @@ class AutocompleteSearchManager {
                     
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
-                    this.#updateButtonStates();
                     
                     // For staff and program items with URLs, open in new tab
                     if ((type === 'staff' || type === 'program') && url) {
@@ -661,11 +623,10 @@ class AutocompleteSearchManager {
      * @param {boolean} isLoading - Whether the component is in a loading state
      */
     #updateLoadingState(isLoading) {
-        this.submitButton?.classList.toggle('loading', isLoading);
-        this.inputField.disabled = isLoading;
-        if (this.clearButton) {
-            this.clearButton.disabled = isLoading;
+        if (this.submitButton) {
+            this.submitButton.classList.toggle('loading', isLoading);
         }
+        this.inputField.disabled = isLoading;
     }
 
     /**
