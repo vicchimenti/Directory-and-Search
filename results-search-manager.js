@@ -22,8 +22,8 @@
  * - header-search-manager.js: Handles initial search and redirects
  * 
  * @author Victor Chimenti
- * @version 1.4.5
- * @lastModified 2025-02-06
+ * @version 1.5.0
+ * @lastModified 2025-02-27
  */
 
 class ResultsSearchManager {
@@ -66,7 +66,7 @@ class ResultsSearchManager {
             console.warn('Search button not found in DOM');
         }
     }
-    
+
     /**
      * Handles search parameters from the URL.
      * If a query parameter exists, it populates the search field and performs the search.
