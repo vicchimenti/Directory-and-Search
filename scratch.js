@@ -47,7 +47,7 @@
  * Note: Staff suggestions are fixed at 3 items
  * 
  * @author Victor Chimenti
- * @version 3.2.0
+ * @version 3.2.1
  * @lastModified 2025-02-27
  */
 
@@ -136,18 +136,6 @@ class AutocompleteSearchManager {
         if (this.submitButton) {
             this.submitButton.classList.remove('empty-query');
         }
-    }
-
-    /**
-     * Clears the search input and resets the UI state.
-     * 
-     * @private
-     */
-    #clearSearch() {
-        console.log('Clearing search');
-        this.inputField.value = '';
-        this.suggestionsContainer.innerHTML = '';
-        this.inputField.focus();
     }
 
     /**
