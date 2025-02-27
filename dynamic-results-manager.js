@@ -111,6 +111,11 @@ class DynamicResultsManager {
         if (resultsContainer) {
             this.observer.observe(resultsContainer, this.observerConfig);
             console.log('Observer started watching results container');
+            
+            // Add periodic check for search button visibility
+            this.iconCheckInterval = setInterval(() => {
+                this.#ensureSearchButtonIconVisibility();
+            }, 1000); // Check every second
         } else {
             console.warn('Results container not found, waiting for it to appear');
             this.#waitForResultsContainer();
