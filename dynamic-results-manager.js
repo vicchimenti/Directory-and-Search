@@ -62,17 +62,26 @@ class DynamicResultsManager {
 
     /**
      * Ensures search button icon remains visible.
+     * Uses class manipulation instead of inline styles for better accessibility.
      * @private
      */
     #ensureSearchButtonIconVisibility() {
         const searchButton = document.getElementById('on-page-search-button');
         if (searchButton) {
+            // Remove any classes that might hide the icon
+            searchButton.classList.remove('empty-query');
+            
+            // Add a class to ensure visibility
+            searchButton.classList.add('icon-visible');
+            
             const searchIcon = searchButton.querySelector('svg');
             if (searchIcon) {
-                searchIcon.style.opacity = '1';
-                searchIcon.style.visibility = 'visible';
+                // Remove any classes that might hide the icon
+                searchIcon.classList.remove('hidden');
+                
+                // Add a class to ensure visibility
+                searchIcon.classList.add('visible');
             }
-            searchButton.classList.remove('empty-query');
         }
     }
  
