@@ -28,8 +28,8 @@
 * - header-search-manager.js: Handles initial search and redirects
 * 
 * @author Victor Chimenti
-* @version 2.0.1
-* @lastModified 2025-02-27
+* @version 2.1.0
+* @lastModified 2025-02-28
 */
 
 class DynamicResultsManager {
@@ -84,7 +84,7 @@ class DynamicResultsManager {
             }
         }
     }
-    
+
     /**
      * Initializes the MutationObserver to watch for DOM changes.
      * 
