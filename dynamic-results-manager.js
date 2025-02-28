@@ -62,7 +62,7 @@ class DynamicResultsManager {
 
     /**
      * Ensures search button icon remains visible.
-     * Uses class manipulation instead of inline styles for better accessibility.
+     * Uses only class manipulation for better accessibility.
      * @private
      */
     #ensureSearchButtonIconVisibility() {
@@ -84,7 +84,7 @@ class DynamicResultsManager {
             }
         }
     }
- 
+    
     /**
      * Initializes the MutationObserver to watch for DOM changes.
      * 
