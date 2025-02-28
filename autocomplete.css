@@ -225,6 +225,16 @@ button[id="on-page-search-button"] svg {
     visibility: visible;
 }
 
+/* Override user agent stylesheet */
+svg.autocomplete-concierge_icon,
+svg.visible,
+button#on-page-search-button svg,
+.search-submit-button svg {
+    display: inline-block !important; /* Override display: none */
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .suggestions-columns {
