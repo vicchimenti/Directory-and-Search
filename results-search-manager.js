@@ -22,8 +22,8 @@
  * - header-search-manager.js: Handles initial search and redirects
  * 
  * @author Victor Chimenti
- * @version 1.5.0
- * @lastModified 2025-02-27
+ * @version 1.5.1
+ * @lastModified 2025-02-28
  */
 
 class ResultsSearchManager {
