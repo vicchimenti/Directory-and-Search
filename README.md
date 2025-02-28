@@ -10,6 +10,7 @@
 - [ ] Can I whitelist per facet?
 - [ ] How do I set a facet category to default?
 - [ ] How do I handle the show more?
+= [ ] Light Button SVG
 
 ### Don't Forget
 
