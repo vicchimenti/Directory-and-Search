@@ -50,15 +50,18 @@ class ResultsSearchManager {
         console.log("setupResultsSearch");
         const onPageSearch = document.getElementById("on-page-search-button");
         if (onPageSearch) {
-            // Ensure search button icon is visible
-            const searchIcon = onPageSearch.querySelector('svg');
-            if (searchIcon) {
-                searchIcon.style.opacity = '1';
-                searchIcon.style.visibility = 'visible';
-            }
-            
             // Remove any classes that might hide the icon
             onPageSearch.classList.remove('empty-query');
+            
+            // Add a visibility class
+            onPageSearch.classList.add('icon-visible');
+            
+            // Add visibility classes to the icon if it exists
+            const searchIcon = onPageSearch.querySelector('svg');
+            if (searchIcon) {
+                searchIcon.classList.remove('hidden');
+                searchIcon.classList.add('visible');
+            }
             
             // Then add the event listener
             onPageSearch.addEventListener('click', this.#handleResultsSearch);
