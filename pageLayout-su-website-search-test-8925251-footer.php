@@ -49,7 +49,6 @@
         <t4 type="navigation" name="Return Scripts for End of Body - Search" id="1090" />
 
         <!-- Partial Scripts -->
-        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/themes/stencils/js/main.js"></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js"></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
         <!-- End Partial Scripts -->
