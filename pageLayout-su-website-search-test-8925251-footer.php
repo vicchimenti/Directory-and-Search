@@ -18,6 +18,10 @@
         <!-- handlebars.min.js -->
         <script nomodule src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
         <!-- es6-promise.auto.min.js -->
+        <!-- Partial Scripts -->
+        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js"></script>
+        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
+        <!-- End Partial Scripts -->
         <script src="<t4 type='media' id='8723392' formatter='path/*' />" defer></script>
         <!-- flats.min.js -->
         <script src="<t4 type='media' id='6907524' formatter='path/*' />" defer></script>
@@ -48,10 +52,7 @@
         <t4 type="navigation" name="V10 Top Content Custom JS" id="1017" />
         <t4 type="navigation" name="Return Scripts for End of Body - Search" id="1090" />
 
-        <!-- Partial Scripts -->
-        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js"></script>
-        <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
-        <!-- End Partial Scripts -->
+
 
     </body>
 </html>
