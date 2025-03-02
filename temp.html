@@ -1,72 +1,7 @@
-<div class="tabs tabs--center">
-    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
-    <div class="tab__list collapse show multi-collapse" role="tablist">
-        <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
-
-                    <a class="tab__button tab__button--active" id="All_Results0" role="tab" aria-selected="true" aria-controls="0-tab" tabindex="0" data-tab-group-control="All_Results0" href="?form=partial&amp;profile=_default&amp;query=biology&amp;collection=seattleu%7Esp-search"> 
-
-                        All Results                            
-                        &nbsp; 
-                        <span class="tabs__count">(299)</span>                             
-                    </a>
-
-                    <a class="tab__button " id="Programs1" role="tab" aria-selected="false" aria-controls="0-tab" tabindex="0" data-tab-group-control="Programs1" href="?form=partial&amp;f.Tabs%7Cseattleu%7Eds-programs=Programs&amp;profile=_default&amp;query=biology&amp;collection=seattleu%7Esp-search"> 
-
-                        Programs                            
-                        &nbsp; 
-                        <span class="tabs__count">(35)</span>                             
-                    </a>
-
-                    <a class="tab__button " id="People2" role="tab" aria-selected="false" aria-controls="0-tab" tabindex="0" data-tab-group-control="People2" href="?form=partial&amp;profile=_default&amp;query=biology&amp;f.Tabs%7Cseattleu%7Eds-staff=People&amp;collection=seattleu%7Esp-search"> 
-
-                        People                            
-                        &nbsp; 
-                        <span class="tabs__count">(39)</span>                             
-                    </a>
-
-                    <a class="tab__button " id="News3" role="tab" aria-selected="false" aria-controls="0-tab" tabindex="0" data-tab-group-control="News3" href="?form=partial&amp;profile=_default&amp;query=biology&amp;f.Tabs%7Cseattleu%7Eds-news=News&amp;collection=seattleu%7Esp-search"> 
-
-                        News                            
-                        &nbsp; 
-                        <span class="tabs__count">(13)</span>                             
-                    </a>
-
-            </div>                    
-        </div>
-    </div>
-</div>
-
-
-<div class="tabs tabs--center">
-    <button class="btn btn-primary" type="button" 
-            aria-expanded="false" 
-            aria-controls="filterPanel">
-        Show Filters
-    </button>
-    <div class="tab__list" 
-         id="filterPanel"
-         role="tablist" 
-         aria-hidden="true"
-         hidden>
-        <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
-            <!-- your existing tab buttons -->
-        </div>                    
-    </div>
-</div>
-
-
-<div class="tabs tabs--center">
-    <button class="btn btn-primary" type="button" 
-            aria-expanded="true" 
-            aria-controls="filterPanel">
-        Hide Filters
-    </button>
-    <div class="tab__list" 
-         id="filterPanel"
-         role="tablist" 
-         aria-hidden="false">
-        <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
-            <!-- your existing tab buttons -->
-        </div>                    
-    </div>
-</div>
+<form id="searchForm">
+    <label for="search-input" hidden>Search</label>
+    <input id="search-input" class="sq-search" name="search-input" type="text">
+    <!-- Add the suggestions container here -->
+    <div id="header-suggestions" class="header-suggestions-container" hidden></div>
+    <input hidden id="search-button" type="submit" value="Submit">
+</form>
