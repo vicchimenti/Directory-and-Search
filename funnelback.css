@@ -8754,3 +8754,72 @@ html {
 .funnelback-search__side .promo-section article {
     margin: 0;
 }
+
+
+
+
+/* 
+*   Header Autocomplete Styles
+*   Version: 1.0.0
+*   Date: 2025-03-02
+*   Description: Styles for header search autocomplete suggestions
+*   Last Modified By: Vic
+*/
+
+/* Header suggestions container styles */
+.header-suggestions-container {
+    position: absolute;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 0.625rem 0.625rem;
+}
+
+.header-suggestions-list {
+    padding: 8px 0;
+}
+
+.header-suggestion-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    --pnp-typeface-margin: 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+}
+
+.header-suggestion-item:hover,
+.header-suggestion-item.active {
+    background-color: #f5f5f5;
+}
+
+/* Match the styling with existing autocomplete */
+.header-suggestion-item .suggestion-text {
+    color: #262626;
+}
+
+/* Active suggestion styling */
+.header-suggestion-item.active .suggestion-text {
+    font-weight: 700;
+}
+
+/* Ensure the suggestion container appears properly */
+#search-input {
+    position: relative;
+}
+
+/* Adjust the z-index to ensure suggestions appear above other content */
+.primary-nav__right {
+    position: relative;
+    z-index: 1001;
+}
+
+/* 
+* These styles ensure the header suggestions match existing Funnelback styling 
+* while maintaining a clean, simple single-column layout
+*/
