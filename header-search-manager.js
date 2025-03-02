@@ -41,7 +41,7 @@ class HeaderSearchManager {
             collection: 'seattleu~sp-search',
             profile: '_default',
             minLength: 3,
-            maxResults: 10,
+            maxResults: 8,
             suggestEndpoint: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
             ...config
         };
