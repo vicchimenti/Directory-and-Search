@@ -1,185 +1,162 @@
 /**
- * @fileoverview Suggestion Handler for Funnelback Search Integration (People)
+ * @fileoverview Query Middleware for Funnelback Proxy
  * 
- * Handles autocomplete suggestion requests for faculty and staff searches with
- * structured logging for Vercel serverless environment.
+ * This middleware integrates the query analytics system with your existing
+ * Funnelback proxy servers. It extracts relevant information from requests
+ * and responses to track search behavior without modifying your existing handlers.
+ * 
+ * Features:
+ * - Non-intrusive integration with existing handlers
+ * - Captures query data and response metrics
+ * - Handles errors gracefully
+ * - Configurable tracking options
  * 
  * @author Victor Chimenti
- * @version 2.1.2
+ * @version 1.0.1
  * @license MIT
  */
 
-const axios = require('axios');
-const os = require('os');
+const { recordQuery } = require('./queryAnalytics');
 
 /**
- * Creates a standardized log entry for Vercel environment
+ * Middleware function to track query analytics
+ * This should be added to each handler
  * 
- * @param {string} level - Log level ('info', 'warn', 'error')
- * @param {string} message - Main log message/action
- * @param {Object} data - Additional data to include in log
+ * @param {Object} options - Configuration options
+ * @param {string} options.handler - Name of the handler using this middleware
+ * @returns {Function} Express middleware function
  */
-function logEvent(level, message, data = {}) {
-    const serverInfo = {
-        hostname: os.hostname(),
-        platform: os.platform(),
-        arch: os.arch(),
-        cpus: os.cpus().length,
-        memory: Math.round(os.totalmem() / 1024 / 1024 / 1024) + 'GB'
-    };
-
-    // Extract relevant request headers
-    const requestInfo = data.headers ? {
-        'Request Headers': {
-            'x-forwarded-host': data.headers['x-forwarded-host'],
-            'x-vercel-ip-timezone': data.headers['x-vercel-ip-timezone'],
-            'referer': data.headers.referer,
-            'x-vercel-ip-as-number': data.headers['x-vercel-ip-as-number'],
-            'sec-fetch-mode': data.headers['sec-fetch-mode'],
-            'x-vercel-proxied-for': data.headers['x-vercel-proxied-for'],
-            'x-real-ip': data.headers['x-real-ip'],
-            'x-vercel-ip-postal-code': data.headers['x-vercel-ip-postal-code'],
-            'host': data.headers.host,
-            'sec-fetch-dest': data.headers['sec-fetch-dest'],
-            'sec-fetch-site': data.headers['sec-fetch-site'],
-            'x-forwarded-for': data.headers['x-forwarded-for'],
-            'origin': data.headers.origin,
-            'sec-ch-ua': data.headers['sec-ch-ua'],
-            'user-agent': data.headers['user-agent'],
-            'sec-ch-ua-platform': data.headers['sec-ch-ua-platform'],
-            'x-vercel-ip-longitude': data.headers['x-vercel-ip-longitude'],
-            'accept': data.headers.accept,
-            'x-vercel-forwarded-for': data.headers['x-vercel-forwarded-for'],
-            'x-vercel-ip-latitude': data.headers['x-vercel-ip-latitude'],
-            'x-forwarded-proto': data.headers['x-forwarded-proto'],
-            'x-vercel-ip-country-region': data.headers['x-vercel-ip-country-region'],
-            'x-vercel-deployment-url': data.headers['x-vercel-deployment-url'],
-            'accept-encoding': data.headers['accept-encoding'],
-            'x-vercel-id': data.headers['x-vercel-id'],
-            'accept-language': data.headers['accept-language'],
-            'x-vercel-ip-city': decodeURIComponent(data.headers['x-vercel-ip-city'] || ''),
-            'x-vercel-ip-country': data.headers['x-vercel-ip-country']
-        }
-    } : null;
-
-    const logEntry = {
-        service: 'suggest-people',
-        logVersion: '2.1.2',
-        timestamp: new Date().toISOString(),
-        event: {
-            level,
-            action: message,
-            query: data.query || null,
-            response: data.status ? {
-                status: data.status,
-                processingTime: data.processingTime,
-                contentPreview: data.responseContent ? 
-                    data.responseContent.substring(0, 500) + '...' : null
-            } : null,
-            error: data.error || null
-        },
-        client: {
-            origin: data.headers?.origin || null,
-            userAgent: data.headers?.['user-agent'] || null
-        },
-        server: serverInfo,
-        request: requestInfo
+function trackQuery(options = {}) {
+  const handlerName = options.handler || 'unknown';
+  
+  return async (req, res, next) => {
+    const startTime = Date.now();
+    const originalSend = res.send;
+    let resultCount = 0;
+    let responseData = null;
+    let errorOccurred = false;
+    let errorMessage = '';
+    let errorStatus = 0;
+    
+    // Extract relevant request data
+    const queryData = {
+      handler: handlerName,
+      query: req.query.query || '',
+      collection: req.query.collection || 'seattleu~sp-search',
+      userIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+      userAgent: req.headers['user-agent'],
+      referer: req.headers.referer,
+      city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
+      region: req.headers['x-vercel-ip-country-region'],
+      country: req.headers['x-vercel-ip-country'],
+      timezone: req.headers['x-vercel-ip-timezone'],
+      latitude: req.headers['x-vercel-ip-latitude'],
+      longitude: req.headers['x-vercel-ip-longitude'],
+      isProgramTab: !!req.query['f.Tabs|programMain'],
+      isStaffTab: !!req.query['f.Tabs|seattleu~ds-staff'],
+      tabs: [],
     };
     
-    console.log(JSON.stringify(logEntry));
-}
-
-async function handler(req, res) {
-    const startTime = Date.now();
-    const requestId = req.headers['x-vercel-id'] || Date.now().toString();
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-
-    // CORS handling for Seattle University domain
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+    // Add tabs information
+    if (queryData.isProgramTab) queryData.tabs.push('program-main');
+    if (queryData.isStaffTab) queryData.tabs.push('Faculty & Staff');
+    
+    // Add filter information
+    queryData.filters = {};
+    Object.keys(req.query).forEach(key => {
+      if (key.startsWith('f.')) {
+        queryData.filters[key] = req.query[key];
+      }
+    });
+    
+    // Check if this is a refinement query
+    if (req.headers.referer && req.headers.referer.includes('query=')) {
+      queryData.isRefinement = true;
+      try {
+        const refererUrl = new URL(req.headers.referer);
+        queryData.originalQuery = refererUrl.searchParams.get('query') || '';
+      } catch (e) {
+        // Ignore errors in parsing referer
+      }
     }
-
-    try {
-        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.json';
-        
-        // Keep params for logging
-        const params = new URLSearchParams();
-        params.append('form', 'partial');
-        params.append('profile', '_default');
-        params.append('query', req.query.query);
-        params.append('f.Tabs|seattleu|Eds-staff', 'Faculty & Staff');
-        params.append('collection', 'seattleu~sp-search');
-        params.append('num_ranks', '5');
-
-        // Use correctly encoded queryString for request
-        const queryString = [
-            'form=partial',
-            'profile=_default',
-            `query=${encodeURIComponent(req.query.query)}`,
-            'f.Tabs%7Cseattleu%7CEds-staff=Faculty+%26+Staff',
-            'collection=seattleu~sp-search',
-            'num_ranks=5'
-        ].join('&');
-
-        const url = `${funnelbackUrl}?${queryString}`;
-
-        // Log request details
-        logEvent('debug', 'Outgoing request details', {
-            service: 'suggest-people',
-            url: url,
-            query: Object.fromEntries(params),
-            headers: req.headers
-        });
-
-        const response = await axios.get(url, {
-            headers: {
-                'Accept': 'application/json',
-                'X-Forwarded-For': userIp
+    
+    // Override res.send to capture response data
+    res.send = function(data) {
+      responseData = data;
+      
+      // Try to determine result count from response based on handler type
+      try {
+        if (handlerName === 'suggest' || handlerName === 'suggestPeople') {
+          // For suggestion endpoints, the response is usually an array
+          if (Array.isArray(data)) {
+            resultCount = data.length;
+          } else if (typeof data === 'string') {
+            // Try to parse if it's a JSON string
+            const parsed = JSON.parse(data);
+            resultCount = Array.isArray(parsed) ? parsed.length : 0;
+          }
+        } else if (handlerName === 'suggestPrograms') {
+          // For program suggestions, check the programs array
+          if (typeof data === 'string') {
+            const parsed = JSON.parse(data);
+            resultCount = parsed.programs ? parsed.programs.length : 0;
+          } else if (data.programs) {
+            resultCount = data.programs.length;
+          }
+        } else if (handlerName === 'search' || handlerName === 'server') {
+          // For search endpoints, try to extract from HTML response
+          // This is more complex and might need regex patterns
+          if (typeof data === 'string' && data.includes('resultsSummary')) {
+            const match = data.match(/totalMatching">([0-9,]+)</);
+            if (match && match[1]) {
+              resultCount = parseInt(match[1].replace(/,/g, ''), 10);
             }
-        });
-
-        // Log the successful response
-        logEvent('info', 'Response received', {
-            service: 'suggest-people',
-            query: Object.fromEntries(params),
-            status: response.status,
-            processingTime: `${Date.now() - startTime}ms`,
-            responseContent: JSON.stringify(response.data).substring(0, 500) + '...',
-            headers: req.headers,
-        });
-
-        // Format and send response
-        const formattedResults = response.data?.response?.resultPacket?.results || [];
-        res.setHeader('Content-Type', 'application/json');
-        res.send(formattedResults);
-
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing response data for analytics:', error);
+      }
+      
+      // Complete analytics data
+      queryData.responseTime = Date.now() - startTime;
+      queryData.resultCount = resultCount;
+      queryData.error = {
+        occurred: errorOccurred,
+        message: errorMessage,
+        status: errorStatus
+      };
+      
+      // Record the query asynchronously (don't wait for it)
+      recordQuery(queryData).catch(err => {
+        console.error('Error recording query analytics:', err);
+      });
+      
+      // Call the original send
+      return originalSend.call(this, data);
+    };
+    
+    // Override res.status to capture error status
+    const originalStatus = res.status;
+    res.status = function(code) {
+      if (code >= 400) {
+        errorOccurred = true;
+        errorStatus = code;
+      }
+      return originalStatus.call(this, code);
+    };
+    
+    // Continue with the request
+    try {
+      next();
     } catch (error) {
-        // Log detailed error information
-        logEvent('error', 'Handler error', {
-            service: 'suggest-people',
-            query: req.query,
-            error: {
-                message: error.message,
-                stack: error.stack,
-                response: error.response?.data,
-                status: error.response?.status
-            },
-            status: error.response?.status || 500,
-            processingTime: `${Date.now() - startTime}ms`,
-            headers: req.headers
-        });
-        
-        res.status(error.response?.status || 500).json({
-            error: 'Error fetching results',
-            message: error.message,
-            details: error.response?.data
-        });
+      errorOccurred = true;
+      errorMessage = error.message;
+      errorStatus = 500;
+      throw error; // Re-throw to be handled by your error handler
     }
+  };
 }
 
-module.exports = handler;
+module.exports = {
+  trackQuery
+};
