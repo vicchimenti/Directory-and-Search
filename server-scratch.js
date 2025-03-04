@@ -75,7 +75,7 @@ function logEvent(level, message, data = {}) {
 
     const logEntry = {
         service: 'suggest-people',
-        logVersion: '2.3.0',
+        logVersion: '3.0.0',
         timestamp: new Date().toISOString(),
         event: {
             level,
