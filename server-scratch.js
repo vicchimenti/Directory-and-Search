@@ -1,14 +1,14 @@
 /**
- * @fileoverview Spelling Suggestions Proxy Server
+ * @fileoverview Search Tools Proxy Server
  * 
- * Handles spelling suggestion requests for the Funnelback integration.
- * Ensures proper formatting of spelling-specific requests and manages
- * the 'form=partial' parameter required for spelling suggestions.
+ * Handles search tool-specific requests for the Funnelback integration.
+ * Manages requests to Funnelback's tool endpoints, such as faceted search
+ * and advanced search features.
  * 
  * Features:
  * - CORS handling
- * - Spelling-specific parameter management
- * - Detailed request logging
+ * - Tool-specific parameter management
+ * - Request path handling
  * - Analytics integration
  * 
  * @author Victor Chimenti
@@ -20,33 +20,7 @@ const axios = require('axios');
 const { recordQuery } = require('../lib/queryAnalytics');
 
 /**
- * Extracts spelling suggestions from HTML response
- * 
- * @param {string} htmlContent - The HTML response from Funnelback
- * @returns {Array} Array of spelling suggestions, or empty array if none found
- */
-function extractSpellingSuggestions(htmlContent) {
-    try {
-        // Simple regex to extract spelling suggestions
-        const regex = /class="spelling">Did you mean:([^<]+)</g;
-        const matches = [];
-        let match;
-        
-        while ((match = regex.exec(htmlContent)) !== null) {
-            if (match[1]) {
-                matches.push(match[1].trim());
-            }
-        }
-        
-        return matches;
-    } catch (error) {
-        console.error('Error extracting spelling suggestions:', error);
-        return [];
-    }
-}
-
-/**
- * Handler for spelling suggestion requests.
+ * Handler for search tools requests.
  * 
  * @param {Object} req - Express request object
  * @param {Object} req.query - Query parameters from the request
@@ -64,7 +38,7 @@ async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Log request details
-    console.log('Spelling Request:');
+    console.log('Tools Request:');
     console.log('- User IP:', userIp);
     console.log('- Query Parameters:', req.query);
     console.log('- Request Headers:', req.headers);
@@ -75,30 +49,24 @@ async function handler(req, res) {
     }
 
     try {
-        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s';
+        const toolPath = req.query.path || '';
         
-        const params = new URLSearchParams({
-            ...req.query,
-            collection: 'seattleu~sp-search',
-            profile: '_default',
-            form: 'partial'
-        });
+        console.log('Making Funnelback tools request:');
+        console.log('- Base URL:', funnelbackUrl);
+        console.log('- Tool Path:', toolPath);
 
-        console.log('Making Funnelback spelling request:');
-        console.log('- URL:', `${funnelbackUrl}?${params.toString()}`);
-
-        const response = await axios.get(funnelbackUrl, {
-            params: params,
+        const response = await axios.get(`${funnelbackUrl}/${toolPath}`, {
+            params: req.query,
             headers: {
                 'Accept': 'text/html',
                 'X-Forwarded-For': userIp
             }
         });
 
-        console.log('Spelling response received successfully');
+        console.log('Tools response received successfully');
         
-        // Extract spelling suggestions
-        const suggestions = extractSpellingSuggestions(response.data);
+        // Calculate processing time for analytics
         const processingTime = Date.now() - startTime;
         
         // Record analytics data
@@ -109,9 +77,9 @@ async function handler(req, res) {
                 console.log('Raw query parameters:', req.query);
                 
                 const analyticsData = {
-                    handler: 'spelling',
+                    handler: 'tools',
                     query: req.query.query || req.query.partial_query || '[empty query]',
-                    searchCollection: 'seattleu~sp-search',
+                    searchCollection: req.query.collection || 'seattleu~sp-search',
                     userIp: userIp,
                     userAgent: req.headers['user-agent'],
                     referer: req.headers.referer,
@@ -122,13 +90,13 @@ async function handler(req, res) {
                     latitude: req.headers['x-vercel-ip-latitude'],
                     longitude: req.headers['x-vercel-ip-longitude'],
                     responseTime: processingTime,
-                    resultCount: suggestions.length,
+                    resultCount: 0, // Can't easily extract this from tools responses
                     isProgramTab: Boolean(req.query['f.Tabs|programMain']),
                     isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
                     tabs: [],
-                    // Additional spelling-specific data
-                    hasSuggestions: suggestions.length > 0,
-                    suggestions: suggestions,
+                    // Additional tools-specific data
+                    toolPath: toolPath,
+                    toolParams: req.query,
                     timestamp: new Date()
                 };
                 
@@ -163,12 +131,12 @@ async function handler(req, res) {
         
         res.send(response.data);
     } catch (error) {
-        console.error('Error in spelling handler:', {
+        console.error('Error in tools handler:', {
             message: error.message,
             status: error.response?.status,
             data: error.response?.data
         });
-        res.status(500).send('Spelling error: ' + (error.response?.data || error.message));
+        res.status(500).send('Tools error: ' + (error.response?.data || error.message));
     }
 }
 
