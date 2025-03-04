@@ -1,162 +1,161 @@
 /**
- * @fileoverview Query Middleware for Funnelback Proxy
+ * @fileoverview Dedicated Search Results Proxy Server
  * 
- * This middleware integrates the query analytics system with your existing
- * Funnelback proxy servers. It extracts relevant information from requests
- * and responses to track search behavior without modifying your existing handlers.
+ * Handles specific search result requests for the Funnelback integration.
+ * This server is optimized for handling pure search queries separate from
+ * other functionality like spelling suggestions or tools.
  * 
  * Features:
- * - Non-intrusive integration with existing handlers
- * - Captures query data and response metrics
- * - Handles errors gracefully
- * - Configurable tracking options
+ * - CORS handling
+ * - Search-specific parameter management
+ * - Detailed logging of search requests
+ * - Analytics integration for tracking search queries
  * 
  * @author Victor Chimenti
- * @version 1.0.1
+ * @version 1.2.0
  * @license MIT
  */
 
-const { recordQuery } = require('./queryAnalytics');
+const axios = require('axios');
+const { recordQuery } = require('../lib/queryAnalytics');
 
 /**
- * Middleware function to track query analytics
- * This should be added to each handler
+ * Extracts the number of results from an HTML response
  * 
- * @param {Object} options - Configuration options
- * @param {string} options.handler - Name of the handler using this middleware
- * @returns {Function} Express middleware function
+ * @param {string} htmlContent - The HTML response from Funnelback
+ * @returns {number} The number of results, or 0 if not found
  */
-function trackQuery(options = {}) {
-  const handlerName = options.handler || 'unknown';
-  
-  return async (req, res, next) => {
-    const startTime = Date.now();
-    const originalSend = res.send;
-    let resultCount = 0;
-    let responseData = null;
-    let errorOccurred = false;
-    let errorMessage = '';
-    let errorStatus = 0;
-    
-    // Extract relevant request data
-    const queryData = {
-      handler: handlerName,
-      query: req.query.query || '',
-      collection: req.query.collection || 'seattleu~sp-search',
-      userIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
-      userAgent: req.headers['user-agent'],
-      referer: req.headers.referer,
-      city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
-      region: req.headers['x-vercel-ip-country-region'],
-      country: req.headers['x-vercel-ip-country'],
-      timezone: req.headers['x-vercel-ip-timezone'],
-      latitude: req.headers['x-vercel-ip-latitude'],
-      longitude: req.headers['x-vercel-ip-longitude'],
-      isProgramTab: !!req.query['f.Tabs|programMain'],
-      isStaffTab: !!req.query['f.Tabs|seattleu~ds-staff'],
-      tabs: [],
-    };
-    
-    // Add tabs information
-    if (queryData.isProgramTab) queryData.tabs.push('program-main');
-    if (queryData.isStaffTab) queryData.tabs.push('Faculty & Staff');
-    
-    // Add filter information
-    queryData.filters = {};
-    Object.keys(req.query).forEach(key => {
-      if (key.startsWith('f.')) {
-        queryData.filters[key] = req.query[key];
-      }
-    });
-    
-    // Check if this is a refinement query
-    if (req.headers.referer && req.headers.referer.includes('query=')) {
-      queryData.isRefinement = true;
-      try {
-        const refererUrl = new URL(req.headers.referer);
-        queryData.originalQuery = refererUrl.searchParams.get('query') || '';
-      } catch (e) {
-        // Ignore errors in parsing referer
-      }
-    }
-    
-    // Override res.send to capture response data
-    res.send = function(data) {
-      responseData = data;
-      
-      // Try to determine result count from response based on handler type
-      try {
-        if (handlerName === 'suggest' || handlerName === 'suggestPeople') {
-          // For suggestion endpoints, the response is usually an array
-          if (Array.isArray(data)) {
-            resultCount = data.length;
-          } else if (typeof data === 'string') {
-            // Try to parse if it's a JSON string
-            const parsed = JSON.parse(data);
-            resultCount = Array.isArray(parsed) ? parsed.length : 0;
-          }
-        } else if (handlerName === 'suggestPrograms') {
-          // For program suggestions, check the programs array
-          if (typeof data === 'string') {
-            const parsed = JSON.parse(data);
-            resultCount = parsed.programs ? parsed.programs.length : 0;
-          } else if (data.programs) {
-            resultCount = data.programs.length;
-          }
-        } else if (handlerName === 'search' || handlerName === 'server') {
-          // For search endpoints, try to extract from HTML response
-          // This is more complex and might need regex patterns
-          if (typeof data === 'string' && data.includes('resultsSummary')) {
-            const match = data.match(/totalMatching">([0-9,]+)</);
-            if (match && match[1]) {
-              resultCount = parseInt(match[1].replace(/,/g, ''), 10);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error parsing response data for analytics:', error);
-      }
-      
-      // Complete analytics data
-      queryData.responseTime = Date.now() - startTime;
-      queryData.resultCount = resultCount;
-      queryData.error = {
-        occurred: errorOccurred,
-        message: errorMessage,
-        status: errorStatus
-      };
-      
-      // Record the query asynchronously (don't wait for it)
-      recordQuery(queryData).catch(err => {
-        console.error('Error recording query analytics:', err);
-      });
-      
-      // Call the original send
-      return originalSend.call(this, data);
-    };
-    
-    // Override res.status to capture error status
-    const originalStatus = res.status;
-    res.status = function(code) {
-      if (code >= 400) {
-        errorOccurred = true;
-        errorStatus = code;
-      }
-      return originalStatus.call(this, code);
-    };
-    
-    // Continue with the request
+function extractResultCount(htmlContent) {
     try {
-      next();
+        // Look for result count in HTML response
+        const match = htmlContent.match(/totalMatching">([0-9,]+)</);
+        if (match && match[1]) {
+            return parseInt(match[1].replace(/,/g, ''), 10);
+        }
     } catch (error) {
-      errorOccurred = true;
-      errorMessage = error.message;
-      errorStatus = 500;
-      throw error; // Re-throw to be handled by your error handler
+        console.error('Error extracting result count:', error);
     }
-  };
+    return 0;
 }
 
-module.exports = {
-  trackQuery
-};
+/**
+ * Handler for dedicated search requests.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters from the request
+ * @param {Object} req.headers - Request headers
+ * @param {string} req.method - HTTP method of the request
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+async function handler(req, res) {
+    const startTime = Date.now();
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Log request details
+    console.log('Search Request:');
+    console.log('- User IP:', userIp);
+    console.log('- Query Parameters:', req.query);
+    console.log('- Request Headers:', req.headers);
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    try {
+        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+
+        console.log('Making Funnelback search request:');
+        console.log('- URL:', funnelbackUrl);
+        console.log('- Parameters:', req.query);
+
+        const response = await axios.get(funnelbackUrl, {
+            params: req.query,
+            headers: {
+                'Accept': 'text/html',
+                'X-Forwarded-For': userIp
+            }
+        });
+
+        console.log('Search response received successfully');
+        
+        // Extract the result count from the HTML response
+        const resultCount = extractResultCount(response.data);
+        const processingTime = Date.now() - startTime;
+        
+        // Record analytics data
+        try {
+            console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
+            
+            if (process.env.MONGODB_URI) {
+                // Extract query from query parameters - looking at both query and partial_query
+                console.log('Raw query parameters:', req.query);
+                console.log('Looking for query in:', req.query.query, req.query.partial_query);
+                
+                const analyticsData = {
+                    handler: 'search',
+                    query: req.query.query || req.query.partial_query || '[empty query]',
+                    collection: req.query.collection || 'seattleu~sp-search',
+                    userIp: userIp,
+                    userAgent: req.headers['user-agent'],
+                    referer: req.headers.referer,
+                    city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
+                    region: req.headers['x-vercel-ip-country-region'],
+                    country: req.headers['x-vercel-ip-country'],
+                    timezone: req.headers['x-vercel-ip-timezone'],
+                    latitude: req.headers['x-vercel-ip-latitude'],
+                    longitude: req.headers['x-vercel-ip-longitude'],
+                    responseTime: processingTime,
+                    resultCount: resultCount,
+                    isProgramTab: Boolean(req.query['f.Tabs|programMain']),
+                    isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
+                    tabs: [],
+                    timestamp: new Date()
+                };
+                
+                // Add tabs information
+                if (analyticsData.isProgramTab) analyticsData.tabs.push('program-main');
+                if (analyticsData.isStaffTab) analyticsData.tabs.push('Faculty & Staff');
+                
+                // Log analytics data (excluding sensitive info)
+                const loggableData = { ...analyticsData };
+                delete loggableData.userIp;
+                console.log('Analytics data prepared for recording:', loggableData);
+                
+                // Record the analytics
+                try {
+                    const recordResult = await recordQuery(analyticsData);
+                    console.log('Analytics record result:', recordResult ? 'Saved' : 'Not saved');
+                    if (recordResult && recordResult._id) {
+                        console.log('Analytics record ID:', recordResult._id.toString());
+                    }
+                } catch (recordError) {
+                    console.error('Error recording analytics:', recordError.message);
+                    if (recordError.name === 'ValidationError') {
+                        console.error('Validation errors:', Object.keys(recordError.errors).join(', '));
+                    }
+                }
+            } else {
+                console.log('No MongoDB URI defined, skipping analytics recording');
+            }
+        } catch (analyticsError) {
+            console.error('Analytics error:', analyticsError);
+        }
+        
+        res.send(response.data);
+    } catch (error) {
+        console.error('Error in search handler:', {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data
+        });
+        res.status(500).send('Search error: ' + (error.response?.data || error.message));
+    }
+}
+
+module.exports = handler;
