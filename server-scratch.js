@@ -1,67 +1,127 @@
 /**
- * @fileoverview Primary Funnelback Search Proxy Server
+ * @fileoverview Suggestion Handler for Funnelback Search Integration (People)
  * 
- * Handles the main search functionality for the Funnelback integration.
- * Acts as a proxy between client-side requests and Funnelback's search API,
- * managing CORS, request forwarding, and IP handling.
+ * Handles autocomplete suggestion requests for faculty and staff searches with
+ * structured logging for Vercel serverless environment. Returns detailed information
+ * including affiliation, college, department, and position data.
  * 
  * Features:
  * - CORS handling for Seattle University domain
- * - IP forwarding to Funnelback
- * - Query parameter management
- * - Error handling and logging
+ * - Structured JSON logging for Vercel
+ * - Request/Response tracking with detailed headers
+ * - Enhanced response format with rich metadata
+ * - Title cleaning and formatting
+ * - Comprehensive error handling with detailed logging
  * - Analytics integration
  * 
  * @author Victor Chimenti
- * @version 2.0.0
+ * @version 2.3.0
  * @license MIT
  */
 
 const axios = require('axios');
+const os = require('os');
 const { recordQuery } = require('../lib/queryAnalytics');
 
 /**
- * Extracts the number of results from an HTML response
+ * Creates a standardized log entry for Vercel environment
  * 
- * @param {string} htmlContent - The HTML response from Funnelback
- * @returns {number} The number of results, or 0 if not found
+ * @param {string} level - Log level ('info', 'warn', 'error')
+ * @param {string} message - Main log message/action
+ * @param {Object} data - Additional data to include in log
  */
-function extractResultCount(htmlContent) {
-    try {
-        // Look for result count in HTML response
-        const match = htmlContent.match(/totalMatching">([0-9,]+)</);
-        if (match && match[1]) {
-            return parseInt(match[1].replace(/,/g, ''), 10);
+function logEvent(level, message, data = {}) {
+    const serverInfo = {
+        hostname: os.hostname(),
+        platform: os.platform(),
+        arch: os.arch(),
+        cpus: os.cpus().length,
+        memory: Math.round(os.totalmem() / 1024 / 1024 / 1024) + 'GB'
+    };
+
+    // Extract relevant request headers
+    const requestInfo = data.headers ? {
+        'Request Headers': {
+            'x-forwarded-host': data.headers['x-forwarded-host'],
+            'x-vercel-ip-timezone': data.headers['x-vercel-ip-timezone'],
+            'referer': data.headers.referer,
+            'x-vercel-ip-as-number': data.headers['x-vercel-ip-as-number'],
+            'sec-fetch-mode': data.headers['sec-fetch-mode'],
+            'x-vercel-proxied-for': data.headers['x-vercel-proxied-for'],
+            'x-real-ip': data.headers['x-real-ip'],
+            'x-vercel-ip-postal-code': data.headers['x-vercel-ip-postal-code'],
+            'host': data.headers.host,
+            'sec-fetch-dest': data.headers['sec-fetch-dest'],
+            'sec-fetch-site': data.headers['sec-fetch-site'],
+            'x-forwarded-for': data.headers['x-forwarded-for'],
+            'origin': data.headers.origin,
+            'sec-ch-ua': data.headers['sec-ch-ua'],
+            'user-agent': data.headers['user-agent'],
+            'sec-ch-ua-platform': data.headers['sec-ch-ua-platform'],
+            'x-vercel-ip-longitude': data.headers['x-vercel-ip-longitude'],
+            'accept': data.headers.accept,
+            'x-vercel-forwarded-for': data.headers['x-vercel-forwarded-for'],
+            'x-vercel-ip-latitude': data.headers['x-vercel-ip-latitude'],
+            'x-forwarded-proto': data.headers['x-forwarded-proto'],
+            'x-vercel-ip-country-region': data.headers['x-vercel-ip-country-region'],
+            'x-vercel-deployment-url': data.headers['x-vercel-deployment-url'],
+            'accept-encoding': data.headers['accept-encoding'],
+            'x-vercel-id': data.headers['x-vercel-id'],
+            'accept-language': data.headers['accept-language'],
+            'x-vercel-ip-city': decodeURIComponent(data.headers['x-vercel-ip-city'] || ''),
+            'x-vercel-ip-country': data.headers['x-vercel-ip-country']
         }
-    } catch (error) {
-        console.error('Error extracting result count:', error);
-    }
-    return 0;
+    } : null;
+
+    const logEntry = {
+        service: 'suggest-people',
+        logVersion: '2.3.0',
+        timestamp: new Date().toISOString(),
+        event: {
+            level,
+            action: message,
+            query: data.query || null,
+            response: data.status ? {
+                status: data.status,
+                processingTime: data.processingTime,
+                contentPreview: data.responseContent ? 
+                    data.responseContent.substring(0, 500) + '...' : null
+            } : null,
+            error: data.error || null
+        },
+        client: {
+            origin: data.headers?.origin || null,
+            userAgent: data.headers?.['user-agent'] || null
+        },
+        server: serverInfo,
+        request: requestInfo
+    };
+    
+    console.log(JSON.stringify(logEntry));
 }
 
 /**
- * Main request handler for search functionality.
+ * Cleans a title string by removing HTML tags and taking only the first part before any pipe character
  * 
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters from the request
- * @param {Object} req.headers - Request headers
- * @param {string} req.method - HTTP method of the request
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
+ * @param {string} title - The raw title string to clean
+ * @returns {string} The cleaned title
  */
+function cleanTitle(title = '') {
+    return title
+        .replace(/<\/?[^>]+(>|$)/g, '') // Remove HTML tags
+        .split('|')[0]                   // Take first part before pipe
+        .trim();                         // Clean up whitespace
+}
+
 async function handler(req, res) {
     const startTime = Date.now();
-    // Enable CORS for Seattle University domain
+    const requestId = req.headers['x-vercel-id'] || Date.now().toString();
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
+    // CORS handling for Seattle University domain
     res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // Log request details
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log('Main Search Request:');
-    console.log('- User IP:', userIp);
-    console.log('- Query Parameters:', req.query);
-    console.log('- Request Headers:', req.headers);
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
@@ -69,47 +129,76 @@ async function handler(req, res) {
     }
 
     try {
-        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.json';
+        
+        // Keep params for logging
+        const params = new URLSearchParams();
+        params.append('form', 'partial');
+        params.append('profile', '_default');
+        params.append('query', req.query.query || '');
+        params.append('f.Tabs|seattleu|Eds-staff', 'Faculty & Staff');
+        params.append('collection', 'seattleu~sp-search');
+        params.append('num_ranks', '5');
 
-        // Add default parameters if not provided
-        const params = {
-            collection: 'seattleu~sp-search',
-            profile: '_default',
-            form: 'partial',
-            ...req.query
-        };
+        // Use correctly encoded queryString for request
+        const queryString = [
+            'form=partial',
+            'profile=_default',
+            `query=${encodeURIComponent(req.query.query || '')}`,
+            'f.Tabs%7Cseattleu%7Eds-staff=Faculty+%26+Staff',
+            'collection=seattleu~sp-search',
+            'num_ranks=5'
+        ].join('&');
 
-        console.log('Making Funnelback request:');
-        console.log('- URL:', funnelbackUrl);
-        console.log('- Parameters:', params);
+        const url = `${funnelbackUrl}?${queryString}`;
 
-        const response = await axios.get(funnelbackUrl, {
-            params: params,
+        // Log the exact URL for debugging
+        console.log('DEBUG - Exact Funnelback URL:', url);
+
+        // Log request details
+        logEvent('debug', 'Outgoing request details', {
+            service: 'suggest-people',
+            url: url,
+            query: Object.fromEntries(params),
+            headers: req.headers
+        });
+
+        console.log('DEBUG - Making request to Funnelback with URL:', url);
+        const response = await axios.get(url, {
             headers: {
-                'Accept': 'text/html',
+                'Accept': 'application/json',
                 'X-Forwarded-For': userIp
             }
         });
+        console.log('DEBUG - Response status:', response.status);
+        console.log('DEBUG - Response data type:', response.data?.response?.resultPacket?.results ? 'Has results' : 'No results');
+        console.log('DEBUG - Number of results:', response.data?.response?.resultPacket?.results?.length || 0);
 
-        console.log('Funnelback response received successfully');
-        
-        // Extract the result count from the HTML response
-        const resultCount = extractResultCount(response.data);
+        // Get result count for analytics
+        const resultCount = response.data?.response?.resultPacket?.results?.length || 0;
         const processingTime = Date.now() - startTime;
-        
+
+        // Log the successful response
+        logEvent('info', 'Response received', {
+            service: 'suggest-people',
+            query: Object.fromEntries(params),
+            status: response.status,
+            processingTime: `${processingTime}ms`,
+            responseContent: JSON.stringify(response.data).substring(0, 500) + '...',
+            headers: req.headers,
+        });
+
         // Record analytics data
         try {
             console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
             
             if (process.env.MONGODB_URI) {
-                // Extract query from query parameters - looking at both query and partial_query
                 console.log('Raw query parameters:', req.query);
-                console.log('Looking for query in:', req.query.query, req.query.partial_query);
                 
                 const analyticsData = {
-                    handler: 'server',
-                    query: req.query.query || req.query.partial_query || '[empty query]',
-                    collection: params.collection,
+                    handler: 'suggestPeople',
+                    query: req.query.query || '[empty query]',
+                    collection: 'seattleu~sp-search',
                     userIp: userIp,
                     userAgent: req.headers['user-agent'],
                     referer: req.headers.referer,
@@ -121,15 +210,10 @@ async function handler(req, res) {
                     longitude: req.headers['x-vercel-ip-longitude'],
                     responseTime: processingTime,
                     resultCount: resultCount,
-                    isProgramTab: Boolean(req.query['f.Tabs|programMain']),
-                    isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
-                    tabs: [],
+                    isStaffTab: true,  // This is specifically for staff searches
+                    tabs: ['Faculty & Staff'],
                     timestamp: new Date()
                 };
-                
-                // Add tabs information
-                if (analyticsData.isProgramTab) analyticsData.tabs.push('program-main');
-                if (analyticsData.isStaffTab) analyticsData.tabs.push('Faculty & Staff');
                 
                 // Log analytics data (excluding sensitive info)
                 const loggableData = { ...analyticsData };
@@ -155,15 +239,49 @@ async function handler(req, res) {
         } catch (analyticsError) {
             console.error('Analytics error:', analyticsError);
         }
-        
-        res.send(response.data);
-    } catch (error) {
-        console.error('Error in main search handler:', {
-            message: error.message,
-            status: error.response?.status,
-            data: error.response?.data
+
+        // Format and send response
+        const formattedResults = (response.data?.response?.resultPacket?.results || []).map(result => {
+            // Extract and clean metadata fields
+            const affiliation = result.listMetadata?.affiliation?.[0] ? cleanTitle(result.listMetadata.affiliation[0]) : null;
+            const position = result.listMetadata?.peoplePosition?.[0] ? cleanTitle(result.listMetadata.peoplePosition[0]) : null;
+            const department = result.listMetadata?.peopleDepartment?.[0] ? cleanTitle(result.listMetadata.peopleDepartment[0]) : null;
+            const college = result.listMetadata?.college?.[0] ? cleanTitle(result.listMetadata.college[0]) : null;
+
+            return {
+                title: cleanTitle(result.title) || '',
+                affiliation: affiliation,
+                position: position,
+                department: department,
+                college: college,
+                url: result.liveUrl || '',
+                image: result.listMetadata?.image?.[0] || null
+            };
         });
-        res.status(500).send('Search error: ' + (error.response?.data || error.message));
+        res.setHeader('Content-Type', 'application/json');
+        res.send(formattedResults);
+
+    } catch (error) {
+        // Log detailed error information
+        logEvent('error', 'Handler error', {
+            service: 'suggest-people',
+            query: req.query,
+            error: {
+                message: error.message,
+                stack: error.stack,
+                response: error.response?.data,
+                status: error.response?.status
+            },
+            status: error.response?.status || 500,
+            processingTime: `${Date.now() - startTime}ms`,
+            headers: req.headers
+        });
+        
+        res.status(error.response?.status || 500).json({
+            error: 'Error fetching results',
+            message: error.message,
+            details: error.response?.data
+        });
     }
 }
 
