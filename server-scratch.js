@@ -1,18 +1,19 @@
 /**
- * @fileoverview Dedicated Search Results Proxy Server
+ * @fileoverview Primary Funnelback Search Proxy Server
  * 
- * Handles specific search result requests for the Funnelback integration.
- * This server is optimized for handling pure search queries separate from
- * other functionality like spelling suggestions or tools.
+ * Handles the main search functionality for the Funnelback integration.
+ * Acts as a proxy between client-side requests and Funnelback's search API,
+ * managing CORS, request forwarding, and IP handling.
  * 
  * Features:
- * - CORS handling
- * - Search-specific parameter management
- * - Detailed logging of search requests
- * - Analytics integration for tracking search queries
+ * - CORS handling for Seattle University domain
+ * - IP forwarding to Funnelback
+ * - Query parameter management
+ * - Error handling and logging
+ * - Analytics integration
  * 
  * @author Victor Chimenti
- * @version 2.0.0
+ * @version 1.1.0
  * @license MIT
  */
 
@@ -39,7 +40,7 @@ function extractResultCount(htmlContent) {
 }
 
 /**
- * Handler for dedicated search requests.
+ * Main request handler for search functionality.
  * 
  * @param {Object} req - Express request object
  * @param {Object} req.query - Query parameters from the request
@@ -50,14 +51,14 @@ function extractResultCount(htmlContent) {
  */
 async function handler(req, res) {
     const startTime = Date.now();
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
+    // Enable CORS for Seattle University domain
     res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     // Log request details
-    console.log('Search Request:');
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    console.log('Main Search Request:');
     console.log('- User IP:', userIp);
     console.log('- Query Parameters:', req.query);
     console.log('- Request Headers:', req.headers);
@@ -70,19 +71,27 @@ async function handler(req, res) {
     try {
         const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
-        console.log('Making Funnelback search request:');
+        // Add default parameters if not provided
+        const params = {
+            collection: 'seattleu~sp-search',
+            profile: '_default',
+            form: 'partial',
+            ...req.query
+        };
+
+        console.log('Making Funnelback request:');
         console.log('- URL:', funnelbackUrl);
-        console.log('- Parameters:', req.query);
+        console.log('- Parameters:', params);
 
         const response = await axios.get(funnelbackUrl, {
-            params: req.query,
+            params: params,
             headers: {
                 'Accept': 'text/html',
                 'X-Forwarded-For': userIp
             }
         });
 
-        console.log('Search response received successfully');
+        console.log('Funnelback response received successfully');
         
         // Extract the result count from the HTML response
         const resultCount = extractResultCount(response.data);
@@ -98,9 +107,9 @@ async function handler(req, res) {
                 console.log('Looking for query in:', req.query.query, req.query.partial_query);
                 
                 const analyticsData = {
-                    handler: 'search',
+                    handler: 'server',
                     query: req.query.query || req.query.partial_query || '[empty query]',
-                    collection: req.query.collection || 'seattleu~sp-search',
+                    collection: params.collection,
                     userIp: userIp,
                     userAgent: req.headers['user-agent'],
                     referer: req.headers.referer,
@@ -149,7 +158,7 @@ async function handler(req, res) {
         
         res.send(response.data);
     } catch (error) {
-        console.error('Error in search handler:', {
+        console.error('Error in main search handler:', {
             message: error.message,
             status: error.response?.status,
             data: error.response?.data
