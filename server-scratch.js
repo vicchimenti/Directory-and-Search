@@ -1,162 +1,256 @@
 /**
- * @fileoverview Query Middleware for Funnelback Proxy
+ * @fileoverview Enhanced Query Analytics for Funnelback Search Integration
  * 
- * This middleware integrates the query analytics system with your existing
- * Funnelback proxy servers. It extracts relevant information from requests
- * and responses to track search behavior without modifying your existing handlers.
+ * This module provides MongoDB integration for tracking search queries and
+ * click-through data. It supports finding, creating, and updating query records
+ * with associated click data.
  * 
  * Features:
- * - Non-intrusive integration with existing handlers
- * - Captures query data and response metrics
- * - Handles errors gracefully
- * - Configurable tracking options
+ * - Search query tracking
+ * - Click-through tracking with position, title, and URL
+ * - Session-based tracking
+ * - Query attribution
+ * - Automatic MongoDB connection handling
  * 
  * @author Victor Chimenti
- * @version 1.0.1
- * @license MIT
+ * @version 2.0.0
+ * @lastModified 2025-03-05
  */
 
-const { recordQuery } = require('./queryAnalytics');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
+// Connect to MongoDB if not already connected
+async function connectToMongoDB() {
+    if (mongoose.connection.readyState === 0) {
+        console.log('Connecting to MongoDB...');
+        try {
+            await mongoose.connect(process.env.MONGODB_URI, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            });
+            console.log('Connected to MongoDB successfully');
+        } catch (error) {
+            console.error('MongoDB connection error:', error);
+            throw error;
+        }
+    }
+}
+
+// Define Schema for search queries with click tracking
+const QuerySchema = new Schema({
+    // Base query information
+    handler: { type: String, required: true },
+    query: { type: String, required: true },
+    searchCollection: { type: String },
+    
+    // User information
+    userIp: { type: String },
+    userAgent: { type: String },
+    referer: { type: String },
+    sessionId: { type: String },
+    
+    // Location information
+    city: { type: String },
+    region: { type: String },
+    country: { type: String },
+    timezone: { type: String },
+    latitude: { type: String },
+    longitude: { type: String },
+    
+    // Search results information
+    responseTime: { type: Number },
+    resultCount: { type: Number, default: 0 },
+    hasResults: { type: Boolean, default: false },
+    
+    // Tab-specific information
+    isProgramTab: { type: Boolean, default: false },
+    isStaffTab: { type: Boolean, default: false },
+    tabs: [{ type: String }],
+    
+    // Click tracking
+    clickedResults: [{ 
+        url: { type: String, required: true },
+        title: { type: String },
+        position: { type: Number },
+        timestamp: { type: Date, default: Date.now }
+    }],
+    
+    // Timestamps
+    timestamp: { type: Date, default: Date.now },
+    lastClickTimestamp: { type: Date }
+});
+
+// Create indexes for common queries
+QuerySchema.index({ query: 1, timestamp: -1 });
+QuerySchema.index({ userIp: 1, timestamp: -1 });
+QuerySchema.index({ timestamp: -1 });
+
+// Define or get models
+let Query;
+try {
+    Query = mongoose.model('Query');
+} catch (error) {
+    Query = mongoose.model('Query', QuerySchema);
+}
 
 /**
- * Middleware function to track query analytics
- * This should be added to each handler
+ * Records a search query in the database
  * 
- * @param {Object} options - Configuration options
- * @param {string} options.handler - Name of the handler using this middleware
- * @returns {Function} Express middleware function
+ * @param {Object} queryData - Data about the search query
+ * @returns {Promise<Object>} The saved query object or null if not saved
  */
-function trackQuery(options = {}) {
-  const handlerName = options.handler || 'unknown';
-  
-  return async (req, res, next) => {
-    const startTime = Date.now();
-    const originalSend = res.send;
-    let resultCount = 0;
-    let responseData = null;
-    let errorOccurred = false;
-    let errorMessage = '';
-    let errorStatus = 0;
-    
-    // Extract relevant request data
-    const queryData = {
-      handler: handlerName,
-      query: req.query.query || '',
-      collection: req.query.collection || 'seattleu~sp-search',
-      userIp: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
-      userAgent: req.headers['user-agent'],
-      referer: req.headers.referer,
-      city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
-      region: req.headers['x-vercel-ip-country-region'],
-      country: req.headers['x-vercel-ip-country'],
-      timezone: req.headers['x-vercel-ip-timezone'],
-      latitude: req.headers['x-vercel-ip-latitude'],
-      longitude: req.headers['x-vercel-ip-longitude'],
-      isProgramTab: !!req.query['f.Tabs|programMain'],
-      isStaffTab: !!req.query['f.Tabs|seattleu~ds-staff'],
-      tabs: [],
-    };
-    
-    // Add tabs information
-    if (queryData.isProgramTab) queryData.tabs.push('program-main');
-    if (queryData.isStaffTab) queryData.tabs.push('Faculty & Staff');
-    
-    // Add filter information
-    queryData.filters = {};
-    Object.keys(req.query).forEach(key => {
-      if (key.startsWith('f.')) {
-        queryData.filters[key] = req.query[key];
-      }
-    });
-    
-    // Check if this is a refinement query
-    if (req.headers.referer && req.headers.referer.includes('query=')) {
-      queryData.isRefinement = true;
-      try {
-        const refererUrl = new URL(req.headers.referer);
-        queryData.originalQuery = refererUrl.searchParams.get('query') || '';
-      } catch (e) {
-        // Ignore errors in parsing referer
-      }
-    }
-    
-    // Override res.send to capture response data
-    res.send = function(data) {
-      responseData = data;
-      
-      // Try to determine result count from response based on handler type
-      try {
-        if (handlerName === 'suggest' || handlerName === 'suggestPeople') {
-          // For suggestion endpoints, the response is usually an array
-          if (Array.isArray(data)) {
-            resultCount = data.length;
-          } else if (typeof data === 'string') {
-            // Try to parse if it's a JSON string
-            const parsed = JSON.parse(data);
-            resultCount = Array.isArray(parsed) ? parsed.length : 0;
-          }
-        } else if (handlerName === 'suggestPrograms') {
-          // For program suggestions, check the programs array
-          if (typeof data === 'string') {
-            const parsed = JSON.parse(data);
-            resultCount = parsed.programs ? parsed.programs.length : 0;
-          } else if (data.programs) {
-            resultCount = data.programs.length;
-          }
-        } else if (handlerName === 'search' || handlerName === 'server') {
-          // For search endpoints, try to extract from HTML response
-          // This is more complex and might need regex patterns
-          if (typeof data === 'string' && data.includes('resultsSummary')) {
-            const match = data.match(/totalMatching">([0-9,]+)</);
-            if (match && match[1]) {
-              resultCount = parseInt(match[1].replace(/,/g, ''), 10);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error parsing response data for analytics:', error);
-      }
-      
-      // Complete analytics data
-      queryData.responseTime = Date.now() - startTime;
-      queryData.resultCount = resultCount;
-      queryData.error = {
-        occurred: errorOccurred,
-        message: errorMessage,
-        status: errorStatus
-      };
-      
-      // Record the query asynchronously (don't wait for it)
-      recordQuery(queryData).catch(err => {
-        console.error('Error recording query analytics:', err);
-      });
-      
-      // Call the original send
-      return originalSend.call(this, data);
-    };
-    
-    // Override res.status to capture error status
-    const originalStatus = res.status;
-    res.status = function(code) {
-      if (code >= 400) {
-        errorOccurred = true;
-        errorStatus = code;
-      }
-      return originalStatus.call(this, code);
-    };
-    
-    // Continue with the request
+async function recordQuery(queryData) {
     try {
-      next();
+        if (!process.env.MONGODB_URI) {
+            console.log('MongoDB URI not defined, skipping analytics');
+            return null;
+        }
+        
+        await connectToMongoDB();
+        
+        // Set hasResults based on resultCount
+        if (queryData.resultCount !== undefined) {
+            queryData.hasResults = queryData.resultCount > 0;
+        }
+        
+        // Create and save the query
+        const query = new Query(queryData);
+        await query.save();
+        
+        console.log(`Query recorded: "${queryData.query}" (ID: ${query._id})`);
+        return query;
     } catch (error) {
-      errorOccurred = true;
-      errorMessage = error.message;
-      errorStatus = 500;
-      throw error; // Re-throw to be handled by your error handler
+        console.error('Error recording query:', error);
+        return null;
     }
-  };
+}
+
+/**
+ * Records a click on a search result
+ * 
+ * @param {Object} clickData - Data about the clicked result
+ * @returns {Promise<Object>} The updated query object or null if not updated
+ */
+async function recordClick(clickData) {
+    try {
+        if (!process.env.MONGODB_URI) {
+            console.log('MongoDB URI not defined, skipping click analytics');
+            return null;
+        }
+        
+        await connectToMongoDB();
+        
+        // Prepare filters to find the matching query
+        const filters = {
+            query: clickData.originalQuery
+        };
+        
+        // Add sessionId to filter if available (more reliable than IP)
+        if (clickData.sessionId) {
+            filters.sessionId = clickData.sessionId;
+        } 
+        // Otherwise use IP address as fallback
+        else if (clickData.userIp) {
+            filters.userIp = clickData.userIp;
+        }
+        
+        // Create click record
+        const clickRecord = {
+            url: clickData.clickedUrl,
+            title: clickData.clickedTitle || '',
+            position: parseInt(clickData.clickPosition, 10) || 0,
+            timestamp: new Date()
+        };
+        
+        console.log('Looking for query to update with click:', filters);
+        
+        // Find the most recent matching query and update it
+        const result = await Query.findOneAndUpdate(
+            filters,
+            { 
+                $push: { clickedResults: clickRecord },
+                $set: { lastClickTimestamp: new Date() }
+            },
+            { 
+                new: true,  // Return the updated document
+                sort: { timestamp: -1 } // Get the most recent one
+            }
+        );
+        
+        if (!result) {
+            console.log('No matching query found for click, creating new record');
+            
+            // If no matching query, create a new one with this click
+            const newQueryData = {
+                handler: 'click-only',
+                query: clickData.originalQuery,
+                userIp: clickData.userIp,
+                userAgent: clickData.userAgent,
+                referer: clickData.referer,
+                sessionId: clickData.sessionId,
+                city: clickData.city,
+                region: clickData.region,
+                country: clickData.country,
+                clickedResults: [clickRecord],
+                lastClickTimestamp: new Date(),
+                timestamp: new Date()
+            };
+            
+            return await recordQuery(newQueryData);
+        }
+        
+        console.log(`Click recorded for query "${result.query}" (ID: ${result._id})`);
+        return result;
+    } catch (error) {
+        console.error('Error recording click:', error);
+        return null;
+    }
+}
+
+/**
+ * Batch record multiple clicks
+ * 
+ * @param {Array} clicksData - Array of click data objects
+ * @returns {Promise<Object>} Result with count of processed clicks
+ */
+async function recordClicks(clicksData) {
+    if (!Array.isArray(clicksData) || clicksData.length === 0) {
+        return { processed: 0 };
+    }
+    
+    try {
+        if (!process.env.MONGODB_URI) {
+            console.log('MongoDB URI not defined, skipping batch click analytics');
+            return { processed: 0 };
+        }
+        
+        await connectToMongoDB();
+        
+        console.log(`Processing batch of ${clicksData.length} clicks`);
+        
+        // Process each click
+        const results = await Promise.allSettled(
+            clicksData.map(clickData => recordClick(clickData))
+        );
+        
+        // Count successful operations
+        const successful = results.filter(r => r.status === 'fulfilled' && r.value).length;
+        
+        console.log(`Batch processing complete: ${successful}/${clicksData.length} successful`);
+        
+        return {
+            processed: successful,
+            total: clicksData.length
+        };
+    } catch (error) {
+        console.error('Error in batch click processing:', error);
+        return { processed: 0, error: error.message };
+    }
 }
 
 module.exports = {
-  trackQuery
+    recordQuery,
+    recordClick,
+    recordClicks
 };
