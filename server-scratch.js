@@ -1,250 +1,168 @@
 /**
- * @fileoverview Analytics API Click Endpoint for Funnelback Search Integration
+ * @fileoverview Dedicated Search Results Proxy Server - Enhanced with Analytics
  * 
- * This file contains API handler for tracking various search analytics events
- * including click tracking data.
+ * Handles specific search result requests for the Funnelback integration.
+ * Enhanced with session tracking and improved analytics integration.
+ * 
+ * Features:
+ * - CORS handling
+ * - Search-specific parameter management
+ * - Detailed logging of search requests
+ * - Enhanced analytics with session tracking
+ * - Click-through attribution
  * 
  * @author Victor Chimenti
- * @version 1.0.2
+ * @version 2.1.0
+ * @license MIT
  * @lastModified 2025-03-05
  */
 
-// api/analytics/click.js
-module.exports = async (req, res) => {
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // Handle preflight
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-
-    // Only accept POST
-    if (req.method !== 'POST') {
-        return res.status(405).send('Method Not Allowed');
-    }
-    
-    try {
-        const { recordClick } = require('../../lib/queryAnalytics');
-        const clickData = req.body;
-        
-        // Add server-side data
-        clickData.userIp = userIp;
-        clickData.userAgent = req.headers['user-agent'];
-        clickData.referer = req.headers.referer;
-        clickData.city = decodeURIComponent(req.headers['x-vercel-ip-city'] || '');
-        clickData.region = req.headers['x-vercel-ip-country-region'];
-        clickData.country = req.headers['x-vercel-ip-country'];
-        
-        console.log('Recording click data:', {
-            query: clickData.originalQuery,
-            url: clickData.clickedUrl,
-            position: clickData.clickPosition
-        });
-        
-        // Record click in database
-        const result = await recordClick(clickData);
-        console.log('Click recorded:', result ? 'Success' : 'Failed');
-        
-        // Send minimal response for performance
-        res.status(200).json({ success: true });
-    } catch (error) {
-        console.error('Error recording click:', error);
-        res.status(500).json({ error: error.message });
-    }
-};
-
-
-
-
+const axios = require('axios');
+const { recordQuery } = require('../lib/queryAnalytics');
 
 /**
- * @fileoverview Analytics API Endpoints for Funnelback Search Integration
+ * Extracts the number of results from an HTML response
  * 
- * This file contains API handlers for tracking various search analytics events
- * including click tracking and supplementary analytics data.
- * 
- * @author Victor Chimenti
- * @version 1.0.0
- * @lastModified 2025-03-05
+ * @param {string} htmlContent - The HTML response from Funnelback
+ * @returns {number} The number of results, or 0 if not found
  */
-
-// api/analytics/click.js
-exports.clickHandler = async (req, res) => {
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    // Handle preflight
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-
-    // Only accept POST
-    if (req.method !== 'POST') {
-        return res.status(405).send('Method Not Allowed');
-    }
-    
+function extractResultCount(htmlContent) {
     try {
-        const { recordClick } = require('../../lib/queryAnalytics');
-        const clickData = req.body;
-        
-        // Add server-side data
-        clickData.userIp = userIp;
-        clickData.userAgent = req.headers['user-agent'];
-        clickData.referer = req.headers.referer;
-        clickData.city = decodeURIComponent(req.headers['x-vercel-ip-city'] || '');
-        clickData.region = req.headers['x-vercel-ip-country-region'];
-        clickData.country = req.headers['x-vercel-ip-country'];
-        
-        console.log('Recording click data:', {
-            query: clickData.originalQuery,
-            url: clickData.clickedUrl,
-            position: clickData.clickPosition
-        });
-        
-        // Record click in database
-        const result = await recordClick(clickData);
-        console.log('Click recorded:', result ? 'Success' : 'Failed');
-        
-        // Send minimal response for performance
-        res.status(200).json({ success: true });
+        // Look for result count in HTML response
+        const match = htmlContent.match(/totalMatching">([0-9,]+)</);
+        if (match && match[1]) {
+            return parseInt(match[1].replace(/,/g, ''), 10);
+        }
     } catch (error) {
-        console.error('Error recording click:', error);
-        res.status(500).json({ error: error.message });
+        console.error('Error extracting result count:', error);
     }
-};
+    return 0;
+}
 
-// api/analytics/clicks-batch.js
-exports.clicksBatchHandler = async (req, res) => {
+/**
+ * Handler for dedicated search requests.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters from the request
+ * @param {Object} req.headers - Request headers
+ * @param {string} req.method - HTTP method of the request
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+async function handler(req, res) {
+    const startTime = Date.now();
     const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     
-    // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Log request details
+    console.log('Search Request:');
+    console.log('- User IP:', userIp);
+    console.log('- Query Parameters:', req.query);
+    console.log('- Request Headers:', req.headers);
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).send('Method Not Allowed');
-    }
-    
     try {
-        const { recordClicks } = require('../../lib/queryAnalytics');
-        
-        // Get clicks from request body
-        const { clicks } = req.body;
-        
-        if (!Array.isArray(clicks) || clicks.length === 0) {
-            return res.status(400).json({ error: 'No clicks provided' });
-        }
-        
-        console.log(`Processing batch of ${clicks.length} clicks`);
-        
-        // Add server-side data to each click
-        const processedClicks = clicks.map(click => ({
-            ...click,
-            userIp: userIp,
-            userAgent: req.headers['user-agent'],
-            referer: req.headers.referer,
-            city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
-            region: req.headers['x-vercel-ip-country-region'],
-            country: req.headers['x-vercel-ip-country']
-        }));
-        
-        // Record clicks in database
-        const result = await recordClicks(processedClicks);
-        
-        // Send response
-        res.status(200).json(result);
-    } catch (error) {
-        console.error('Error processing clicks batch:', error);
-        res.status(500).json({ error: error.message });
-    }
-};
+        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
 
-// api/analytics/supplement.js
-exports.supplementHandler = async (req, res) => {
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        console.log('Making Funnelback search request:');
+        console.log('- URL:', funnelbackUrl);
+        console.log('- Parameters:', req.query);
 
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-
-    if (req.method !== 'POST') {
-        return res.status(405).send('Method Not Allowed');
-    }
-    
-    try {
-        const { Query } = require('mongoose').models;
-        const data = req.body;
-        
-        if (!data.query) {
-            return res.status(400).json({ error: 'No query provided' });
-        }
-        
-        console.log('Processing supplementary analytics for query:', data.query);
-        
-        // Find the most recent query with matching information
-        const filters = {
-            query: data.query
-        };
-        
-        // Add sessionId to filter if available
-        if (data.sessionId) {
-            filters.sessionId = data.sessionId;
-        } else {
-            // Fall back to IP address
-            filters.userIp = userIp;
-        }
-        
-        // Prepare update based on provided data
-        const update = {};
-        
-        // Add result count if provided
-        if (data.resultCount !== undefined) {
-            update.resultCount = data.resultCount;
-            update.hasResults = data.resultCount > 0;
-        }
-        
-        // Update the query document
-        const result = await Query.findOneAndUpdate(
-            filters,
-            { $set: update },
-            { 
-                new: true,
-                sort: { timestamp: -1 }
+        const response = await axios.get(funnelbackUrl, {
+            params: req.query,
+            headers: {
+                'Accept': 'text/html',
+                'X-Forwarded-For': userIp
             }
-        );
+        });
+
+        console.log('Search response received successfully');
         
-        if (!result) {
-            console.log('No matching query found for supplementary data');
-            return res.status(404).json({ error: 'Query not found' });
+        // Extract the result count from the HTML response
+        const resultCount = extractResultCount(response.data);
+        const processingTime = Date.now() - startTime;
+        
+        // Record analytics data
+        try {
+            console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
+            
+            if (process.env.MONGODB_URI) {
+                // Extract query from query parameters - looking at both query and partial_query
+                console.log('Raw query parameters:', req.query);
+                console.log('Looking for query in:', req.query.query, req.query.partial_query);
+                
+                // Extract session ID if provided by the client
+                const sessionId = req.query.sessionId || null;
+                
+                const analyticsData = {
+                    handler: 'search',
+                    query: req.query.query || req.query.partial_query || '[empty query]',
+                    searchCollection: req.query.collection || 'seattleu~sp-search',
+                    userIp: userIp,
+                    userAgent: req.headers['user-agent'],
+                    referer: req.headers.referer,
+                    city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
+                    region: req.headers['x-vercel-ip-country-region'],
+                    country: req.headers['x-vercel-ip-country'],
+                    timezone: req.headers['x-vercel-ip-timezone'],
+                    latitude: req.headers['x-vercel-ip-latitude'],
+                    longitude: req.headers['x-vercel-ip-longitude'],
+                    responseTime: processingTime,
+                    resultCount: resultCount,
+                    hasResults: resultCount > 0,
+                    isProgramTab: Boolean(req.query['f.Tabs|programMain']),
+                    isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
+                    tabs: [],
+                    // Include session ID if available
+                    sessionId: sessionId,
+                    timestamp: new Date()
+                };
+                
+                // Add tabs information
+                if (analyticsData.isProgramTab) analyticsData.tabs.push('program-main');
+                if (analyticsData.isStaffTab) analyticsData.tabs.push('Faculty & Staff');
+                
+                // Log analytics data (excluding sensitive info)
+                const loggableData = { ...analyticsData };
+                delete loggableData.userIp;
+                console.log('Analytics data prepared for recording:', loggableData);
+                
+                // Record the analytics
+                try {
+                    const recordResult = await recordQuery(analyticsData);
+                    console.log('Analytics record result:', recordResult ? 'Saved' : 'Not saved');
+                    if (recordResult && recordResult._id) {
+                        console.log('Analytics record ID:', recordResult._id.toString());
+                    }
+                } catch (recordError) {
+                    console.error('Error recording analytics:', recordError.message);
+                    if (recordError.name === 'ValidationError') {
+                        console.error('Validation errors:', Object.keys(recordError.errors).join(', '));
+                    }
+                }
+            } else {
+                console.log('No MongoDB URI defined, skipping analytics recording');
+            }
+        } catch (analyticsError) {
+            console.error('Analytics error:', analyticsError);
         }
         
-        console.log('Supplementary data recorded successfully');
-        res.status(200).json({ success: true });
+        res.send(response.data);
     } catch (error) {
-        console.error('Error recording supplementary analytics:', error);
-        res.status(500).json({ error: error.message });
+        console.error('Error in search handler:', {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data
+        });
+        res.status(500).send('Search error: ' + (error.response?.data || error.message));
     }
-};
+}
+
+module.exports = handler;
