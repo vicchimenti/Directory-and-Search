@@ -1,257 +1,250 @@
 /**
- * @fileoverview Enhanced Query Analytics for Funnelback Search Integration
+ * @fileoverview Analytics API Click Endpoint for Funnelback Search Integration
  * 
- * This module provides MongoDB integration for tracking search queries and
- * click-through data. It supports finding, creating, and updating query records
- * with associated click data.
- * 
- * Features:
- * - Search query tracking
- * - Click-through tracking with position, title, and URL
- * - Session-based tracking
- * - Query attribution
- * - Automatic MongoDB connection handling
+ * This file contains API handler for tracking various search analytics events
+ * including click tracking data.
  * 
  * @author Victor Chimenti
- * @version 2.0.1
+ * @version 1.0.2
  * @lastModified 2025-03-05
- * @license MIT
  */
 
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+// api/analytics/click.js
+module.exports = async (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-// Connect to MongoDB if not already connected
-async function connectToMongoDB() {
-    if (mongoose.connection.readyState === 0) {
-        console.log('Connecting to MongoDB...');
-        try {
-            await mongoose.connect(process.env.MONGODB_URI, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            });
-            console.log('Connected to MongoDB successfully');
-        } catch (error) {
-            console.error('MongoDB connection error:', error);
-            throw error;
-        }
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
     }
-}
 
-// Define Schema for search queries with click tracking
-const QuerySchema = new Schema({
-    // Base query information
-    handler: { type: String, required: true },
-    query: { type: String, required: true },
-    searchCollection: { type: String },
-    
-    // User information
-    userIp: { type: String },
-    userAgent: { type: String },
-    referer: { type: String },
-    sessionId: { type: String },
-    
-    // Location information
-    city: { type: String },
-    region: { type: String },
-    country: { type: String },
-    timezone: { type: String },
-    latitude: { type: String },
-    longitude: { type: String },
-    
-    // Search results information
-    responseTime: { type: Number },
-    resultCount: { type: Number, default: 0 },
-    hasResults: { type: Boolean, default: false },
-    
-    // Tab-specific information
-    isProgramTab: { type: Boolean, default: false },
-    isStaffTab: { type: Boolean, default: false },
-    tabs: [{ type: String }],
-    
-    // Click tracking
-    clickedResults: [{ 
-        url: { type: String, required: true },
-        title: { type: String },
-        position: { type: Number },
-        timestamp: { type: Date, default: Date.now }
-    }],
-    
-    // Timestamps
-    timestamp: { type: Date, default: Date.now },
-    lastClickTimestamp: { type: Date }
-});
-
-// Create indexes for common queries
-QuerySchema.index({ query: 1, timestamp: -1 });
-QuerySchema.index({ userIp: 1, timestamp: -1 });
-QuerySchema.index({ timestamp: -1 });
-
-// Define or get models
-let Query;
-try {
-    Query = mongoose.model('Query');
-} catch (error) {
-    Query = mongoose.model('Query', QuerySchema);
-}
-
-/**
- * Records a search query in the database
- * 
- * @param {Object} queryData - Data about the search query
- * @returns {Promise<Object>} The saved query object or null if not saved
- */
-async function recordQuery(queryData) {
-    try {
-        if (!process.env.MONGODB_URI) {
-            console.log('MongoDB URI not defined, skipping analytics');
-            return null;
-        }
-        
-        await connectToMongoDB();
-        
-        // Set hasResults based on resultCount
-        if (queryData.resultCount !== undefined) {
-            queryData.hasResults = queryData.resultCount > 0;
-        }
-        
-        // Create and save the query
-        const query = new Query(queryData);
-        await query.save();
-        
-        console.log(`Query recorded: "${queryData.query}" (ID: ${query._id})`);
-        return query;
-    } catch (error) {
-        console.error('Error recording query:', error);
-        return null;
+    // Only accept POST
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
     }
-}
-
-/**
- * Records a click on a search result
- * 
- * @param {Object} clickData - Data about the clicked result
- * @returns {Promise<Object>} The updated query object or null if not updated
- */
-async function recordClick(clickData) {
+    
     try {
-        if (!process.env.MONGODB_URI) {
-            console.log('MongoDB URI not defined, skipping click analytics');
-            return null;
-        }
+        const { recordClick } = require('../../lib/queryAnalytics');
+        const clickData = req.body;
         
-        await connectToMongoDB();
+        // Add server-side data
+        clickData.userIp = userIp;
+        clickData.userAgent = req.headers['user-agent'];
+        clickData.referer = req.headers.referer;
+        clickData.city = decodeURIComponent(req.headers['x-vercel-ip-city'] || '');
+        clickData.region = req.headers['x-vercel-ip-country-region'];
+        clickData.country = req.headers['x-vercel-ip-country'];
         
-        // Prepare filters to find the matching query
-        const filters = {
-            query: clickData.originalQuery
-        };
-        
-        // Add sessionId to filter if available (more reliable than IP)
-        if (clickData.sessionId) {
-            filters.sessionId = clickData.sessionId;
-        } 
-        // Otherwise use IP address as fallback
-        else if (clickData.userIp) {
-            filters.userIp = clickData.userIp;
-        }
-        
-        // Create click record
-        const clickRecord = {
+        console.log('Recording click data:', {
+            query: clickData.originalQuery,
             url: clickData.clickedUrl,
-            title: clickData.clickedTitle || '',
-            position: parseInt(clickData.clickPosition, 10) || 0,
-            timestamp: new Date()
+            position: clickData.clickPosition
+        });
+        
+        // Record click in database
+        const result = await recordClick(clickData);
+        console.log('Click recorded:', result ? 'Success' : 'Failed');
+        
+        // Send minimal response for performance
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Error recording click:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
+
+/**
+ * @fileoverview Analytics API Endpoints for Funnelback Search Integration
+ * 
+ * This file contains API handlers for tracking various search analytics events
+ * including click tracking and supplementary analytics data.
+ * 
+ * @author Victor Chimenti
+ * @version 1.0.0
+ * @lastModified 2025-03-05
+ */
+
+// api/analytics/click.js
+exports.clickHandler = async (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    // Only accept POST
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
+    }
+    
+    try {
+        const { recordClick } = require('../../lib/queryAnalytics');
+        const clickData = req.body;
+        
+        // Add server-side data
+        clickData.userIp = userIp;
+        clickData.userAgent = req.headers['user-agent'];
+        clickData.referer = req.headers.referer;
+        clickData.city = decodeURIComponent(req.headers['x-vercel-ip-city'] || '');
+        clickData.region = req.headers['x-vercel-ip-country-region'];
+        clickData.country = req.headers['x-vercel-ip-country'];
+        
+        console.log('Recording click data:', {
+            query: clickData.originalQuery,
+            url: clickData.clickedUrl,
+            position: clickData.clickPosition
+        });
+        
+        // Record click in database
+        const result = await recordClick(clickData);
+        console.log('Click recorded:', result ? 'Success' : 'Failed');
+        
+        // Send minimal response for performance
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Error recording click:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// api/analytics/clicks-batch.js
+exports.clicksBatchHandler = async (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
+    }
+    
+    try {
+        const { recordClicks } = require('../../lib/queryAnalytics');
+        
+        // Get clicks from request body
+        const { clicks } = req.body;
+        
+        if (!Array.isArray(clicks) || clicks.length === 0) {
+            return res.status(400).json({ error: 'No clicks provided' });
+        }
+        
+        console.log(`Processing batch of ${clicks.length} clicks`);
+        
+        // Add server-side data to each click
+        const processedClicks = clicks.map(click => ({
+            ...click,
+            userIp: userIp,
+            userAgent: req.headers['user-agent'],
+            referer: req.headers.referer,
+            city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
+            region: req.headers['x-vercel-ip-country-region'],
+            country: req.headers['x-vercel-ip-country']
+        }));
+        
+        // Record clicks in database
+        const result = await recordClicks(processedClicks);
+        
+        // Send response
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error processing clicks batch:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// api/analytics/supplement.js
+exports.supplementHandler = async (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
+    }
+    
+    try {
+        const { Query } = require('mongoose').models;
+        const data = req.body;
+        
+        if (!data.query) {
+            return res.status(400).json({ error: 'No query provided' });
+        }
+        
+        console.log('Processing supplementary analytics for query:', data.query);
+        
+        // Find the most recent query with matching information
+        const filters = {
+            query: data.query
         };
         
-        console.log('Looking for query to update with click:', filters);
+        // Add sessionId to filter if available
+        if (data.sessionId) {
+            filters.sessionId = data.sessionId;
+        } else {
+            // Fall back to IP address
+            filters.userIp = userIp;
+        }
         
-        // Find the most recent matching query and update it
+        // Prepare update based on provided data
+        const update = {};
+        
+        // Add result count if provided
+        if (data.resultCount !== undefined) {
+            update.resultCount = data.resultCount;
+            update.hasResults = data.resultCount > 0;
+        }
+        
+        // Update the query document
         const result = await Query.findOneAndUpdate(
             filters,
+            { $set: update },
             { 
-                $push: { clickedResults: clickRecord },
-                $set: { lastClickTimestamp: new Date() }
-            },
-            { 
-                new: true,  // Return the updated document
-                sort: { timestamp: -1 } // Get the most recent one
+                new: true,
+                sort: { timestamp: -1 }
             }
         );
         
         if (!result) {
-            console.log('No matching query found for click, creating new record');
-            
-            // If no matching query, create a new one with this click
-            const newQueryData = {
-                handler: 'click-only',
-                query: clickData.originalQuery,
-                userIp: clickData.userIp,
-                userAgent: clickData.userAgent,
-                referer: clickData.referer,
-                sessionId: clickData.sessionId,
-                city: clickData.city,
-                region: clickData.region,
-                country: clickData.country,
-                clickedResults: [clickRecord],
-                lastClickTimestamp: new Date(),
-                timestamp: new Date()
-            };
-            
-            return await recordQuery(newQueryData);
+            console.log('No matching query found for supplementary data');
+            return res.status(404).json({ error: 'Query not found' });
         }
         
-        console.log(`Click recorded for query "${result.query}" (ID: ${result._id})`);
-        return result;
+        console.log('Supplementary data recorded successfully');
+        res.status(200).json({ success: true });
     } catch (error) {
-        console.error('Error recording click:', error);
-        return null;
+        console.error('Error recording supplementary analytics:', error);
+        res.status(500).json({ error: error.message });
     }
-}
-
-/**
- * Batch record multiple clicks
- * 
- * @param {Array} clicksData - Array of click data objects
- * @returns {Promise<Object>} Result with count of processed clicks
- */
-async function recordClicks(clicksData) {
-    if (!Array.isArray(clicksData) || clicksData.length === 0) {
-        return { processed: 0 };
-    }
-    
-    try {
-        if (!process.env.MONGODB_URI) {
-            console.log('MongoDB URI not defined, skipping batch click analytics');
-            return { processed: 0 };
-        }
-        
-        await connectToMongoDB();
-        
-        console.log(`Processing batch of ${clicksData.length} clicks`);
-        
-        // Process each click
-        const results = await Promise.allSettled(
-            clicksData.map(clickData => recordClick(clickData))
-        );
-        
-        // Count successful operations
-        const successful = results.filter(r => r.status === 'fulfilled' && r.value).length;
-        
-        console.log(`Batch processing complete: ${successful}/${clicksData.length} successful`);
-        
-        return {
-            processed: successful,
-            total: clicksData.length
-        };
-    } catch (error) {
-        console.error('Error in batch click processing:', error);
-        return { processed: 0, error: error.message };
-    }
-}
-
-module.exports = {
-    recordQuery,
-    recordClick,
-    recordClicks
 };
