@@ -47,7 +47,7 @@
  * Note: Staff suggestions are fixed at 3 items
  * 
  * @author Victor Chimenti
- * @version 3.2.2
+ * @version 3.3.0
  * @lastModified 2025-02-27
  */
 
@@ -76,10 +76,10 @@ class AutocompleteSearchManager {
             minLength: 3,
             programLimit: 5,
             endpoints: {
-                suggest: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
-                search: 'https://funnelback-proxy.vercel.app/proxy/funnelback/search',
-                suggestPeople: 'https://funnelback-proxy.vercel.app/proxy/suggestPeople',
-                suggestPrograms: 'https://funnelback-proxy.vercel.app/proxy/suggestPrograms'
+                suggest: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
+                search: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
+                suggestPeople: 'https://funnelback-proxy-one.vercel.app/proxy/suggestPeople',
+                suggestPrograms: 'https://funnelback-proxy-one.vercel.app/proxy/suggestPrograms'
             },
             ...config
         };
