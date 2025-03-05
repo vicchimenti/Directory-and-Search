@@ -15,6 +15,7 @@
  * @author Victor Chimenti
  * @version 2.0.1
  * @lastModified 2025-03-05
+ * @license MIT
  */
 
 const mongoose = require('mongoose');
