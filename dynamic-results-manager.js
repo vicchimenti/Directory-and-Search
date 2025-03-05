@@ -244,7 +244,8 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackResults(url, method) {
-        const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/search';
+        const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search';
+        
         try {
             const queryString = url.includes('?') ? url.split('?')[1] : '';
             const fullUrl = `${proxyUrl}?${queryString}`;
