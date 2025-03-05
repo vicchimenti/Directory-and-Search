@@ -12,7 +12,7 @@
  * - Maintains session data for query attribution
  * 
  * @author Victor Chimenti
- * @version 3.0.0
+ * @version 3.1.0
  * @lastModified 2025-03-05
  */
 
@@ -28,7 +28,7 @@ class ResultsSearchManager {
         this.originalQuery = null;
         this.sessionId = this.#getOrCreateSessionId();
         this.analyticsEnabled = true;
-        this.proxyBaseUrl = 'https://funnelback-proxy.vercel.app/proxy';
+        this.proxyBaseUrl = 'https://funnelback-proxy-one.vercel.app/';
         this.analyticsEndpoint = `${this.proxyBaseUrl}/analytics`;
         
         // Initialize search functionality
