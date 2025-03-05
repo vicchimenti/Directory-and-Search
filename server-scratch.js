@@ -13,7 +13,7 @@
  * - Automatic MongoDB connection handling
  * 
  * @author Victor Chimenti
- * @version 2.0.0
+ * @version 2.0.1
  * @lastModified 2025-03-05
  */
 
