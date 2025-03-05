@@ -23,7 +23,7 @@
  * - results-search-manager.js: Handles the actual Funnelback API calls
  * 
  * @author Victor Chimenti
- * @version 2.1.0
+ * @version 2.2.0
  * @lastModified 2025-03-02
  */
 
@@ -42,7 +42,7 @@ class HeaderSearchManager {
             profile: '_default',
             minLength: 3,
             maxResults: 8,
-            suggestEndpoint: 'https://funnelback-proxy.vercel.app/proxy/funnelback/suggest',
+            suggestEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
             ...config
         };
 
