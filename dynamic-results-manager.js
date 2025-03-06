@@ -73,8 +73,7 @@ class DynamicResultsManager {
      * Extracts the original search query from the URL or search input
      * @private
      */
-    #
-    extractOriginalQuery() {
+    #extractOriginalQuery() {
         // Try to get query from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const urlQuery = urlParams.get('query');
@@ -96,8 +95,7 @@ class DynamicResultsManager {
      * @private
      * @returns {string} Session ID
      */
-    #
-    getOrCreateSessionId() {
+    #getOrCreateSessionId() {
         let sessionId = sessionStorage.getItem('searchSessionId');
 
         if (!sessionId) {
@@ -113,8 +111,7 @@ class DynamicResultsManager {
      * Uses only class manipulation for better accessibility.
      * @private
      */
-    #
-    ensureSearchButtonIconVisibility() {
+    #ensureSearchButtonIconVisibility() {
         const searchButton = document.getElementById('on-page-search-button');
         if (searchButton) {
             // Remove any classes that might hide the icon
@@ -139,8 +136,7 @@ class DynamicResultsManager {
      * 
      * @private
      */
-    #
-    initializeObserver() {
+    #initializeObserver() {
         this.observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 // Skip mutations that might affect the search button
@@ -165,8 +161,7 @@ class DynamicResultsManager {
      * 
      * @private
      */
-    #
-    startObserving() {
+    #startObserving() {
         const resultsContainer = document.getElementById('results');
         if (resultsContainer) {
             this.observer.observe(resultsContainer, this.observerConfig);
@@ -187,8 +182,7 @@ class DynamicResultsManager {
      * 
      * @private
      */
-    #
-    waitForResultsContainer() {
+    #waitForResultsContainer() {
         const bodyObserver = new MutationObserver((mutations, obs) => {
             const resultsContainer = document.getElementById('results');
             if (resultsContainer) {
@@ -210,8 +204,7 @@ class DynamicResultsManager {
      * @private
      * @param {NodeList} nodes - The newly added DOM nodes
      */
-    #
-    attachEventListenersToNewContent(nodes) {
+    #attachEventListenersToNewContent(nodes) {
         if (!nodes ? .length) return;
 
         nodes.forEach(node => {
@@ -254,8 +247,7 @@ class DynamicResultsManager {
      * 
      * @private
      */
-    #
-    setupDynamicListeners() {
+    #setupDynamicListeners() {
         console.log("DynamicResultsManager: setupDynamicListeners");
         document.removeEventListener('click', this.#handleDynamicClick);
         document.addEventListener('click', this.#handleDynamicClick);
@@ -275,8 +267,7 @@ class DynamicResultsManager {
      * @private
      * @param {Event} e - The click event
      */
-    #
-    handleResultLinkDelegation = (e) => {
+    #handleResultLinkDelegation = (e) => {
         // Check if click was on a search result link
         const resultLink = e.target.closest('.fb-result h3 a, .search-result-item h3 a, .listing-item__title a');
         if (resultLink) {
@@ -292,8 +283,7 @@ class DynamicResultsManager {
      * @param {Event} e - The click event
      * @param {Element} link - The clicked result link element
      */
-    #
-    handleResultLinkClick = (e, link) => {
+    #handleResultLinkClick = (e, link) => {
         // Don't prevent default navigation - let the user go to the result
 
         // Only proceed if we have a query and link
