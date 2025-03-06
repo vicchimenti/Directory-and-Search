@@ -1,182 +1,85 @@
 /**
- * @fileoverview Primary Funnelback Search Proxy Server
+ * @fileoverview Analytics API Click Endpoint for Funnelback Search Integration
  * 
- * Handles the main search functionality for the Funnelback integration.
- * Acts as a proxy between client-side requests and Funnelback's search API,
- * managing CORS, request forwarding, and IP handling.
- * 
- * Features:
- * - CORS handling for Seattle University domain
- * - IP forwarding to Funnelback
- * - Query parameter management
- * - Error handling and logging
- * - Analytics integration
- * - Consistent schema handling
+ * This file contains API handler for tracking various search analytics events
+ * including click tracking data.
  * 
  * @author Victor Chimenti
- * @version 3.0.0
- * @license MIT
- * @lastModified 2025-03-06
+ * @version 1.2.0
+ * @module api/analytics/click
+ * @lastModified 2025-03-07
  */
 
-const axios = require('axios');
-const { recordQuery } = require('../lib/queryAnalytics');
-const { 
-    createStandardAnalyticsData, 
-    sanitizeSessionId, 
-    logAnalyticsData 
-} = require('../lib/schemaHandler');
-
-/**
- * Extracts the number of results from an HTML response
- * 
- * @param {string} htmlContent - The HTML response from Funnelback
- * @returns {number} The number of results, or 0 if not found
- */
-function extractResultCount(htmlContent) {
-    try {
-        // Look for result count in HTML response
-        const match = htmlContent.match(/totalMatching">([0-9,]+)</);
-        if (match && match[1]) {
-            return parseInt(match[1].replace(/,/g, ''), 10);
-        }
-    } catch (error) {
-        console.error('Error extracting result count:', error);
-    }
-    return 0;
-}
-
-/**
- * Main request handler for search functionality.
- * 
- * @param {Object} req - Express request object
- * @param {Object} req.query - Query parameters from the request
- * @param {Object} req.headers - Request headers
- * @param {string} req.method - HTTP method of the request
- * @param {Object} res - Express response object
- * @returns {Promise<void>}
- */
-async function handler(req, res) {
-    const startTime = Date.now();
-    // Enable CORS for Seattle University domain
+// api/analytics/click.js
+module.exports = async (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Log request details
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log('Main Search Request:');
-    console.log('- User IP:', userIp);
-    console.log('- Query Parameters:', req.query);
-    console.log('- Request Headers:', req.headers);
-
+    // Handle preflight
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
+    // Only accept POST
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
+    }
+    
     try {
-        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
-
-        // Add default parameters if not provided
-        const params = {
-            collection: 'seattleu~sp-search',
-            profile: '_default',
-            form: 'partial',
-            ...req.query
-        };
-
-        console.log('Making Funnelback request:');
-        console.log('- URL:', funnelbackUrl);
-        console.log('- Parameters:', params);
-
-        const response = await axios.get(funnelbackUrl, {
-            params: params,
-            headers: {
-                'Accept': 'text/html',
-                'X-Forwarded-For': userIp
-            }
-        });
-
-        console.log('Funnelback response received successfully');
+        const { recordClick } = require('../../lib/queryAnalytics');
+        const { sanitizeSessionId, createStandardClickData } = require('../../lib/schemaHandler');
+        const clickData = req.body || {};
         
-        // Extract the result count from the HTML response
-        const resultCount = extractResultCount(response.data);
-        const processingTime = Date.now() - startTime;
-        
-        // Record analytics data
-        try {
-            console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
-            
-            if (process.env.MONGODB_URI) {
-                // Extract and sanitize session ID
-                const sessionId = sanitizeSessionId(req.query.sessionId);
-                console.log('Extracted session ID:', sessionId);
-                
-                // Create raw analytics data
-                const rawData = {
-                    handler: 'server',
-                    query: req.query.query || req.query.partial_query || '[empty query]',
-                    searchCollection: params.collection,
-                    userIp: userIp,
-                    userAgent: req.headers['user-agent'],
-                    referer: req.headers.referer,
-                    city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
-                    region: req.headers['x-vercel-ip-country-region'],
-                    country: req.headers['x-vercel-ip-country'],
-                    timezone: req.headers['x-vercel-ip-timezone'],
-                    latitude: req.headers['x-vercel-ip-latitude'],
-                    longitude: req.headers['x-vercel-ip-longitude'],
-                    responseTime: processingTime,
-                    resultCount: resultCount,
-                    hasResults: resultCount > 0,
-                    isProgramTab: Boolean(req.query['f.Tabs|programMain']),
-                    isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
-                    tabs: [],
-                    sessionId: sessionId,
-                    clickedResults: [], // Initialize empty array to ensure field exists
-                    timestamp: new Date()
-                };
-                
-                // Add tabs information
-                if (rawData.isProgramTab) rawData.tabs.push('program-main');
-                if (rawData.isStaffTab) rawData.tabs.push('Faculty & Staff');
-                
-                // Standardize data to ensure consistent schema
-                const analyticsData = createStandardAnalyticsData(rawData);
-                
-                // Log data (excluding sensitive information)
-                logAnalyticsData(analyticsData, 'server recording');
-                
-                // Record the analytics
-                try {
-                    const recordResult = await recordQuery(analyticsData);
-                    console.log('Analytics record result:', recordResult ? 'Saved' : 'Not saved');
-                    if (recordResult && recordResult._id) {
-                        console.log('Analytics record ID:', recordResult._id.toString());
-                    }
-                } catch (recordError) {
-                    console.error('Error recording analytics:', recordError.message);
-                    if (recordError.name === 'ValidationError') {
-                        console.error('Validation errors:', Object.keys(recordError.errors).join(', '));
-                    }
-                }
-            } else {
-                console.log('No MongoDB URI defined, skipping analytics recording');
-            }
-        } catch (analyticsError) {
-            console.error('Analytics error:', analyticsError);
+        // Validate required fields
+        if (!clickData.originalQuery) {
+            return res.status(400).json({ error: 'Missing required field: originalQuery' });
         }
         
-        res.send(response.data);
-    } catch (error) {
-        console.error('Error in main search handler:', {
-            message: error.message,
-            status: error.response?.status,
-            data: error.response?.data
+        if (!clickData.clickedUrl) {
+            return res.status(400).json({ error: 'Missing required field: clickedUrl' });
+        }
+        
+        // Add server-side data
+        clickData.userIp = userIp;
+        clickData.userAgent = req.headers['user-agent'];
+        clickData.referer = req.headers.referer;
+        clickData.city = decodeURIComponent(req.headers['x-vercel-ip-city'] || '');
+        clickData.region = req.headers['x-vercel-ip-country-region'];
+        clickData.country = req.headers['x-vercel-ip-country'];
+        
+        // Sanitize session ID
+        clickData.sessionId = sanitizeSessionId(clickData.sessionId);
+        
+        // Log what we're recording
+        console.log('Recording click data:', {
+            query: clickData.originalQuery,
+            url: clickData.clickedUrl,
+            title: clickData.clickedTitle || '(no title)',
+            position: clickData.clickPosition || 'unknown',
+            sessionId: clickData.sessionId || 'null'
         });
-        res.status(500).send('Search error: ' + (error.response?.data || error.message));
+        
+        // Create standardized click data
+        const standardClickData = createStandardClickData(clickData);
+        console.log('Standardized click data:', standardClickData);
+        
+        // Record click in database
+        const result = await recordClick(clickData);
+        console.log('Click recorded:', result ? 'Success' : 'Failed');
+        
+        if (result && result._id) {
+            console.log('Updated record ID:', result._id.toString());
+        }
+        
+        // Send minimal response for performance
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Error recording click:', error);
+        res.status(500).json({ error: error.message });
     }
 }
-
-module.exports = handler;
