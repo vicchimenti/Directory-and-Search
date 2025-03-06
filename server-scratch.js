@@ -1,362 +1,129 @@
 /**
-* @fileoverview Suggestion Handler for Funnelback Search Integration
-* 
-* Handles autocomplete suggestion requests for the Funnelback integration.
-* Provides real-time search suggestions as users type, with structured logging
-* for Vercel serverless environment.
-* 
-* Features:
-* - CORS handling for Seattle University domain
-* - Structured JSON logging for Vercel
-* - Request/Response tracking with detailed headers
-* - Query parameter tracking
-* - Session-based analytics tracking
-* - Enrichment data recording
-* - Comprehensive error handling with detailed logging
-* - Query analytics integration
-* 
-* @author Victor Chimenti
-* @version 2.3.0
-* @license MIT
-*/
-
-const axios = require('axios');
-const os = require('os');
-const { recordQuery } = require('../lib/queryAnalytics');
-
-// Don't initialize MongoDB connection here - we'll handle that in the recordQuery function
+ * @fileoverview Consistent Schema Handler for Analytics
+ * 
+ * This module provides standardized schema handling functions for all analytics endpoints,
+ * ensuring consistent data format, proper null checks, and schema validation.
+ * 
+ * @author Victor Chimenti
+ * @version 1.0.1
+ * @license MIT
+ */
 
 /**
-* Creates a standardized log entry for Vercel environment
-* 
-* @param {string} level - Log level ('info', 'warn', 'error')
-* @param {string} message - Main log message/action
-* @param {Object} data - Additional data to include in log
-* @param {Object} [data.query] - Query parameters
-* @param {Object} [data.headers] - Request headers
-* @param {number} [data.status] - HTTP status code
-* @param {string} [data.processingTime] - Request processing duration
-* @param {number} [data.suggestionsCount] - Number of suggestions returned
-*/
-function logEvent(level, message, data = {}) {
-   // [Your existing logEvent function]
-   // No changes needed here
-   const serverInfo = {
-       hostname: os.hostname(),
-       platform: os.platform(),
-       arch: os.arch(),
-       cpus: os.cpus().length,
-       memory: Math.round(os.totalmem() / 1024 / 1024 / 1024) + 'GB'
-   };
-
-   // Format query parameters in the preferred style
-   const queryParams = data.query ? {
-       'Query Parameters': {
-           ...data.query,
-           collection: data.query.collection || 'seattleu~sp-search',
-           profile: data.query.profile || '_default',
-           form: data.query.form || 'partial'
-       }
-   } : null;
-
-   // Extract relevant request headers
-   const requestInfo = data.headers ? {
-       'Request Headers': {
-           'x-forwarded-host': data.headers['x-forwarded-host'],
-           'x-vercel-ip-timezone': data.headers['x-vercel-ip-timezone'],
-           'referer': data.headers.referer,
-           'x-vercel-ip-as-number': data.headers['x-vercel-ip-as-number'],
-           'sec-fetch-mode': data.headers['sec-fetch-mode'],
-           'x-vercel-proxied-for': data.headers['x-vercel-proxied-for'],
-           'x-real-ip': data.headers['x-real-ip'],
-           'x-vercel-ip-postal-code': data.headers['x-vercel-ip-postal-code'],
-           'host': data.headers.host,
-           'sec-fetch-dest': data.headers['sec-fetch-dest'],
-           'sec-fetch-site': data.headers['sec-fetch-site'],
-           'x-forwarded-for': data.headers['x-forwarded-for'],
-           'origin': data.headers.origin,
-           'sec-ch-ua': data.headers['sec-ch-ua'],
-           'user-agent': data.headers['user-agent'],
-           'sec-ch-ua-platform': data.headers['sec-ch-ua-platform'],
-           'x-vercel-ip-longitude': data.headers['x-vercel-ip-longitude'],
-           'accept': data.headers.accept,
-           'x-vercel-forwarded-for': data.headers['x-vercel-forwarded-for'],
-           'x-vercel-ip-latitude': data.headers['x-vercel-ip-latitude'],
-           'x-forwarded-proto': data.headers['x-forwarded-proto'],
-           'x-vercel-ip-country-region': data.headers['x-vercel-ip-country-region'],
-           'x-vercel-deployment-url': data.headers['x-vercel-deployment-url'],
-           'accept-encoding': data.headers['accept-encoding'],
-           'x-vercel-id': data.headers['x-vercel-id'],
-           'accept-language': data.headers['accept-language'],
-           'x-vercel-ip-city': decodeURIComponent(data.headers['x-vercel-ip-city'] || ''),
-           'x-vercel-ip-country': data.headers['x-vercel-ip-country']
-       }
-   } : null;
-
-   const logEntry = {
-       service: 'suggest-handler',
-       level,
-       ...queryParams,
-       action: message,
-       ...requestInfo,
-       response: data.status ? {
-           status: data.status,
-           processingTime: data.processingTime,
-           suggestionsCount: data.suggestionsCount
-       } : null,
-       serverInfo,
-       timestamp: new Date().toISOString()
-   };
-   
-   console.log(JSON.stringify(logEntry));
-}
-
-/**
-* Enriches suggestions with metadata based on content and tab parameters
-* 
-* @param {Array<string>} suggestions - Raw suggestions from Funnelback
-* @param {Object} query - Query parameters including tab information
-* @returns {Array<Object>} Enriched suggestions with metadata
-*/
-function enrichSuggestions(suggestions, query) {
-    // Log incoming request parameters
-    console.log('Enrichment Request Parameters:', {
-        isProgramTab: Boolean(query['f.Tabs|programMain']),
-        isStaffTab: Boolean(query['f.Tabs|seattleu~ds-staff']),
-        tabParameters: {
-            program: query['f.Tabs|programMain'],
-            staff: query['f.Tabs|seattleu~ds-staff']
-        }
-    });
-
-    // Determine which tab made the request
-    const isProgramTab = Boolean(query['f.Tabs|programMain']);
-    const isStaffTab = Boolean(query['f.Tabs|seattleu~ds-staff']);
-
-    const enrichedSuggestions = suggestions.map(suggestion => {
-        let metadata = {
-            tabs: []
-        };
+ * Creates a standardized analytics data object with consistent schema
+ * Ensures all properties have proper null checks and default values
+ * 
+ * @param {Object} data - Raw data to standardize
+ * @returns {Object} Standardized analytics data with consistent schema
+ */
+function createStandardAnalyticsData(data) {
+    // Basic required fields with defaults
+    const standardData = {
+        // Required fields - these should never be null
+        handler: data.handler || 'unknown',
+        query: data.query || '[empty query]',
+        timestamp: data.timestamp || new Date(),
         
-        // Add tab information based on the source of the request
-        if (isProgramTab) {
-            metadata.tabs.push('program-main');
-        }
-        if (isStaffTab) {
-            metadata.tabs.push('Faculty & Staff');
-        }
-
-        // Log each suggestion enrichment
-        console.log('Enriching suggestion:', {
-            original: suggestion,
-            tabs: metadata.tabs,
-            isProgramTab,
-            isStaffTab
-        });
-
-        return {
-            display: suggestion,
-            metadata
+        // User information - can be null in schema but provide defaults
+        userIp: data.userIp || null,
+        userAgent: data.userAgent || null,
+        referer: data.referer || null,
+        sessionId: sanitizeSessionId(data.sessionId),
+        
+        // Location information - can be null
+        city: data.city || null,
+        region: data.region || null,
+        country: data.country || null,
+        timezone: data.timezone || null,
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
+        
+        // Search results information - ensure consistent types
+        searchCollection: data.searchCollection || data.collection || null,
+        responseTime: data.responseTime || 0,
+        resultCount: data.resultCount || 0,
+        hasResults: Boolean(data.hasResults || (data.resultCount && data.resultCount > 0)),
+        
+        // Tab information
+        isProgramTab: Boolean(data.isProgramTab || false),
+        isStaffTab: Boolean(data.isStaffTab || false),
+        tabs: Array.isArray(data.tabs) ? data.tabs : [],
+        
+        // Click information - ensure proper array initialization
+        clickedResults: Array.isArray(data.clickedResults) ? data.clickedResults : []
+    };
+    
+    // Handler-specific data
+    if (data.handler === 'suggest') {
+        standardData.enrichmentData = data.enrichmentData || {
+            totalSuggestions: data.resultCount || 0,
+            suggestionsData: []
         };
-    });
-
-    // Log final enriched results
-    console.log('Enrichment complete:', {
-        totalSuggestions: suggestions.length,
-        enrichedSuggestions: enrichedSuggestions.map(s => ({
-            display: s.display,
-            tabs: s.metadata.tabs
-        }))
-    });
-
-    return enrichedSuggestions;
+    }
+    
+    return standardData;
 }
 
 /**
-* Extract session ID from request query parameters
-* Handles both string and array formats
-* 
-* @param {Object} query - The request query parameters
-* @returns {string|null} The session ID as a string or null if not found
-*/
-function extractSessionId(query) {
-    if (!query.sessionId) {
+ * Validates and sanitizes session ID to ensure consistent format
+ * Handles arrays, strings, and null values
+ * 
+ * @param {any} sessionId - Raw session ID value from request
+ * @returns {string|null} Sanitized session ID or null
+ */
+function sanitizeSessionId(sessionId) {
+    if (!sessionId) {
         return null;
     }
     
-    // If sessionId is an array, take the first value
-    if (Array.isArray(query.sessionId)) {
-        console.log('Session ID is an array, using first value:', query.sessionId[0]);
-        return query.sessionId[0];
+    // Handle array case
+    if (Array.isArray(sessionId)) {
+        return sessionId[0] || null;
     }
     
-    // Otherwise, use it as is
-    return query.sessionId;
+    // Handle string case
+    if (typeof sessionId === 'string') {
+        return sessionId.trim() || null;
+    }
+    
+    // For any other case, convert to string if possible
+    return String(sessionId) || null;
 }
 
 /**
-* Handler for suggestion requests to Funnelback search service
-* Now includes enhanced analytics tracking with session support
-* 
-* @param {Object} req - Express request object
-* @param {Object} req.query - Query parameters from the request
-* @param {Object} req.headers - Request headers
-* @param {string} req.method - HTTP method of the request
-* @param {Object} res - Express response object
-* @returns {Promise<void>}
-*/
-async function handler(req, res) {
-   const startTime = Date.now();
-   const requestId = req.headers['x-vercel-id'] || Date.now().toString();
-   
-   // Set CORS headers
-   res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-   const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-
-   if (req.method === 'OPTIONS') {
-       logEvent('info', 'OPTIONS request', { 
-           requestId,
-           headers: req.headers
-       });
-       res.status(200).end();
-       return;
-   }
-
-   try {
-       const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/suggest.json';
-       
-       logEvent('info', 'Request received', {
-           query: req.query,
-           requestId,
-           headers: req.headers
-       });
-
-       const response = await axios.get(funnelbackUrl, {
-        params: req.query,
-        headers: {
-            'Accept': 'application/json',
-            'X-Forwarded-For': userIp
-        }
-    });
-
-    // Enrich suggestions with metadata
-    const enrichedResponse = enrichSuggestions(response.data, req.query);
-    
-    // Process time for this request
-    const processingTime = Date.now() - startTime;
-
-    logEvent('info', 'Response enriched', {
-        status: response.status,
-        processingTime: `${processingTime}ms`,
-        suggestionsCount: enrichedResponse.length || 0,
-        query: req.query,
-        headers: req.headers
-    });
-
-    // Record query data for analytics with enhanced debugging
-    try {
-        // Log MongoDB URI presence (not the actual value for security)
-        console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
-        
-        if (process.env.MONGODB_URI) {
-            // Create analytics data
-            console.log('Raw query parameters:', req.query);  // Log all query parameters to debug
-            console.log('Looking for query in:', req.query.query, req.query.partial_query); // Check both possible fields
-
-            // Extract session ID if provided by the client
-            const sessionId = extractSessionId(req.query);
-            console.log('Extracted session ID:', sessionId);
-            
-            const analyticsData = {
-                handler: 'suggest',
-                // Look for query in either the query parameter or partial_query parameter
-                query: req.query.query || req.query.partial_query || '[empty query]',
-                collection: req.query.collection || 'seattleu~sp-search',
-                userIp: userIp,
-                userAgent: req.headers['user-agent'],
-                referer: req.headers.referer,
-                city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
-                region: req.headers['x-vercel-ip-country-region'],
-                country: req.headers['x-vercel-ip-country'],
-                timezone: req.headers['x-vercel-ip-timezone'],
-                latitude: req.headers['x-vercel-ip-latitude'],
-                longitude: req.headers['x-vercel-ip-longitude'],
-                responseTime: processingTime,
-                resultCount: enrichedResponse.length || 0,
-                hasResults: enrichedResponse.length > 0,
-                isProgramTab: Boolean(req.query['f.Tabs|programMain']),
-                isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
-                tabs: [],
-                // Include session ID if available
-                sessionId: sessionId,
-                // Include enrichment data
-                enrichmentData: {
-                    totalSuggestions: enrichedResponse.length,
-                    suggestionsData: enrichedResponse.map(s => ({
-                        display: s.display,
-                        tabs: s.metadata.tabs
-                    }))
-                },
-                timestamp: new Date()
-            };
-
-            // Add tabs information
-            if (analyticsData.isProgramTab) analyticsData.tabs.push('program-main');
-            if (analyticsData.isStaffTab) analyticsData.tabs.push('Faculty & Staff');
-            
-            // Log analytics data (excluding sensitive info)
-            const loggableData = { ...analyticsData };
-            delete loggableData.userIp; // Remove sensitive data for logging
-            console.log('Analytics data prepared for recording:', loggableData);
-            
-            // Record the analytics with better error handling
-            try {
-                const recordResult = await recordQuery(analyticsData);
-                console.log('Analytics record result:', recordResult ? 'Saved' : 'Not saved');
-                if (recordResult && recordResult._id) {
-                    console.log('Analytics record ID:', recordResult._id.toString());
-                }
-            } catch (recordError) {
-                console.error('Error recording analytics:', recordError.message);
-                console.error('Full error:', recordError);
-                
-                // Try to provide more specific error information
-                if (recordError.name === 'ValidationError') {
-                    console.error('Validation errors:', Object.keys(recordError.errors).join(', '));
-                } else if (recordError.name === 'MongooseError') {
-                    console.error('Mongoose error type:', recordError.name);
-                } else if (recordError.name === 'MongoServerError') {
-                    console.error('MongoDB server error code:', recordError.code);
-                }
-            }
-        } else {
-            console.log('No MongoDB URI defined, skipping analytics recording');
-        }
-    } catch (analyticsError) {
-        // Log analytics error but don't fail the request
-        console.error('Analytics preparation error:', analyticsError);
-    }
-  
-    // Send response to client
-    res.json(enrichedResponse);
-   } catch (error) {
-       logEvent('error', 'Handler error', {
-           query: req.query,
-           error: error.message,
-           status: error.response?.status || 500,
-           processingTime: `${Date.now() - startTime}ms`,
-           headers: req.headers
-       });
-       
-       res.status(500).json({
-           error: 'Suggestion error',
-           details: error.response?.data || error.message
-       });
-   }
+ * Creates a standardized click data object for tracking clicks
+ * 
+ * @param {Object} clickData - Raw click data from request
+ * @returns {Object} Standardized click data with consistent schema
+ */
+function createStandardClickData(clickData) {
+    return {
+        url: clickData.clickedUrl || null,
+        title: clickData.clickedTitle || '',
+        position: parseInt(clickData.clickPosition, 10) || 0,
+        timestamp: new Date()
+    };
 }
 
-// Export a single function as required by Vercel
-module.exports = handler;
+/**
+ * Logs analytics data in a standardized format with sensitive data removed
+ * 
+ * @param {Object} analyticsData - Data to log
+ * @param {string} context - Context for the log
+ */
+function logAnalyticsData(analyticsData, context) {
+    // Create a copy of the data to avoid modifying the original
+    const loggableData = { ...analyticsData };
+    
+    // Remove sensitive data
+    delete loggableData.userIp;
+    
+    console.log(`Analytics data prepared for ${context}:`, loggableData);
+}
+
+module.exports = {
+    createStandardAnalyticsData,
+    sanitizeSessionId,
+    createStandardClickData,
+    logAnalyticsData
+};
