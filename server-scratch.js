@@ -1,352 +1,98 @@
 /**
-* @fileoverview Suggestion Handler for Funnelback Search Integration
-* 
-* Handles autocomplete suggestion requests for the Funnelback integration.
-* Provides real-time search suggestions as users type, with structured logging
-* for Vercel serverless environment.
-* 
-* Features:
-* - CORS handling for Seattle University domain
-* - Structured JSON logging for Vercel
-* - Request/Response tracking with detailed headers
-* - Query parameter tracking
-* - Session-based analytics tracking
-* - Enrichment data recording
-* - Comprehensive error handling with detailed logging
-* - Query analytics integration
-* - Consistent schema handling
-* 
-* @author Victor Chimenti
-* @version 3.0.0
-* @license MIT
-* @lastModified 2025-03-06
-*/
+ * @fileoverview Analytics API Click Batch Endpoint for Funnelback Search Integration
+ * 
+ * This file contains the API handler for tracking various search analytics events
+ * including batch click tracking data.
+ * 
+ * @author Victor Chimenti
+ * @version 1.2.0
+ * @module api/analytics/clicks-batch
+ * @lastModified 2025-03-07
+ */
 
-const axios = require('axios');
-const os = require('os');
-const { recordQuery } = require('../lib/queryAnalytics');
-const { 
-    createStandardAnalyticsData, 
-    sanitizeSessionId, 
-    logAnalyticsData 
-} = require('../lib/schemaHandler');
+// api/analytics/clicks-batch.js
+module.exports = async (req, res) => {
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-// Don't initialize MongoDB connection here - we'll handle that in the recordQuery function
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
 
-/**
-* Creates a standardized log entry for Vercel environment
-* 
-* @param {string} level - Log level ('info', 'warn', 'error')
-* @param {string} message - Main log message/action
-* @param {Object} data - Additional data to include in log
-* @param {Object} [data.query] - Query parameters
-* @param {Object} [data.headers] - Request headers
-* @param {number} [data.status] - HTTP status code
-* @param {string} [data.processingTime] - Request processing duration
-* @param {number} [data.suggestionsCount] - Number of suggestions returned
-*/
-function logEvent(level, message, data = {}) {
-   // [Your existing logEvent function]
-   // No changes needed here
-   const serverInfo = {
-       hostname: os.hostname(),
-       platform: os.platform(),
-       arch: os.arch(),
-       cpus: os.cpus().length,
-       memory: Math.round(os.totalmem() / 1024 / 1024 / 1024) + 'GB'
-   };
-
-   // Format query parameters in the preferred style
-   const queryParams = data.query ? {
-       'Query Parameters': {
-           ...data.query,
-           collection: data.query.collection || 'seattleu~sp-search',
-           profile: data.query.profile || '_default',
-           form: data.query.form || 'partial'
-       }
-   } : null;
-
-   // Extract relevant request headers
-   const requestInfo = data.headers ? {
-       'Request Headers': {
-           'x-forwarded-host': data.headers['x-forwarded-host'],
-           'x-vercel-ip-timezone': data.headers['x-vercel-ip-timezone'],
-           'referer': data.headers.referer,
-           'x-vercel-ip-as-number': data.headers['x-vercel-ip-as-number'],
-           'sec-fetch-mode': data.headers['sec-fetch-mode'],
-           'x-vercel-proxied-for': data.headers['x-vercel-proxied-for'],
-           'x-real-ip': data.headers['x-real-ip'],
-           'x-vercel-ip-postal-code': data.headers['x-vercel-ip-postal-code'],
-           'host': data.headers.host,
-           'sec-fetch-dest': data.headers['sec-fetch-dest'],
-           'sec-fetch-site': data.headers['sec-fetch-site'],
-           'x-forwarded-for': data.headers['x-forwarded-for'],
-           'origin': data.headers.origin,
-           'sec-ch-ua': data.headers['sec-ch-ua'],
-           'user-agent': data.headers['user-agent'],
-           'sec-ch-ua-platform': data.headers['sec-ch-ua-platform'],
-           'x-vercel-ip-longitude': data.headers['x-vercel-ip-longitude'],
-           'accept': data.headers.accept,
-           'x-vercel-forwarded-for': data.headers['x-vercel-forwarded-for'],
-           'x-vercel-ip-latitude': data.headers['x-vercel-ip-latitude'],
-           'x-forwarded-proto': data.headers['x-forwarded-proto'],
-           'x-vercel-ip-country-region': data.headers['x-vercel-ip-country-region'],
-           'x-vercel-deployment-url': data.headers['x-vercel-deployment-url'],
-           'accept-encoding': data.headers['accept-encoding'],
-           'x-vercel-id': data.headers['x-vercel-id'],
-           'accept-language': data.headers['accept-language'],
-           'x-vercel-ip-city': decodeURIComponent(data.headers['x-vercel-ip-city'] || ''),
-           'x-vercel-ip-country': data.headers['x-vercel-ip-country']
-       }
-   } : null;
-
-   const logEntry = {
-       service: 'suggest-handler',
-       level,
-       ...queryParams,
-       action: message,
-       ...requestInfo,
-       response: data.status ? {
-           status: data.status,
-           processingTime: data.processingTime,
-           suggestionsCount: data.suggestionsCount
-       } : null,
-       serverInfo,
-       timestamp: new Date().toISOString()
-   };
-   
-   console.log(JSON.stringify(logEntry));
-}
-
-/**
-* Enriches suggestions with metadata based on content and tab parameters
-* 
-* @param {Array<string>} suggestions - Raw suggestions from Funnelback
-* @param {Object} query - Query parameters including tab information
-* @returns {Array<Object>} Enriched suggestions with metadata
-*/
-function enrichSuggestions(suggestions, query) {
-    if (!Array.isArray(suggestions)) {
-        console.log('No suggestions to enrich or invalid format');
-        return [];
+    if (req.method !== 'POST') {
+        return res.status(405).send('Method Not Allowed');
     }
     
-    // Log incoming request parameters
-    console.log('Enrichment Request Parameters:', {
-        isProgramTab: Boolean(query['f.Tabs|programMain']),
-        isStaffTab: Boolean(query['f.Tabs|seattleu~ds-staff']),
-        tabParameters: {
-            program: query['f.Tabs|programMain'],
-            staff: query['f.Tabs|seattleu~ds-staff']
-        },
-        suggestionCount: suggestions.length
-    });
-
-    // Determine which tab made the request
-    const isProgramTab = Boolean(query['f.Tabs|programMain']);
-    const isStaffTab = Boolean(query['f.Tabs|seattleu~ds-staff']);
-
-    const enrichedSuggestions = suggestions.map(suggestion => {
-        let metadata = {
-            tabs: []
-        };
-        
-        // Add tab information based on the source of the request
-        if (isProgramTab) {
-            metadata.tabs.push('program-main');
-        }
-        if (isStaffTab) {
-            metadata.tabs.push('Faculty & Staff');
-        }
-
-        // Log each suggestion enrichment
-        console.log('Enriching suggestion:', {
-            original: suggestion,
-            tabs: metadata.tabs,
-            isProgramTab,
-            isStaffTab
-        });
-
-        return {
-            display: suggestion,
-            metadata
-        };
-    });
-
-    // Log final enriched results
-    console.log('Enrichment complete:', {
-        totalSuggestions: suggestions.length,
-        enrichedSuggestions: enrichedSuggestions.map(s => ({
-            display: s.display,
-            tabs: s.metadata.tabs
-        }))
-    });
-
-    return enrichedSuggestions;
-}
-
-/**
-* Handler for suggestion requests to Funnelback search service
-* Now includes enhanced analytics tracking with session support
-* 
-* @param {Object} req - Express request object
-* @param {Object} req.query - Query parameters from the request
-* @param {Object} req.headers - Request headers
-* @param {string} req.method - HTTP method of the request
-* @param {Object} res - Express response object
-* @returns {Promise<void>}
-*/
-async function handler(req, res) {
-   const startTime = Date.now();
-   const requestId = req.headers['x-vercel-id'] || Date.now().toString();
-   
-   // Set CORS headers
-   res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-   const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-
-   if (req.method === 'OPTIONS') {
-       logEvent('info', 'OPTIONS request', { 
-           requestId,
-           headers: req.headers
-       });
-       res.status(200).end();
-       return;
-   }
-
-   try {
-       const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/suggest.json';
-       
-       logEvent('info', 'Request received', {
-           query: req.query,
-           requestId,
-           headers: req.headers
-       });
-
-       const response = await axios.get(funnelbackUrl, {
-        params: req.query,
-        headers: {
-            'Accept': 'application/json',
-            'X-Forwarded-For': userIp
-        }
-    });
-
-    // Ensure response data is an array (handle API inconsistencies)
-    const responseData = Array.isArray(response.data) ? response.data : [];
-
-    // Enrich suggestions with metadata
-    const enrichedResponse = enrichSuggestions(responseData, req.query);
-    
-    // Process time for this request
-    const processingTime = Date.now() - startTime;
-
-    logEvent('info', 'Response enriched', {
-        status: response.status,
-        processingTime: `${processingTime}ms`,
-        suggestionsCount: enrichedResponse.length || 0,
-        query: req.query,
-        headers: req.headers
-    });
-
-    // Record query data for analytics with enhanced debugging
     try {
-        // Log MongoDB URI presence (not the actual value for security)
-        console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
+        const { recordClicks } = require('../../lib/queryAnalytics');
+        const { sanitizeSessionId, createStandardClickData } = require('../../lib/schemaHandler');
         
-        if (process.env.MONGODB_URI) {
-            // Extract and sanitize session ID
-            const sessionId = sanitizeSessionId(req.query.sessionId);
-            console.log('Extracted session ID:', sessionId);
+        // Get clicks from request body
+        const { clicks } = req.body || {};
+        
+        if (!Array.isArray(clicks) || clicks.length === 0) {
+            return res.status(400).json({ error: 'No clicks provided' });
+        }
+        
+        console.log(`Processing batch of ${clicks.length} clicks`);
+        
+        // Add server-side data to each click and validate
+        const processedClicks = clicks.map(click => {
+            // Validate required fields
+            if (!click.originalQuery || !click.clickedUrl) {
+                console.warn('Skipping click with missing required fields:', click);
+                return null;
+            }
             
-            // Create raw analytics data
-            const rawData = {
-                handler: 'suggest',
-                query: req.query.query || req.query.partial_query || '[empty query]',
-                collection: req.query.collection || 'seattleu~sp-search',
+            // Process valid click
+            const processedClick = {
+                ...click,
                 userIp: userIp,
                 userAgent: req.headers['user-agent'],
                 referer: req.headers.referer,
                 city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
                 region: req.headers['x-vercel-ip-country-region'],
                 country: req.headers['x-vercel-ip-country'],
-                timezone: req.headers['x-vercel-ip-timezone'],
-                latitude: req.headers['x-vercel-ip-latitude'],
-                longitude: req.headers['x-vercel-ip-longitude'],
-                responseTime: processingTime,
-                resultCount: enrichedResponse.length || 0,
-                hasResults: enrichedResponse.length > 0,
-                isProgramTab: Boolean(req.query['f.Tabs|programMain']),
-                isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
-                tabs: [],
-                sessionId: sessionId,
-                clickedResults: [], // Ensure field exists
-                enrichmentData: {
-                    totalSuggestions: enrichedResponse.length,
-                    suggestionsData: enrichedResponse.map(s => ({
-                        display: s.display,
-                        tabs: s.metadata.tabs
-                    }))
-                },
-                timestamp: new Date()
+                sessionId: sanitizeSessionId(click.sessionId)
             };
-
-            // Add tabs information
-            if (rawData.isProgramTab) rawData.tabs.push('program-main');
-            if (rawData.isStaffTab) rawData.tabs.push('Faculty & Staff');
             
-            // Standardize data to ensure consistent schema
-            const analyticsData = createStandardAnalyticsData(rawData);
+            // Apply standard schema to click
+            const standardizedClick = createStandardClickData(processedClick);
+            console.log('Standardized click data:', {
+                query: processedClick.originalQuery,
+                url: processedClick.clickedUrl,
+                title: processedClick.clickedTitle || '(no title)',
+                position: standardizedClick.position || 0
+            });
             
-            // Log analytics data (excluding sensitive info)
-            logAnalyticsData(analyticsData, 'suggest recording');
-            
-            // Record the analytics with better error handling
-            try {
-                const recordResult = await recordQuery(analyticsData);
-                console.log('Analytics record result:', recordResult ? 'Saved' : 'Not saved');
-                if (recordResult && recordResult._id) {
-                    console.log('Analytics record ID:', recordResult._id.toString());
-                }
-            } catch (recordError) {
-                console.error('Error recording analytics:', recordError.message);
-                console.error('Full error:', recordError);
-                
-                // Try to provide more specific error information
-                if (recordError.name === 'ValidationError') {
-                    console.error('Validation errors:', Object.keys(recordError.errors).join(', '));
-                } else if (recordError.name === 'MongooseError') {
-                    console.error('Mongoose error type:', recordError.name);
-                } else if (recordError.name === 'MongoServerError') {
-                    console.error('MongoDB server error code:', recordError.code);
-                }
-            }
-        } else {
-            console.log('No MongoDB URI defined, skipping analytics recording');
+            return processedClick;
+        }).filter(Boolean); // Remove any null entries (invalid clicks)
+        
+        if (processedClicks.length === 0) {
+            return res.status(400).json({ error: 'No valid clicks provided' });
         }
-    } catch (analyticsError) {
-        // Log analytics error but don't fail the request
-        console.error('Analytics preparation error:', analyticsError);
+        
+        // Record clicks in database
+        const result = await recordClicks(processedClicks);
+        
+        console.log('Batch processing complete:', {
+            processed: result.processed,
+            total: processedClicks.length,
+            skipped: clicks.length - processedClicks.length
+        });
+        
+        // Send response
+        res.status(200).json({
+            ...result,
+            skipped: clicks.length - processedClicks.length
+        });
+    } catch (error) {
+        console.error('Error processing clicks batch:', error);
+        res.status(500).json({ error: error.message });
     }
-  
-    // Send response to client
-    res.json(enrichedResponse);
-   } catch (error) {
-       logEvent('error', 'Handler error', {
-           query: req.query,
-           error: error.message,
-           status: error.response?.status || 500,
-           processingTime: `${Date.now() - startTime}ms`,
-           headers: req.headers
-       });
-       
-       res.status(500).json({
-           error: 'Suggestion error',
-           details: error.response?.data || error.message
-       });
-   }
-}
-
-// Export a single function as required by Vercel
-module.exports = handler;
+};
