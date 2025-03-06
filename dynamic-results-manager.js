@@ -9,6 +9,8 @@
 * - Manages dynamic content updates via MutationObserver
 * - Handles multiple types of search result interactions
 * - Maintains event listeners across dynamic content changes
+* - Tracks search result link clicks for analytics
+* - Captures data-live-url attributes for accurate destination tracking
 * - Integrates with Funnelback search API via Vercel proxy
 * 
 * Dependencies:
@@ -28,8 +30,8 @@
 * - header-search-manager.js: Handles initial search and redirects
 * 
 * @author Victor Chimenti
-* @version 2.2.0
-* @lastModified 2025-03-05
+* @version 3.0.0
+* @lastModified 2025-03-06
 */
 
 class DynamicResultsManager {
@@ -43,6 +45,11 @@ class DynamicResultsManager {
             subtree: true
         };
         
+        // Analytics configuration
+        this.analyticsEndpoint = 'https://funnelback-proxy.vercel.app/proxy/analytics/click';
+        this.sessionId = this.#getOrCreateSessionId();
+        this.originalQuery = null;
+        
         if (window.location.pathname.includes('search-test')) {
             this.#initializeObserver();
             
@@ -51,13 +58,52 @@ class DynamicResultsManager {
                     this.#setupDynamicListeners();
                     this.#startObserving();
                     this.#ensureSearchButtonIconVisibility();
+                    this.#extractOriginalQuery();
                 });
             } else {
                 this.#setupDynamicListeners();
                 this.#startObserving();
                 this.#ensureSearchButtonIconVisibility();
+                this.#extractOriginalQuery();
             }
         }
+    }
+
+    /**
+     * Extracts the original search query from the URL or search input
+     * @private
+     */
+    #extractOriginalQuery() {
+        // Try to get query from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlQuery = urlParams.get('query');
+        
+        if (urlQuery) {
+            this.originalQuery = urlQuery;
+            return;
+        }
+        
+        // Try to get query from search input field
+        const searchInput = document.getElementById('autocomplete-concierge-inputField');
+        if (searchInput && searchInput.value) {
+            this.originalQuery = searchInput.value;
+        }
+    }
+    
+    /**
+     * Gets or creates a session ID for analytics tracking
+     * @private
+     * @returns {string} Session ID
+     */
+    #getOrCreateSessionId() {
+        let sessionId = sessionStorage.getItem('searchSessionId');
+        
+        if (!sessionId) {
+            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+            sessionStorage.setItem('searchSessionId', sessionId);
+        }
+        
+        return sessionId;
     }
 
     /**
@@ -163,6 +209,7 @@ class DynamicResultsManager {
     
         nodes.forEach(node => {
             if (node?.nodeType === Node.ELEMENT_NODE) {
+                // Selectors for interactive elements
                 const elements = node.querySelectorAll([
                     '.facet-group__list a',
                     '.tab-list__nav a', 
@@ -182,6 +229,15 @@ class DynamicResultsManager {
                         element.addEventListener('click', this.#handleDynamicClick);
                     }
                 });
+                
+                // Specifically add listeners to search result links (h3 links)
+                const resultLinks = node.querySelectorAll('.fb-result h3 a, .search-result-item h3 a, .listing-item__title a');
+                resultLinks.forEach(link => {
+                    if (link) {
+                        link.removeEventListener('click', this.#handleResultLinkClick);
+                        link.addEventListener('click', this.#handleResultLinkClick);
+                    }
+                });
             }
         });
     }
@@ -195,6 +251,112 @@ class DynamicResultsManager {
         console.log("DynamicResultsManager: setupDynamicListeners");
         document.removeEventListener('click', this.#handleDynamicClick);
         document.addEventListener('click', this.#handleDynamicClick);
+        
+        // Set up delegation for result link clicks
+        const resultsContainer = document.getElementById('results');
+        if (resultsContainer) {
+            resultsContainer.removeEventListener('click', this.#handleResultLinkDelegation);
+            resultsContainer.addEventListener('click', this.#handleResultLinkDelegation);
+        }
+    }
+    
+    /**
+     * Handles delegated click events for search result links.
+     * This approach ensures we catch all result links, even those added dynamically.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     */
+    #handleResultLinkDelegation = (e) => {
+        // Check if click was on a search result link
+        const resultLink = e.target.closest('.fb-result h3 a, .search-result-item h3 a, .listing-item__title a');
+        if (resultLink) {
+            this.#handleResultLinkClick(e, resultLink);
+        }
+    }
+    
+    /**
+     * Specifically handles clicks on search result links for analytics tracking.
+     * Captures data-live-url attribute for accurate destination tracking.
+     * 
+     * @private
+     * @param {Event} e - The click event
+     * @param {Element} link - The clicked result link element
+     */
+    #handleResultLinkClick = (e, link) => {
+        // Don't prevent default navigation - let the user go to the result
+        
+        // Only proceed if we have a query and link
+        if (!this.originalQuery || !link) return;
+        
+        try {
+            // Get link details
+            const href = link.getAttribute('href') || '';
+            const dataLiveUrl = link.getAttribute('data-live-url') || href;
+            const title = link.innerText.trim() || '';
+            
+            // Get position information if possible
+            let position = -1;
+            const resultItem = link.closest('.fb-result, .search-result-item, .listing-item');
+            if (resultItem) {
+                const allResults = Array.from(document.querySelectorAll('.fb-result, .search-result-item, .listing-item'));
+                position = allResults.indexOf(resultItem) + 1;
+            }
+            
+            console.log(`Result link clicked: "${title}" - ${dataLiveUrl} (position ${position})`);
+            
+            // Prepare analytics data
+            const clickData = {
+                originalQuery: this.originalQuery,
+                clickedUrl: dataLiveUrl, // Using data-live-url for accurate destination
+                clickedTitle: title,
+                clickPosition: position,
+                sessionId: this.sessionId,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Send analytics data (non-blocking)
+            this.#sendClickData(clickData);
+            
+        } catch (error) {
+            console.error('Error tracking result link click:', error);
+            // Don't block navigation even if tracking fails
+        }
+    }
+    
+    /**
+     * Sends click data to the analytics endpoint.
+     * Uses sendBeacon for non-blocking operation to avoid delaying navigation.
+     * 
+     * @private
+     * @param {Object} clickData - Data about the clicked result
+     */
+    #sendClickData(clickData) {
+        try {
+            // Use sendBeacon if available (works during page unload)
+            if (navigator.sendBeacon) {
+                const blob = new Blob([JSON.stringify(clickData)], {
+                    type: 'application/json'
+                });
+                
+                navigator.sendBeacon(this.analyticsEndpoint, blob);
+                return;
+            }
+            
+            // Fallback to fetch with keepalive
+            fetch(this.analyticsEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(clickData),
+                keepalive: true // This allows the request to outlive the page
+            }).catch(error => {
+                console.error('Error sending click data:', error);
+            });
+        } catch (error) {
+            console.error('Failed to send click data:', error);
+        }
     }
  
     /**
@@ -248,10 +410,21 @@ class DynamicResultsManager {
         
         try {
             const queryString = url.includes('?') ? url.split('?')[1] : '';
-            const fullUrl = `${proxyUrl}?${queryString}`;
+            const fullUrl = `${proxyUrl}?${queryString}&sessionId=${this.sessionId}`; // Add session ID for tracking
             const response = await fetch(fullUrl);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
-            return await response.text();
+            
+            const newContent = await response.text();
+            
+            // Update the original query if needed
+            const urlParams = new URLSearchParams(queryString);
+            const newQuery = urlParams.get('query');
+            if (newQuery) {
+                this.originalQuery = newQuery;
+                console.log(`Updated original query to: ${this.originalQuery}`);
+            }
+            
+            return newContent;
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
             return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
@@ -271,7 +444,8 @@ class DynamicResultsManager {
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/tools';
         try {
             const queryString = new URLSearchParams({
-                path: url.split('/s/')[1]
+                path: url.split('/s/')[1],
+                sessionId: this.sessionId
             });
             const fullUrl = `${proxyUrl}?${queryString}`;
             const response = await fetch(fullUrl);
@@ -295,12 +469,27 @@ class DynamicResultsManager {
     async #fetchFunnelbackSpelling(url, method) {
         const proxyUrl = 'https://funnelback-proxy.vercel.app/proxy/funnelback/spelling';
         try {
-            const queryString = url.includes('?') ? url.split('?')[1] : '';
+            let queryString = url.includes('?') ? url.split('?')[1] : '';
+            
+            // Add session ID if not already present
+            const params = new URLSearchParams(queryString);
+            if (!params.has('sessionId')) {
+                params.append('sessionId', this.sessionId);
+                queryString = params.toString();
+            }
+            
             const fullUrl = `${proxyUrl}?${queryString}`;
             console.log('Making spelling proxy request to:', fullUrl);
             
             const response = await fetch(fullUrl);
             if (!response.ok) throw new Error(`Error: ${response.status}`);
+            
+            // Update query if needed
+            const newQuery = params.get('query');
+            if (newQuery) {
+                this.originalQuery = newQuery;
+            }
+            
             return await response.text();
         } catch (error) {
             console.error(`Error with ${method} request:`, error);
@@ -444,6 +633,11 @@ class DynamicResultsManager {
             clearInterval(this.iconCheckInterval);
         }
         document.removeEventListener('click', this.#handleDynamicClick);
+        
+        const resultsContainer = document.getElementById('results');
+        if (resultsContainer) {
+            resultsContainer.removeEventListener('click', this.#handleResultLinkDelegation);
+        }
     }
  }
  
