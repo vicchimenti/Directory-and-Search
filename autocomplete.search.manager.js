@@ -48,7 +48,7 @@
  * 
  * @author Victor Chimenti
  * @version 3.3.0
- * @lastModified 2025-02-27
+ * @lastModified 2025-03-05
  */
 
 class AutocompleteSearchManager {
