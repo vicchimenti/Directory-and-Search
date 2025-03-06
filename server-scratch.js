@@ -14,9 +14,9 @@
  * - Consistent schema handling
  * 
  * @author Victor Chimenti
- * @version 2.1.0
+ * @version 3.0.0
  * @license MIT
- * @lastModified 2025-03-07
+ * @lastModified 2025-03-06
  */
 
 const axios = require('axios');
