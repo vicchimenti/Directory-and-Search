@@ -1,16 +1,16 @@
 /**
- * @fileoverview Analytics API Click Batch Endpoint for Funnelback Search Integration
+ * @fileoverview Analytics API Click Supplement Endpoint for Funnelback Search Integration
  * 
- * This file contains the API handler for tracking various search analytics events
- * including batch click tracking data.
+ * This file contains API handler for tracking various search analytics events
+ * including supplementary analytics data.
  * 
  * @author Victor Chimenti
- * @version 2.0.0
- * @module api/analytics/clicks-batch
- * @lastModified 2025-03-06
+ * @version 1.2.0
+ * @module api/analytics/supplement
+ * @lastModified 2025-03-07
  */
 
-// api/analytics/clicks-batch.js
+// api/analytics/supplement.js
 module.exports = async (req, res) => {
     const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     
@@ -29,70 +29,68 @@ module.exports = async (req, res) => {
     }
     
     try {
-        const { recordClicks } = require('../../lib/queryAnalytics');
-        const { sanitizeSessionId, createStandardClickData } = require('../../lib/schemaHandler');
+        const { Query } = require('mongoose').models;
+        const { sanitizeSessionId } = require('../../lib/schemaHandler');
+        const data = req.body || {};
         
-        // Get clicks from request body
-        const { clicks } = req.body || {};
-        
-        if (!Array.isArray(clicks) || clicks.length === 0) {
-            return res.status(400).json({ error: 'No clicks provided' });
+        if (!data.query) {
+            return res.status(400).json({ error: 'No query provided' });
         }
         
-        console.log(`Processing batch of ${clicks.length} clicks`);
+        console.log('Processing supplementary analytics for query:', data.query);
         
-        // Add server-side data to each click and validate
-        const processedClicks = clicks.map(click => {
-            // Validate required fields
-            if (!click.originalQuery || !click.clickedUrl) {
-                console.warn('Skipping click with missing required fields:', click);
-                return null;
+        // Find the most recent query with matching information
+        const filters = {
+            query: data.query
+        };
+        
+        // Add sessionId to filter if available (properly sanitized)
+        const sessionId = sanitizeSessionId(data.sessionId);
+        if (sessionId) {
+            filters.sessionId = sessionId;
+            console.log('Using session ID for matching:', sessionId);
+        } else {
+            // Fall back to IP address
+            filters.userIp = userIp;
+            console.log('Using IP address for matching:', userIp);
+        }
+        
+        // Prepare update based on provided data
+        const update = {};
+        
+        // Add result count if provided
+        if (data.resultCount !== undefined) {
+            update.resultCount = data.resultCount;
+            update.hasResults = data.resultCount > 0;
+        }
+        
+        // Add enrichment data if provided
+        if (data.enrichmentData) {
+            update.enrichmentData = data.enrichmentData;
+        }
+        
+        console.log('Update filters:', filters);
+        console.log('Update data:', update);
+        
+        // Update the query document
+        const result = await Query.findOneAndUpdate(
+            filters,
+            { $set: update },
+            { 
+                new: true,
+                sort: { timestamp: -1 }
             }
-            
-            // Process valid click
-            const processedClick = {
-                ...click,
-                userIp: userIp,
-                userAgent: req.headers['user-agent'],
-                referer: req.headers.referer,
-                city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
-                region: req.headers['x-vercel-ip-country-region'],
-                country: req.headers['x-vercel-ip-country'],
-                sessionId: sanitizeSessionId(click.sessionId)
-            };
-            
-            // Apply standard schema to click
-            const standardizedClick = createStandardClickData(processedClick);
-            console.log('Standardized click data:', {
-                query: processedClick.originalQuery,
-                url: processedClick.clickedUrl,
-                title: processedClick.clickedTitle || '(no title)',
-                position: standardizedClick.position || 0
-            });
-            
-            return processedClick;
-        }).filter(Boolean); // Remove any null entries (invalid clicks)
+        );
         
-        if (processedClicks.length === 0) {
-            return res.status(400).json({ error: 'No valid clicks provided' });
+        if (!result) {
+            console.log('No matching query found for supplementary data');
+            return res.status(404).json({ error: 'Query not found' });
         }
         
-        // Record clicks in database
-        const result = await recordClicks(processedClicks);
-        
-        console.log('Batch processing complete:', {
-            processed: result.processed,
-            total: processedClicks.length,
-            skipped: clicks.length - processedClicks.length
-        });
-        
-        // Send response
-        res.status(200).json({
-            ...result,
-            skipped: clicks.length - processedClicks.length
-        });
+        console.log('Supplementary data recorded successfully. Record ID:', result._id.toString());
+        res.status(200).json({ success: true, recordId: result._id.toString() });
     } catch (error) {
-        console.error('Error processing clicks batch:', error);
+        console.error('Error recording supplementary analytics:', error);
         res.status(500).json({ error: error.message });
     }
 };
