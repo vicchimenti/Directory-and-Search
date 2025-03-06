@@ -1,96 +1,182 @@
 /**
- * @fileoverview Analytics API Click Supplement Endpoint for Funnelback Search Integration
+ * @fileoverview Primary Funnelback Search Proxy Server
  * 
- * This file contains API handler for tracking various search analytics events
- * including supplementary analytics data.
+ * Handles the main search functionality for the Funnelback integration.
+ * Acts as a proxy between client-side requests and Funnelback's search API,
+ * managing CORS, request forwarding, and IP handling.
+ * 
+ * Features:
+ * - CORS handling for Seattle University domain
+ * - IP forwarding to Funnelback
+ * - Query parameter management
+ * - Error handling and logging
+ * - Analytics integration
+ * - Consistent schema handling
  * 
  * @author Victor Chimenti
- * @version 2.0.0
- * @module api/analytics/supplement
- * @lastModified 2025-03-06
+ * @version 2.1.0
+ * @license MIT
+ * @lastModified 2025-03-07
  */
 
-// api/analytics/supplement.js
-module.exports = async (req, res) => {
-    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    
-    // Set CORS headers
+const axios = require('axios');
+const { recordQuery } = require('../lib/queryAnalytics');
+const { 
+    createStandardAnalyticsData, 
+    sanitizeSessionId, 
+    logAnalyticsData 
+} = require('../lib/schemaHandler');
+
+/**
+ * Extracts the number of results from an HTML response
+ * 
+ * @param {string} htmlContent - The HTML response from Funnelback
+ * @returns {number} The number of results, or 0 if not found
+ */
+function extractResultCount(htmlContent) {
+    try {
+        // Look for result count in HTML response
+        const match = htmlContent.match(/totalMatching">([0-9,]+)</);
+        if (match && match[1]) {
+            return parseInt(match[1].replace(/,/g, ''), 10);
+        }
+    } catch (error) {
+        console.error('Error extracting result count:', error);
+    }
+    return 0;
+}
+
+/**
+ * Main request handler for search functionality.
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters from the request
+ * @param {Object} req.headers - Request headers
+ * @param {string} req.method - HTTP method of the request
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+async function handler(req, res) {
+    const startTime = Date.now();
+    // Enable CORS for Seattle University domain
     res.setHeader('Access-Control-Allow-Origin', 'https://www.seattleu.edu');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Log request details
+    const userIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    console.log('Main Search Request:');
+    console.log('- User IP:', userIp);
+    console.log('- Query Parameters:', req.query);
+    console.log('- Request Headers:', req.headers);
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).send('Method Not Allowed');
-    }
-    
     try {
-        const { Query } = require('mongoose').models;
-        const { sanitizeSessionId } = require('../../lib/schemaHandler');
-        const data = req.body || {};
-        
-        if (!data.query) {
-            return res.status(400).json({ error: 'No query provided' });
-        }
-        
-        console.log('Processing supplementary analytics for query:', data.query);
-        
-        // Find the most recent query with matching information
-        const filters = {
-            query: data.query
+        const funnelbackUrl = 'https://dxp-us-search.funnelback.squiz.cloud/s/search.html';
+
+        // Add default parameters if not provided
+        const params = {
+            collection: 'seattleu~sp-search',
+            profile: '_default',
+            form: 'partial',
+            ...req.query
         };
-        
-        // Add sessionId to filter if available (properly sanitized)
-        const sessionId = sanitizeSessionId(data.sessionId);
-        if (sessionId) {
-            filters.sessionId = sessionId;
-            console.log('Using session ID for matching:', sessionId);
-        } else {
-            // Fall back to IP address
-            filters.userIp = userIp;
-            console.log('Using IP address for matching:', userIp);
-        }
-        
-        // Prepare update based on provided data
-        const update = {};
-        
-        // Add result count if provided
-        if (data.resultCount !== undefined) {
-            update.resultCount = data.resultCount;
-            update.hasResults = data.resultCount > 0;
-        }
-        
-        // Add enrichment data if provided
-        if (data.enrichmentData) {
-            update.enrichmentData = data.enrichmentData;
-        }
-        
-        console.log('Update filters:', filters);
-        console.log('Update data:', update);
-        
-        // Update the query document
-        const result = await Query.findOneAndUpdate(
-            filters,
-            { $set: update },
-            { 
-                new: true,
-                sort: { timestamp: -1 }
+
+        console.log('Making Funnelback request:');
+        console.log('- URL:', funnelbackUrl);
+        console.log('- Parameters:', params);
+
+        const response = await axios.get(funnelbackUrl, {
+            params: params,
+            headers: {
+                'Accept': 'text/html',
+                'X-Forwarded-For': userIp
             }
-        );
+        });
+
+        console.log('Funnelback response received successfully');
         
-        if (!result) {
-            console.log('No matching query found for supplementary data');
-            return res.status(404).json({ error: 'Query not found' });
+        // Extract the result count from the HTML response
+        const resultCount = extractResultCount(response.data);
+        const processingTime = Date.now() - startTime;
+        
+        // Record analytics data
+        try {
+            console.log('MongoDB URI defined:', !!process.env.MONGODB_URI);
+            
+            if (process.env.MONGODB_URI) {
+                // Extract and sanitize session ID
+                const sessionId = sanitizeSessionId(req.query.sessionId);
+                console.log('Extracted session ID:', sessionId);
+                
+                // Create raw analytics data
+                const rawData = {
+                    handler: 'server',
+                    query: req.query.query || req.query.partial_query || '[empty query]',
+                    searchCollection: params.collection,
+                    userIp: userIp,
+                    userAgent: req.headers['user-agent'],
+                    referer: req.headers.referer,
+                    city: decodeURIComponent(req.headers['x-vercel-ip-city'] || ''),
+                    region: req.headers['x-vercel-ip-country-region'],
+                    country: req.headers['x-vercel-ip-country'],
+                    timezone: req.headers['x-vercel-ip-timezone'],
+                    latitude: req.headers['x-vercel-ip-latitude'],
+                    longitude: req.headers['x-vercel-ip-longitude'],
+                    responseTime: processingTime,
+                    resultCount: resultCount,
+                    hasResults: resultCount > 0,
+                    isProgramTab: Boolean(req.query['f.Tabs|programMain']),
+                    isStaffTab: Boolean(req.query['f.Tabs|seattleu~ds-staff']),
+                    tabs: [],
+                    sessionId: sessionId,
+                    clickedResults: [], // Initialize empty array to ensure field exists
+                    timestamp: new Date()
+                };
+                
+                // Add tabs information
+                if (rawData.isProgramTab) rawData.tabs.push('program-main');
+                if (rawData.isStaffTab) rawData.tabs.push('Faculty & Staff');
+                
+                // Standardize data to ensure consistent schema
+                const analyticsData = createStandardAnalyticsData(rawData);
+                
+                // Log data (excluding sensitive information)
+                logAnalyticsData(analyticsData, 'server recording');
+                
+                // Record the analytics
+                try {
+                    const recordResult = await recordQuery(analyticsData);
+                    console.log('Analytics record result:', recordResult ? 'Saved' : 'Not saved');
+                    if (recordResult && recordResult._id) {
+                        console.log('Analytics record ID:', recordResult._id.toString());
+                    }
+                } catch (recordError) {
+                    console.error('Error recording analytics:', recordError.message);
+                    if (recordError.name === 'ValidationError') {
+                        console.error('Validation errors:', Object.keys(recordError.errors).join(', '));
+                    }
+                }
+            } else {
+                console.log('No MongoDB URI defined, skipping analytics recording');
+            }
+        } catch (analyticsError) {
+            console.error('Analytics error:', analyticsError);
         }
         
-        console.log('Supplementary data recorded successfully. Record ID:', result._id.toString());
-        res.status(200).json({ success: true, recordId: result._id.toString() });
+        res.send(response.data);
     } catch (error) {
-        console.error('Error recording supplementary analytics:', error);
-        res.status(500).json({ error: error.message });
+        console.error('Error in main search handler:', {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data
+        });
+        res.status(500).send('Search error: ' + (error.response?.data || error.message));
     }
-};
+}
+
+module.exports = handler;
