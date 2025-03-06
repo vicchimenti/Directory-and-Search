@@ -29,7 +29,7 @@
 * 
 * @author Victor Chimenti
 * @version 2.2.0
-* @lastModified 2025-02-28
+* @lastModified 2025-03-05
 */
 
 class DynamicResultsManager {
