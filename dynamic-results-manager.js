@@ -30,7 +30,7 @@
 * - header-search-manager.js: Handles initial search and redirects
 * 
 * @author Victor Chimenti
-* @version 3.2.3
+* @version 3.3.0
 * @lastModified 2025-03-07
 */
 
@@ -365,7 +365,7 @@ class DynamicResultsManager {
             console.error('Failed to send click data:', error);
         }
     }
-     
+
     /**
      * Main click handler for all dynamic content interactions.
      * Routes clicks to appropriate handlers based on element clicked.
