@@ -12,8 +12,8 @@
  * - Maintains session data for query attribution
  * 
  * @author Victor Chimenti
- * @version 3.1.3
- * @lastModified 2025-03-05
+ * @version 3.1.4
+ * @lastModified 2025-03-07
  */
 
 class ResultsSearchManager {
