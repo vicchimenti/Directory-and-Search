@@ -46,7 +46,8 @@ class DynamicResultsManager {
         };
         
         // Analytics configuration
-        this.analyticsEndpoint = 'https://funnelback-proxy-one.vercel.app/proxy/analytics/click';
+        this.proxyBaseUrl = 'https://funnelback-proxy-one.vercel.app/proxy';
+        this.analyticsEndpoint = `${this.proxyBaseUrl}/analytics`;
         this.sessionId = this.#getOrCreateSessionId();
         this.originalQuery = null;
         
