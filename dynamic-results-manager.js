@@ -291,9 +291,10 @@ class DynamicResultsManager {
         if (!this.originalQuery || !link) return;
         
         try {
-            // Get link details
+            // Get link details - PRIORITIZE data-live-url over href
+            const dataLiveUrl = link.getAttribute('data-live-url');
             const href = link.getAttribute('href') || '';
-            const dataLiveUrl = link.getAttribute('data-live-url') || href;
+            const clickedUrl = dataLiveUrl || href; // Use data-live-url if available, else href
             const title = link.innerText.trim() || '';
             
             // Get position information if possible
@@ -304,12 +305,12 @@ class DynamicResultsManager {
                 position = allResults.indexOf(resultItem) + 1;
             }
             
-            console.log(`Result link clicked: "${title}" - ${dataLiveUrl} (position ${position})`);
+            console.log(`Result link clicked: "${title}" - ${clickedUrl} (position ${position})`);
             
             // Prepare analytics data
             const clickData = {
                 originalQuery: this.originalQuery,
-                clickedUrl: dataLiveUrl, // Using data-live-url for accurate destination
+                clickedUrl: clickedUrl, // Now correctly using data-live-url when available
                 clickedTitle: title,
                 clickPosition: position,
                 sessionId: this.sessionId,
