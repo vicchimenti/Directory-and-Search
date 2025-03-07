@@ -333,6 +333,8 @@ class DynamicResultsManager {
      * @param {Object} clickData - Data about the clicked result
      */
     #sendClickData(clickData) {
+        const endpoint = `${this.analyticsEndpoint}/click`;
+
         try {
             // Use sendBeacon if available (works during page unload)
             if (navigator.sendBeacon) {
@@ -345,13 +347,15 @@ class DynamicResultsManager {
             }
             
             // Fallback to fetch with keepalive
-            fetch(this.analyticsEndpoint, {
+            fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Origin': window.location.origin
                 },
                 body: JSON.stringify(clickData),
-                keepalive: true // This allows the request to outlive the page
+                credentials: 'include',
+                keepalive: true
             }).catch(error => {
                 console.error('Error sending click data:', error);
             });
