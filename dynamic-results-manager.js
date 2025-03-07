@@ -334,7 +334,7 @@ class DynamicResultsManager {
      */
     #sendClickData(clickData) {
         const endpoint = `${this.analyticsEndpoint}/click`;
-
+    
         try {
             // Use sendBeacon if available (works during page unload)
             if (navigator.sendBeacon) {
@@ -342,7 +342,8 @@ class DynamicResultsManager {
                     type: 'application/json'
                 });
                 
-                navigator.sendBeacon(this.analyticsEndpoint, blob);
+                // Fix: Use the correct endpoint for sendBeacon
+                navigator.sendBeacon(endpoint, blob);
                 return;
             }
             
