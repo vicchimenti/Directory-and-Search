@@ -343,7 +343,7 @@ class DynamicResultsManager {
                     type: 'application/json'
                 });
                 
-                // Fix: Use the correct endpoint for sendBeacon
+                // Use the correct endpoint for sendBeacon
                 navigator.sendBeacon(endpoint, blob);
                 return;
             }
@@ -365,7 +365,7 @@ class DynamicResultsManager {
             console.error('Failed to send click data:', error);
         }
     }
- 
+     
     /**
      * Main click handler for all dynamic content interactions.
      * Routes clicks to appropriate handlers based on element clicked.
