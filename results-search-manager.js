@@ -28,9 +28,7 @@ class ResultsSearchManager {
         this.originalQuery = null;
         this.sessionId = this.#getOrCreateSessionId();
         this.analyticsEnabled = true;
-        // this.proxyBaseUrl = 'https://funnelback-proxy.vercel.app/'; wrong format
         this.proxyBaseUrl = 'https://funnelback-proxy-one.vercel.app/proxy';
-        // this.proxyBaseUrl = 'https://funnelback-proxy.vercel.app/proxy'; legacy endpoint
         this.analyticsEndpoint = `${this.proxyBaseUrl}/analytics`;
         
         // Initialize search functionality
