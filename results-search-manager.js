@@ -167,10 +167,12 @@ class ResultsSearchManager {
             fetch(endpoint, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Origin': window.location.origin
                 },
                 body: JSON.stringify(clickData),
-                keepalive: true // This allows the request to outlive the page
+                credentials: 'include',
+                keepalive: true
             }).catch(error => {
                 console.error('Error sending click data:', error);
             });
