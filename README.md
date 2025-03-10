@@ -48,8 +48,8 @@
 
 ### CSS Integration Verification
 
- Check that all autocomplete styles are already included in funnelback.css
- Verify the styles work correctly with search components in staging
+- [ ] Check that all autocomplete styles are already included in funnelback.css
+- [ ] Verify the styles work correctly with search components in staging
 
 ## Thursday Morning Launch (6 AM)
 
