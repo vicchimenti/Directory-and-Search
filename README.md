@@ -48,14 +48,14 @@
 
 ### CSS Integration Verification
 
-- [ ] Check that all autocomplete styles are already included in funnelback.css
-- [ ] Verify the styles work correctly with search components in staging
+- [x] Check that all autocomplete styles are already included in funnelback.css
+- [x] Verify the styles work correctly with search components in staging
 
 ## Thursday Morning Launch (6 AM)
 
 ### 1. Back Up Existing Google Search (5:30 AM)
 
-- [ ] Create archive folder for existing Google search components
+- [x] Create archive folder for existing Google search components
 - [ ] Move current Google search code to archive folder
 
 ### 2. Update Page Layouts
