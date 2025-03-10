@@ -62,7 +62,6 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 ```html
  <!-- Stylesheets -->
-
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;1,500;1,800&amp;family=Oswald:wght@300;700&amp;family=Roboto+Slab:wght@200;300&amp;display=swap" />
 <t4 type="media" id="6907520" formatter="cssver/*" />
 <!-- app.css -->
@@ -215,6 +214,6 @@ Rollback Steps
 
  Contact Information
 
-Search Team Lead: Gaurav Mandan
-DevOps: Victor Chimenti
-Funnelback Contact: Ashton Martin
+- Search Team Lead: Gaurav Mandan
+- DevOps: Victor Chimenti
+- Funnelback Contact: Ashton Martin
