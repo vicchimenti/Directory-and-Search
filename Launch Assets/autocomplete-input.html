@@ -1,72 +1,70 @@
 <section class="su-listing">
     <div class="su-listing--form-wrapper bg--dark global-padding--8x">
-        <div class="">
-            <div class="searchAreaWrapper">
-                <div class="searchArea">
-                    <div class="global-margin--3x">
-                        <form id="concierge-search-form" 
-                                class="autocomplete-concierge__form" 
-                                method="GET" 
-                                action="">
-                        
-                            <div class="search-config" hidden>
-                                <input type="hidden" name="collection" value="seattleu~sp-search">
-                                <input type="hidden" name="profile" value="_default">
-                                <input type="hidden" name="f.Tabs|programMain" value="program-main">
-                                <input type="hidden" name="f.Tabs|seattleu~ds-staff" value="Faculty & Staff">
-                            </div>
+        <div class="searchAreaWrapper">
+            <div class="searchArea">
+                <div class="global-margin--3x">
+                    <form id="concierge-search-form" 
+                            class="autocomplete-concierge__form" 
+                            method="GET" 
+                            action="">
+                    
+                        <div class="search-config" hidden>
+                            <input type="hidden" name="collection" value="seattleu~sp-search">
+                            <input type="hidden" name="profile" value="_default">
+                            <input type="hidden" name="f.Tabs|programMain" value="program-main">
+                            <input type="hidden" name="f.Tabs|seattleu~ds-staff" value="Faculty & Staff">
+                        </div>
 
-                            <label for="autocomplete-concierge-inputField" 
-                                aria-live="polite" 
-                                id="autocomplete-concierge-label" 
-                                class="sr-only" 
-                                hidden>
-                                Search Seattle University
-                            </label>
-                        
-                            <input type="text" 
-                                    id="autocomplete-concierge-inputField"
-                                    name="query"
-                                    class="on-page-sq-search"
-                                    autocomplete="off"
-                                    spellcheck="false"
-                                    autofocus
-                                    data-autocomplete
-                                    data-collection="seattleu~sp-search"
-                                    data-profile="_default"
-                                    data-max-results="10"
-                                    data-min-length="3"
-                                    data-results-container="results">
-                        
-                            <div class="search-controls">
-                                <!-- Search button -->
-                                <button type="submit"
-                                    id="on-page-search-button"
-                                    class="search-submit-button btn icon-visible"
-                                    aria-labelledby="autocomplete-concierge-submit-label">
-                                    <svg class="autocomplete-concierge_icon visible"
-                                        width="20" height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round">
-                                            <title id="autocomplete-concierge-submit-label">Submit Search</title>
-                                            <circle cx="11" cy="11" r="8"></circle>
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        
-                            <div id="autocomplete-suggestions" 
-                                class="autocomplete-concierge__results" 
-                                role="listbox" 
-                                aria-labelledby="autocomplete-concierge-label"
-                                hidden>
-                            </div>
-                        </form>
-                    </div>
+                        <label for="autocomplete-concierge-inputField" 
+                            aria-live="polite" 
+                            id="autocomplete-concierge-label" 
+                            class="sr-only" 
+                            hidden>
+                            Search Seattle University
+                        </label>
+                    
+                        <input type="text" 
+                                id="autocomplete-concierge-inputField"
+                                name="query"
+                                class="on-page-sq-search"
+                                autocomplete="off"
+                                spellcheck="false"
+                                autofocus
+                                data-autocomplete
+                                data-collection="seattleu~sp-search"
+                                data-profile="_default"
+                                data-max-results="10"
+                                data-min-length="3"
+                                data-results-container="results">
+                    
+                        <div class="search-controls">
+                            <!-- Search button -->
+                            <button type="submit"
+                                id="on-page-search-button"
+                                class="search-submit-button btn icon-visible"
+                                aria-labelledby="autocomplete-concierge-submit-label">
+                                <svg class="autocomplete-concierge_icon visible"
+                                    width="20" height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                        <title id="autocomplete-concierge-submit-label">Submit Search</title>
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    
+                        <div id="autocomplete-suggestions" 
+                            class="autocomplete-concierge__results" 
+                            role="listbox" 
+                            aria-labelledby="autocomplete-concierge-label"
+                            hidden>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
