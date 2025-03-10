@@ -85,11 +85,11 @@
 
     <t4 type="navigation" name="Return Scripts for Start of Body" id="979" />
 
-    <div class="page page--page <t4 type="navigation" name="Return Page Class" id="966" />">
+    <div class="page page--page <t4 type='navigation' name='Return Page Class' id='966' />">
 
         <t4 type="navigation" name="Return Site Wide Notices" id="970" />
 
-        <div class="emergencynotice" aria-live="assertive" data-t4-emergency-notices="<t4 type="media" id="6930620" formatter="path/*" />"></div>
+        <div class="emergencynotice" aria-live="assertive" data-t4-emergency-notices="<t4 type='media' id='6930620' formatter='path/*' />"></div>
 
         <t4 type="navigation" name="Return Common Header HTML" id="940" />
 
