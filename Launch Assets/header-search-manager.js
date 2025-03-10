@@ -23,8 +23,8 @@
  * - results-search-manager.js: Handles the actual Funnelback API calls
  * 
  * @author Victor Chimenti
- * @version 2.2.0
- * @lastModified 2025-03-02
+ * @version 3.0.0
+ * @lastModified 2025-03-10
  */
 
 class HeaderSearchManager {
