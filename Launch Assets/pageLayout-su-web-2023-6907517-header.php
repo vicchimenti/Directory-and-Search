@@ -71,6 +71,8 @@
     <!-- all.css -->
     <t4 type="media" id="7022512" formatter="cssver/*" />
     <!-- t4-extras.css -->
+    <t4 type="media" id="8953952" formatter="cssver/*" />
+    <!-- funnelback.css -->
 
     
     <!-- Custom -->
@@ -89,7 +91,7 @@
 
         <t4 type="navigation" name="Return Site Wide Notices" id="970" />
 
-        <div class="emergencynotice" aria-live="assertive" data-t4-emergency-notices="<t4 type="media" id="6930620" formatter="path/*" />"></div>
+        <div class="emergencynotice" aria-live="assertive" data-t4-emergency-notices="<t4 type='media' id='6930620' formatter='path/*' />"></div>
 
         <t4 type="navigation" name="Return Common Header HTML" id="940" />
 
