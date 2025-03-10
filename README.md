@@ -152,6 +152,12 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 - [x] header-search-manager.js (Line 214)
 - [x] results-search-manager.js (Line 41)
 
+#### Ready to Push
+
+- [ ] dynamic-results-manager.js
+- [ ] header-search-manager.js
+- [ ] results-search-manager.js
+
 ### 5. Publish All Changes (6:00 AM)
 
 - [ ] Publish updated page layouts
