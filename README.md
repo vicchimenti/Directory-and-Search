@@ -216,5 +216,5 @@ Rollback Steps
  Contact Information
 
 Search Team Lead: Gaurav Mandan
-Technical Support: Victor Chimenti
+DevOps: Victor Chimenti
 Funnelback Contact: Ashton Martin
