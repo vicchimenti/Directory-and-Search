@@ -32,7 +32,7 @@ class ResultsSearchManager {
         this.analyticsEndpoint = `${this.proxyBaseUrl}/analytics`;
         
         // Initialize search functionality
-        if (window.location.pathname.includes('search-test')) {
+        if (window.location.pathname.includes('search')) {
             console.log('Initializing ResultsSearchManager with analytics');
             this.#setupResultsSearch();
             this.handleURLParameters(); // Public as it's part of the API
