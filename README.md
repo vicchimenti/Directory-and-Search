@@ -150,7 +150,7 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 - [x] dynamic-results-manager.js (Line 87)
 - [x] header-search-manager.js (Line 214)
-- [ ] results-search-manager.js (Line 41)
+- [x] results-search-manager.js (Line 41)
 
 ### 5. Publish All Changes (6:00 AM)
 
