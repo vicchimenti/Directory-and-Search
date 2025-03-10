@@ -62,7 +62,7 @@
 
 Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
-- [ ] Add Funnelback CSS link to the Stylesheets section:
+- [x] Add Funnelback CSS link to the Stylesheets section:
 
 ```html
  <!-- Stylesheets -->
