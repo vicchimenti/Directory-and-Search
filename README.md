@@ -4,7 +4,7 @@
 
 ### HTML Search Form Update
 
-- [ ] Update `autocomplete-input.html` to reposition the label element
+- [x] Update `autocomplete-input.html` to reposition the label element
 
 ```html
 <form id="concierge-search-form" 
