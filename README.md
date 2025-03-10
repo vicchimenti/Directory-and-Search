@@ -157,6 +157,8 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 - [ ] dynamic-results-manager.js
 - [ ] header-search-manager.js
 - [ ] results-search-manager.js
+- [ ] pageLayout-header.php
+- [ ] pageLayout-footer.php
 
 ### 5. Publish All Changes (6:00 AM)
 
