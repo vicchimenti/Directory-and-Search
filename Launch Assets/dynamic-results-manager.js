@@ -30,8 +30,8 @@
 * - header-search-manager.js: Handles initial search and redirects
 * 
 * @author Victor Chimenti
-* @version 3.3.0
-* @lastModified 2025-03-07
+* @version 4.0.0
+* @lastModified 2025-03-10
 */
 
 class DynamicResultsManager {
