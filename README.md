@@ -148,7 +148,7 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
  Find and replace all instances of "search-test" with "search" in:
 
-- [ ] dynamic-results-manager.js (Line 87)
+- [x] dynamic-results-manager.js (Line 87)
 - [ ] header-search-manager.js (Line 214)
 - [ ] results-search-manager.js (Line 41)
 

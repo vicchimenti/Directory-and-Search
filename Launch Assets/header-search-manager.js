@@ -134,7 +134,7 @@ class HeaderSearchManager {
         });
 
         // Redirect to results page where ResultsSearchManager will handle the search
-        const redirectUrl = `/search-test/?${searchParams.toString()}`;
+        const redirectUrl = `/search/?${searchParams.toString()}`;
         window.location.href = redirectUrl;
     }
 
