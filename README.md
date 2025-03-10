@@ -81,11 +81,11 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 #### Footer File Update (pageLayout-su-web-2023-6907517-footer.php)
 
-- [ ] Replace jQuery source
-- [ ] Add additional JavaScript libraries
-- [ ] Add Funnelback partial scripts
-- [ ] Add Funnelback JavaScript modules
-- [ ] Update navigation tag for end of body scripts
+- [x] Replace jQuery source
+- [x] Add additional JavaScript libraries
+- [x] Add Funnelback partial scripts
+- [x] Add Funnelback JavaScript modules
+- [x] Update navigation tag for end of body scripts
 
 ```php
         </div>
