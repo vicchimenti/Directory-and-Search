@@ -1,9 +1,7 @@
 <t4 type="navigation" name="v10 Access Control - PHP" id="1021" /><t4 type="navigation" name="Return PHP Head" id="977" /><t4 type="media" id="7506257" formatter="inline/*" />
 <!DOCTYPE html>
 <html lang="en-US">
-
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -44,13 +42,13 @@
     <t4 type="navigation" name="V10 - Custom Header Code" id="1014" />
     
     <!-- Nav Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="<t4 type="media" id="6913741" formatter="path/*" />">
-    <link rel="icon" type="image/png" sizes="32x32" href="<t4 type="media" id="6913745" formatter="path/*" />">
-    <link rel="icon" type="image/png" sizes="16x16" href="<t4 type="media" id="6913749" formatter="path/*" />">
-    <link rel="manifest" href="<t4 type="media" id="6913805" formatter="path/*" />">
-    <link rel="shortcut icon" href="<t4 type="media" id="6913753" formatter="path/*" />">
+    <link rel="apple-touch-icon" sizes="180x180" href='<t4 type="media" id="6913741" formatter="path/*" />'>
+    <link rel="icon" type="image/png" sizes="32x32" href='<t4 type="media" id="6913745" formatter="path/*" />'>
+    <link rel="icon" type="image/png" sizes="16x16" href='<t4 type="media" id="6913749" formatter="path/*" />'>
+    <link rel="manifest" href='<t4 type="media" id="6913805" formatter="path/*" />'>
+    <link rel="shortcut icon" href='<t4 type="media" id="6913753" formatter="path/*" />'>
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="<t4 type="media" id="6913806" formatter="path/*" />">
+    <meta name="msapplication-config" content='<t4 type="media" id="6913806" formatter="path/*" />'>
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;1,500;1,800&amp;family=Oswald:wght@300;700&amp;family=Roboto+Slab:wght@200;300&amp;display=swap" />
