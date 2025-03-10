@@ -51,13 +51,13 @@
     
     <!-- Nav Icons -->
 
-    <link rel="apple-touch-icon" sizes="180x180" href="<t4 type="media" id="6913741" formatter="path/*" />">
-    <link rel="icon" type="image/png" sizes="32x32" href="<t4 type="media" id="6913745" formatter="path/*" />">
-    <link rel="icon" type="image/png" sizes="16x16" href="<t4 type="media" id="6913749" formatter="path/*" />">
-    <link rel="manifest" href="<t4 type="media" id="6913805" formatter="path/*" />">
-    <link rel="shortcut icon" href="<t4 type="media" id="6913753" formatter="path/*" />">
+    <link rel="apple-touch-icon" sizes="180x180" href='<t4 type="media" id="6913741" formatter="path/*" />'>
+    <link rel="icon" type="image/png" sizes="32x32" href='<t4 type="media" id="6913745" formatter="path/*" />'>
+    <link rel="icon" type="image/png" sizes="16x16" href='<t4 type="media" id="6913749" formatter="path/*" />'>
+    <link rel="manifest" href='<t4 type="media" id="6913805" formatter="path/*" />'>
+    <link rel="shortcut icon" href='<t4 type="media" id="6913753" formatter="path/*" />'>
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="<t4 type="media" id="6913806" formatter="path/*" />">
+    <meta name="msapplication-config" content='<t4 type="media" id="6913806" formatter="path/*" />'>
 
     
     <!-- Stylesheets -->
