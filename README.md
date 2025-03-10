@@ -44,21 +44,21 @@
     <!-- Rest of the form remains unchanged -->
 </form>```
 
-CSS Integration Verification
+### CSS Integration Verification
 
  Check that all autocomplete styles are already included in funnelback.css
  Verify the styles work correctly with search components in staging
 
-Thursday Morning Launch (6 AM)
+## Thursday Morning Launch (6 AM)
 1. Back Up Existing Google Search (5:30 AM)
 
- Create archive folder for existing Google search components
- Move current Google search code to archive folder
+ - [ ] Create archive folder for existing Google search components
+ - [ ] Move current Google search code to archive folder
 
 2. Update Page Layouts
 Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
- Add Funnelback CSS link to the Stylesheets section:
+ - [ ] Add Funnelback CSS link to the Stylesheets section:
 
 ```html
  <!-- Stylesheets -->
@@ -75,13 +75,13 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 <!-- funnelback.css -->
 ```
 
- Footer File Update (pageLayout-su-web-2023-6907517-footer.php)
+#### Footer File Update (pageLayout-su-web-2023-6907517-footer.php)
 
- Replace jQuery source
- Add additional JavaScript libraries
- Add Funnelback partial scripts
- Add Funnelback JavaScript modules
- Update navigation tag for end of body scripts
+- [ ] Replace jQuery source
+- [ ] Add additional JavaScript libraries
+- [ ] Add Funnelback partial scripts
+- [ ] Add Funnelback JavaScript modules
+- [ ] Update navigation tag for end of body scripts
 
 ```html
  </div>
@@ -129,81 +129,78 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 <t4 type="navigation" name="V10 - Custom Scripts" id="1015" />
 <t4 type="navigation" name="V10 Top Content Custom JS" id="1017" />
 </body>
-
 </html>
 ```
 
-3. Content Migration (5:40-5:55 AM)
+### 3. Content Migration (5:40-5:55 AM)
 
  Move code from Dev to Production site:
 
- Funnelback Search > Site Assets > Common Header > Code Head → Site Assets > Code - Head
- Funnelback Search > Site Assets > Common Header > Code Body → Site Assets > Code - Body Start
- Funnelback Search > Site Assets > Common Header > Code Body End → Site Assets > Code - Body End
+- [ ] Funnelback Search > Site Assets > Common Header > Code Head → Site Assets > Code - Head
+- [ ] Funnelback Search > Site Assets > Common Header > Code Body → Site Assets > Code - Body Start
+- [ ] Funnelback Search > Site Assets > Common Header > Code Body End → Site Assets > Code - Body End
 
-
-
-4. Update JavaScript References (5:55 AM)
+### 4. Update JavaScript References (5:55 AM)
 
  Find and replace all instances of "search-test" with "search" in:
 
- dynamic-results-manager.js (Line 87)
- header-search-manager.js (Line 214)
- results-search-manager.js (Line 41)
+- [ ] dynamic-results-manager.js (Line 87)
+- [ ] header-search-manager.js (Line 214)
+- [ ] results-search-manager.js (Line 41)
 
+### 5. Publish All Changes (6:00 AM)
 
+- [ ] Publish updated page layouts
+- [ ] Publish updated JavaScript files
+- [ ] Publish migrated content assets
 
-5. Publish All Changes (6:00 AM)
+## Post-Launch Verification (6:05-6:30 AM)
 
- Publish updated page layouts
- Publish updated JavaScript files
- Publish migrated content assets
+### Functionality Testing
 
-Post-Launch Verification (6:05-6:30 AM)
-Functionality Testing
+- [ ] Verify search input works
+- [ ] Test autocomplete suggestions
+- [ ] Perform test searches
+- [ ] Check search results display
+- [ ] Test facets and filters
+- [ ] Verify pagination works
+- [ ] Test sorting and filtering options
 
- Verify search input works
- Test autocomplete suggestions
- Perform test searches
- Check search results display
- Test facets and filters
- Verify pagination works
- Test sorting and filtering options
+### Browser Compatibility
 
-Browser Compatibility
+- [ ] Test on Chrome
+- [ ] Test on Firefox
+- [ ] Test on Safari
+- [ ] Test on Edge
 
- Test on Chrome
- Test on Firefox
- Test on Safari
- Test on Edge
+### Device Testing
 
-Device Testing
+- [ ] Test on desktop
+- [ ] Test on mobile devices
+- [ ] Test on tablets
 
- Test on desktop
- Test on mobile devices
- Test on tablets
+### Accessibility Testing
 
-Accessibility Testing
+- [ ] Verify keyboard navigation works
+- [ ] Check screen reader compatibility
+- [ ] Test color contrast compliance
 
- Verify keyboard navigation works
- Check screen reader compatibility
- Test color contrast compliance
+## Rollback Plan (If Needed)
 
-Rollback Plan (If Needed)
-Criteria for Rollback
+### Criteria for Rollback
 
-Critical functionality not working
-Broken page layout
-JavaScript errors preventing site usage
+- Critical functionality not working
+- Broken page layout
+- JavaScript errors preventing site usage
 
-Rollback Steps
+### Rollback Steps
 
- Restore original page layouts
- Restore Google search components
- Revert JavaScript changes
- Notify stakeholders of rollback
+- [ ] Restore original page layouts
+- [ ] Restore Google search components
+- [ ] Revert JavaScript changes
+- [ ] Notify stakeholders of rollback
 
- Common Issues
+## Common Issues
 
 | Issue | Possible Cause | Solution |
 |-------|----------------|----------|
@@ -212,7 +209,7 @@ Rollback Steps
 | Results not styled | Missing CSS | Check funnelback.css is loaded |
 | Results don't display | API error | Check network requests |
 
- Contact Information
+## Contact Information
 
 - Search Team Lead: Gaurav Mandan
 - DevOps: Victor Chimenti
