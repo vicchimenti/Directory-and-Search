@@ -51,7 +51,7 @@ class DynamicResultsManager {
         this.sessionId = this.#getOrCreateSessionId();
         this.originalQuery = null;
         
-        if (window.location.pathname.includes('search-test')) {
+        if (window.location.pathname.includes('search')) {
             this.#initializeObserver();
             
             if (document.readyState === 'loading') {
