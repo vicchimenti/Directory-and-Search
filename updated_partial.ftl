@@ -112,7 +112,7 @@
                                             <p>${ctaText}</p>
                                         </div>
                                         <div class="global-spacing--4x">
-                                            <a href="${ctaLink}" class="btn">${ctaButton}</a>
+                                            <a href="${ctaLink}" class="btn" target="_blank">${ctaButton}</a>
                                         </div>
                                     </div>
                                 </div>
