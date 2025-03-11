@@ -21,8 +21,6 @@
     Global Stencils imports
     The namespace will be available in all templates which are imported 
 -->
-<#import "auto_complete.concierge.ftl" as concierge />
-<#import "auto_complete.ftl" as auto_complete />
 <#import "base.ftl" as base />
 <#import "hero_banner.ftl" as hero_banner />
 <#import "search_tools.ftl" as search_tools />
@@ -86,12 +84,12 @@
                             <div class="grid-x grid-margin-x">
                                 <div class="cell auto">
                                     <div class="promo-section--text text-margin-reset">
-                                        <h2 class="h4">Lorem Ipsum</h2>
+                                        <h2 class="h4">Ready to Apply?</h2>
                                         <div class="global-spacing--2x">
-                                            <p>Aenean lacinia bibendum nulla sed consectetur.</p>
+                                            <p>Start your application with only a few clicks.</p>
                                         </div>
                                         <div class="global-spacing--4x">
-                                            <a href="#" class="btn">CTA</a>
+                                            <a href="https://www.seattleu.edu/apply/" target="_blank" class="btn">Apply Now</a>
                                         </div>
                                     </div>
                                 </div>
@@ -142,3 +140,9 @@
         </div>
     </div>
 </div>
+
+<#-- 
+    Libraries required by the design developed by the Stencils cutup team. 
+    Avoid changing these if possible.
+-->
+<script type="text/javascript" src="https://${httpHost!}/s/resources/${question.collection.id}/${question.profile}/themes/stencils/js/main.js"></script>
