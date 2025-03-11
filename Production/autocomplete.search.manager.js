@@ -48,9 +48,9 @@
  *
  * 
  * @author Victor Chimenti
- * @version 3.3.0
+ * @version 4.0.0
  * @license MIT
- * @lastModified 2025-03-05
+ * @lastModified 2025-03-11
  */
 
 class AutocompleteSearchManager {
