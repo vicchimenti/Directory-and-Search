@@ -44,10 +44,12 @@
  * @property {number} [maxResults=10] - Maximum number of suggestions to show
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
  * @property {number} [programLimit=5] - Maximum number of program suggestions to show
- * Note: Staff suggestions are fixed at 3 items
+ * @property {number} [staffLimit=5] - Maximum number of staff/faculty suggestions to show
+ *
  * 
  * @author Victor Chimenti
  * @version 3.3.0
+ * @license MIT
  * @lastModified 2025-03-05
  */
 
