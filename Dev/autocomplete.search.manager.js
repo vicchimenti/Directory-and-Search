@@ -300,7 +300,7 @@ class AutocompleteSearchManager {
                     };
                 })
                 .filter(staff => staff.title)
-                .slice(0, 3);  // Hard limit to 3 suggestions
+                .slice(0, this.config.staffLimit);
 
             console.log('Processed Results Count:', {
                 suggestions: suggestions.length,
