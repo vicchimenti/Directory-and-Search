@@ -44,11 +44,12 @@
  * @property {number} [maxResults=10] - Maximum number of suggestions to show
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
  * @property {number} [programLimit=5] - Maximum number of program suggestions to show
- * Note: Staff suggestions are fixed at 3 items
+ * @property {number} [staffLimit=5] - Maximum number of staff/faculty suggestions to show
+ *
  * 
  * @author Victor Chimenti
- * @version 3.3.0
- * @lastModified 2025-03-05
+ * @version 3.3.1
+ * @lastModified 2025-03-11
  */
 
 class AutocompleteSearchManager {
@@ -75,6 +76,7 @@ class AutocompleteSearchManager {
             maxResults: 10,
             minLength: 3,
             programLimit: 5,
+            staffLimit: 5,
             endpoints: {
                 suggest: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
                 search: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
