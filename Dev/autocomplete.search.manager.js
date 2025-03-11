@@ -665,7 +665,8 @@ class AutocompleteSearchManager {
                 profile: element.dataset.profile || '_default',
                 maxResults: parseInt(element.dataset.maxResults, 10) || 10,
                 minLength: parseInt(element.dataset.minLength, 10) || 3,
-                programLimit: parseInt(element.dataset.programLimit, 10) || 5
+                programLimit: parseInt(element.dataset.programLimit, 10) || 5,
+                staffLimit: parseInt(element.dataset.staffLimit, 10) || 5
             };
             new AutocompleteSearchManager(config);
         });
