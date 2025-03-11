@@ -19,8 +19,7 @@
 
     <#list facets![] as facet>
         <div class="tabs tabs--center">
-            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Show Filters</button>
-            <div class="tab__list collapse show multi-collapse" role="tablist">
+            <div class="tab__list" role="tablist">
                 <div class="tab-list__nav" data-tab-group-element="tab-list-nav">
                     <#-- 
                         Show all the tabs as individual buttons. 
@@ -40,8 +39,8 @@
                                 href="${value.toggleUrl}"
                             > 
                                 <#-- Display the icon if it is configured -->
-                                <#--  <#if question.getCurrentProfileConfig().get("stencils.tabs.icons${value.label}")??>
-                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icons${value.label}")}"></span>
+                                <#--  <#if question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")??>
+                                    <span class="${question.getCurrentProfileConfig().get("stencils.tabs.icon.${value.label}")}"></span>
                                 </#if>                              -->
 
                                 ${value.label}                            
@@ -72,8 +71,7 @@
                     <#-- 
                         Display the show more button which will be visible whent he viewport 
                         is smaller than the available space to show all the tabs.
-                        
-                    
+                    -->
                     <div 
                         class="overflow-menu__wrapper" 
                         data-tab-group-element="overflow-menu-wrapper"
@@ -94,7 +92,6 @@
                             </svg>
                         </button>
                         <div class="overflow-menu" data-tab-group-element="overflow-menu-container"></div>
-   
                     </div>                    
                 </div>
             </div>
@@ -266,3 +263,4 @@
         </#if>
     </@fb.ExtraResults>
 </#macro>
+
