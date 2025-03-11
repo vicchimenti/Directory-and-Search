@@ -75,6 +75,7 @@ class AutocompleteSearchManager {
             maxResults: 10,
             minLength: 3,
             programLimit: 5,
+            staffLimit: 5, 
             endpoints: {
                 suggest: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
                 search: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
@@ -298,7 +299,7 @@ class AutocompleteSearchManager {
                     };
                 })
                 .filter(staff => staff.title)
-                .slice(0, 3);  // Hard limit to 3 suggestions
+                .slice(0, this.config.staffLimit);
 
             console.log('Processed Results Count:', {
                 suggestions: suggestions.length,
