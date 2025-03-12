@@ -1,5 +1,7 @@
 /**
- * @fileoverview Header Search Manager for Funnelback Search Integration
+ * @fileoverview [DEV ASSET] Header Search Manager for Funnelback Search Integration
+ * 
+ * DEVELOPMENT VERSION - For backup development environment only.
  * 
  * This class manages the header search functionality of the website. It handles
  * the initial search input capture and redirects to the search results page
@@ -23,8 +25,12 @@
  * - results-search-manager.js: Handles the actual Funnelback API calls
  * 
  * @author Victor Chimenti
- * @version 2.2.0
- * @lastModified 2025-03-02
+ * @version 5.0.0
+ * @environment development
+ * @status in-progress
+ * @devVersion 5.0.0
+ * @prodVersion 3.0.0
+ * @lastModified 2025-03-12
  */
 
 class HeaderSearchManager {
