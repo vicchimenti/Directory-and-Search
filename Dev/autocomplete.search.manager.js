@@ -53,7 +53,7 @@
  * @version 5.0.0
  * @environment development
  * @status in-progress
- * @devVersion 5.0.0
+ * @devVersion 5.0.1
  * @prodVersion 4.1.0
  * @namespace AutocompleteSearchManager
  * @lastModified 2025-03-12
@@ -85,10 +85,14 @@ class AutocompleteSearchManager {
             programLimit: 5,
             staffLimit: 5,
             endpoints: {
-                suggest: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
-                search: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
-                suggestPeople: 'https://funnelback-proxy-one.vercel.app/proxy/suggestPeople',
-                suggestPrograms: 'https://funnelback-proxy-one.vercel.app/proxy/suggestPrograms'
+                // suggest: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
+                suggest: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
+                // search: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
+                search: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/search',
+                // suggestPeople: 'https://funnelback-proxy-one.vercel.app/proxy/suggestPeople',
+                suggestPeople: 'https://funnelback-proxy-dev.vercel.app/proxy/suggestPeople',
+                // suggestPrograms: 'https://funnelback-proxy-one.vercel.app/proxy/suggestPrograms'
+                suggestPrograms: 'https://funnelback-proxy-dev.vercel.app/proxy/suggestPrograms'
             },
             ...config
         };
