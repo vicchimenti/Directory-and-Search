@@ -1,16 +1,26 @@
 <#ftl encoding="utf-8" output_format="HTML" />
 <#--
-        This file is responsible for determining the overall structure
-        of the search implementations without the header. Unlike the simple.ftl
-        it only provides the search specific elements and does not include things
-        like the css or headers and footers. 
-        
-        - The HTML for the overall structure of the main content.
-        - Third party libraries
-        - References to javascript templates for sessions and concierge
-
-        The intended purpose of this template is to allow for partial integration
-        into an Content Management System (CMS). 
+/**
+ * @template partial.ftl
+ * @description Main search results template for Funnelback integration
+ * 
+ * This file is responsible for determining the overall structure
+ * of the search implementation without the header. Unlike simple.ftl,
+ * it only provides the search-specific elements and does not include things
+ * like CSS or headers and footers.
+ * 
+ * Components included:
+ * - The HTML for the overall structure of the main content
+ * - Third party libraries
+ * - References to JavaScript templates for sessions and concierge
+ * 
+ * The intended purpose of this template is to allow for partial integration
+ * into a Content Management System (CMS).
+ * 
+ * @version 5.0.0
+ * @author Victor Chimenti
+ * @lastModified 2025-03-12
+ */
 -->
 
 <#-- Core Funnelback imports -->
@@ -18,8 +28,12 @@
 <#import "/web/templates/modernui/funnelback.ftl" as fb />
 
 <#-- 
-    Global Stencils imports
-    The namespace will be available in all templates which are imported 
+/**
+ * Global Stencils imports
+ * 
+ * The namespace will be available in all templates which are imported.
+ * Each import provides specific functionality for the search interface.
+ */
 -->
 <#import "base.ftl" as base />
 <#import "hero_banner.ftl" as hero_banner />
@@ -46,10 +60,14 @@
 
 <#import "sessions.ftl" as sessions />
 
-
-<#-- Specific result styling imports
-    These imports are required for the automatic template selection to work
-    The various namespaces (e.g. 'video', 'facebook') need to be on the main scope 
+<#-- 
+/**
+ * Specific result styling imports
+ * 
+ * These imports are required for the automatic template selection to work.
+ * The various namespaces (e.g. 'video', 'facebook') need to be on the main scope.
+ * Each import handles rendering for a specific content type.
+ */
 -->
 <#import "results.news.ftl" as news />
 <#import "results.law.ftl" as law />
@@ -64,10 +82,28 @@
 <#-- Used to send absolute URLs for resources -->
 <#assign httpHost=httpRequest.getHeader('host')!"">
 
-<#-- Import the icons so that they are available using the <use> directive. -->
+<#-- 
+/**
+ * SVG Icon Import
+ * 
+ * Import SVG icons so they are available using the <use> directive throughout the template.
+ * Icons are hidden but accessible to the DOM.
+ */
+-->
 <div style="display:none">
     <#include "utilities.icons.ftl" />
 </div>
+
+<#-- 
+/**
+ * Main Content Structure
+ * 
+ * Defines the primary search interface layout with:
+ * - Search form
+ * - Tab navigation
+ * - Two-column layout (facets sidebar + results)
+ */
+-->
 <div class="stencils__main higher-education">
             
     <@hero_banner.SearchForm />
@@ -76,7 +112,25 @@
     <div class="grid-container">
         <div class="funnelback-search no-wysiwyg grid-x grid-padding-x">          
 
+            <#-- 
+            /**
+             * Left Sidebar / Facets Column
+             * 
+             * Contains:
+             * - Promotional content section
+             * - Faceted navigation
+             * - Left-positioned curator content
+             */
+            -->
             <div class="funnelback-search__side initial-12 medium-4 cell" id="funnelbach-search-facets">
+                <#-- 
+                /**
+                 * Promotional Section
+                 * 
+                 * Displays contextual promotional content based on the selected tab.
+                 * Each tab has custom heading, text, link URL and button text.
+                 */
+                -->
                 <section class="promo-section global-padding--3x oho-animate-sequence">
                     <article class="bg--dark bg--red global-padding--3x oho-animate fade-in-up">
                         <div class="grid-container">
@@ -120,7 +174,15 @@
                         </div>
                     </article>
                 </section>
-                <#-- Get facets for the current selected tab -->
+
+                <#-- 
+                /**
+                 * Faceted Navigation
+                 * 
+                 * Displays facets specific to the currently selected tab.
+                 * Facet configuration is pulled from the profile settings.
+                 */
+                -->
                 <#assign tabFacets = question.getCurrentProfileConfig().get("stencils.tabs.facets.${(response.customData.stencils.tabs.selected)!}")!>
 
                 <@facets.HasFacets facets=tabFacets>
@@ -130,19 +192,36 @@
                     />
                 </@facets.HasFacets>
 
+                <#-- Left-positioned curator content (if available) -->
                 <@curator.HasCuratorOrBestBet position="left">
                     <@curator.Curator position="left" />
                 </@curator.HasCuratorOrBestBet>
             </div>
+
+            <#-- 
+            /**
+             * Main Content / Results Column
+             * 
+             * Contains:
+             * - Search tools (sort, results per page)
+             * - Query modification feedback
+             * - Spelling suggestions
+             * - Facet breadcrumb trail
+             * - Search results
+             * - Pagination
+             * - Contextual navigation
+             */
+            -->
             <div class="funnelback-search__body initial-12 medium-8 clearfix cell" id="funnelbach-search-body">
                 <h2 class="funnelback-search__title sr-only">Results</h2>
                 
-               <@search_tools.SearchTools />
+                <@search_tools.SearchTools />
                 
                 <@query_blending.QueryBlending />
                 <@spelling_suggestions.SpellingSuggestions />
                 <@facets_breadcrumbs.Breadcrumb />
 
+                <#-- Only display results after search has been performed -->
                 <@s.AfterSearchOnly>                        
                     <@curator.HasCuratorOrBestBet position="top">
                         <@curator.Curator position="top" />
@@ -165,7 +244,11 @@
 </div>
 
 <#-- 
-    Libraries required by the design developed by the Stencils cutup team. 
-    Avoid changing these if possible.
+/**
+ * Required JavaScript Resources
+ * 
+ * Libraries required by the design developed by the Stencils cutup team.
+ * Avoid changing these if possible to maintain proper functionality.
+ */
 -->
 <script type="text/javascript" src="https://${httpHost!}/s/resources/${question.collection.id}/${question.profile}/themes/stencils/js/main.js"></script>
