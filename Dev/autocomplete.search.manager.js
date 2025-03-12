@@ -55,7 +55,7 @@
  * @status in-progress
  * @devVersion 5.0.0
  * @prodVersion 4.1.0
- * @lastModified 2025-03-11
+ * @lastModified 2025-03-12
  */
 
 class AutocompleteSearchManager {
