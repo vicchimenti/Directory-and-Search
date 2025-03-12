@@ -72,7 +72,6 @@
             
     <@hero_banner.SearchForm />
     <@tabs.Tabs />
-
     
     <div class="grid-container">
         <div class="funnelback-search no-wysiwyg grid-x grid-padding-x">          
@@ -84,12 +83,36 @@
                             <div class="grid-x grid-margin-x">
                                 <div class="cell auto">
                                     <div class="promo-section--text text-margin-reset">
-                                        <h2 class="h4">Ready to Apply?</h2>
+                                        <#-- Define CTA based on selected tab -->
+                                        <#assign selectedTab = (response.customData.stencils.tabs.selected)!"">
+                                        <#assign ctaHeading = "Visit our Campus" />
+                                        <#assign ctaText = "Explore Seattle University, a vibrant campus just steps from downtown and the waterfront." />
+                                        <#assign ctaLink = "/visit" />
+                                        <#assign ctaButton = "Schedule a Tour" />
+
+                                        <#if selectedTab == "Programs">
+                                            <#assign ctaHeading = "Discover Programs" />
+                                            <#assign ctaText = "Explore our academic programs and find the right fit for you!" />
+                                            <#assign ctaLink = "/academics/all-programs" />
+                                            <#assign ctaButton = "Browse Programs" />
+                                        <#elseif selectedTab == "Faculty & Staff">
+                                            <#assign ctaHeading = "Meet Our People" />
+                                            <#assign ctaText = "Meet our expert faculty and dedicated staff." />
+                                            <#assign ctaLink = "/directory" />
+                                            <#assign ctaButton = "View Directory" />
+                                        <#elseif selectedTab == "News">
+                                            <#assign ctaHeading = "Latest Updates" />
+                                            <#assign ctaText = "Stay up-to-date with the latest news and research." />
+                                            <#assign ctaLink = "/newsroom" />
+                                            <#assign ctaButton = "The Newsroom" />
+                                        </#if>
+                                        
+                                        <h2 class="h4">${ctaHeading}</h2>
                                         <div class="global-spacing--2x">
-                                            <p>Start your application with only a few clicks.</p>
+                                            <p>${ctaText}</p>
                                         </div>
                                         <div class="global-spacing--4x">
-                                            <a href="https://www.seattleu.edu/apply/" target="_blank" class="btn">Apply Now</a>
+                                            <a href="${ctaLink}" class="btn" target="_blank">${ctaButton}</a>
                                         </div>
                                     </div>
                                 </div>
