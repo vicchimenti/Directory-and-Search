@@ -1,5 +1,7 @@
 /**
- * @fileoverview Enhanced Autocomplete Search Manager for Funnelback Search Integration
+ * @fileoverview [PRODUCTION ASSET] Enhanced Autocomplete Search Manager for Funnelback Search Integration
+ * 
+ * PRODUCTION VERSION - Seattle University search implementation
  * 
  * This class manages real-time search suggestions functionality, integrating with
  * Funnelback search services via a proxy server. It provides a unified search experience
@@ -45,10 +47,13 @@
  * @property {number} [minLength=3] - Minimum characters before showing suggestions
  * @property {number} [programLimit=5] - Maximum number of program suggestions to show
  * @property {number} [staffLimit=5] - Maximum number of staff/faculty suggestions to show
- *
  * 
+ * @namespace AutocompleteSearchManager
  * @author Victor Chimenti
- * @version 4.1.0
+ * @version 5.0.0
+ * @productionVersion 4.1.1
+ * @environment production
+ * @status stable
  * @license MIT
  * @lastModified 2025-03-12
  */
