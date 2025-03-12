@@ -1,5 +1,7 @@
 /**
- * @fileoverview Global Collapse Manager for Funnelback Search UI
+ * @fileoverview [DEV ASSET] Global Collapse Manager for Funnelback Search UI
+ * 
+ * DEVELOPMENT VERSION - For backup development environment only.
  * 
  * This class manages all collapsible elements in the Funnelback search interface.
  * It handles initialization, state management, and animations for collapsible
@@ -22,8 +24,12 @@
  * - Requires specific CSS classes for transitions
  * 
  * @author Victor Chimenti
- * @version 1.1.0
- * @lastModified 2025-02-02
+ * @version 5.0.0
+ * @environment development
+ * @status in-progress
+ * @devVersion 5.0.0
+ * @prodVersion 1.1.0
+ * @lastModified 2025-03-12
  */
 
 class Collapse {
