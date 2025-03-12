@@ -1,5 +1,7 @@
 /**
- * @fileoverview Header Search Manager for Funnelback Search Integration
+ * @fileoverview [PRODUCTION ASSET] Header Search Manager for Funnelback Search Integration
+ * 
+ * PRODUCTION VERSION - Seattle University search implementation
  * 
  * This class manages the header search functionality of the website. It handles
  * the initial search input capture and redirects to the search results page
@@ -22,9 +24,14 @@
  * Related Files:
  * - results-search-manager.js: Handles the actual Funnelback API calls
  * 
+ * @namespace HeaderSearchManager
  * @author Victor Chimenti
- * @version 3.0.0
- * @lastModified 2025-03-10
+ * @version 5.0.0
+ * @productionVersion 3.0.1
+ * @environment production
+ * @status stable
+ * @license MIT
+ * @lastModified 2025-03-12
  */
 
 class HeaderSearchManager {
