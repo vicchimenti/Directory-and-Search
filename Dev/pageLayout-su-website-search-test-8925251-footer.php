@@ -42,7 +42,7 @@
         <!-- header-search-manager.js -->
         <script src="<t4 type='media' id='9248121' formatter='path/*' />" type="module" defer></script>
         <!-- global-collapse-manager.js -->
-        <script src="<t4 type='media' id='9155586' formatter='path/*' />" type="module" defer></script>
+        <script src="<t4 type='media' id='9248118' formatter='path/*' />" type="module" defer></script>
         <!-- autocomplete-search-manager.js -->
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
