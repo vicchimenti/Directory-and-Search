@@ -38,7 +38,7 @@
 * @environment production
 * @status stable
 * @license MIT
-* @lastModified 2025-03-10
+* @lastModified 2025-03-12
 */
 
 class DynamicResultsManager {
