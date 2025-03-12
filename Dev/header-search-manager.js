@@ -30,6 +30,7 @@
  * @status in-progress
  * @devVersion 5.0.0
  * @prodVersion 3.0.0
+ * @namespace HeaderSearchManager
  * @lastModified 2025-03-12
  */
 
