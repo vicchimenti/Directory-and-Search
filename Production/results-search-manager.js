@@ -1,5 +1,7 @@
 /**
- * @fileoverview Enhanced Results Search Manager with Analytics Integration
+ * @fileoverview [PRODUCTION ASSET] Enhanced Results Search Manager with Analytics Integration
+ * 
+ * PRODUCTION VERSION - Seattle University search implementation
  * 
  * This class manages the search results page functionality, handling both
  * URL parameter-based searches and user-initiated searches. It integrates with
@@ -11,10 +13,14 @@
  * - Sends analytics data to proxy server
  * - Maintains session data for query attribution
  * 
+ * @namespace ResultsSearchManager
  * @author Victor Chimenti
- * @version 4.0.0
+ * @version 5.0.0
+ * @productionVersion 4.0.1
+ * @environment production
+ * @status stable
  * @license MIT
- * @lastModified 2025-03-10
+ * @lastModified 2025-03-12
  */
 
 class ResultsSearchManager {
