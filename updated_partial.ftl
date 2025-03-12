@@ -57,7 +57,6 @@
 <#import "extra_search.ftl" as extra_search />
 <#import "results.ftl" as results />
 <#import "client_includes.ftl" as client_includes />
-
 <#import "sessions.ftl" as sessions />
 
 <#-- 
