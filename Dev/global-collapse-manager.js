@@ -29,6 +29,7 @@
  * @status in-progress
  * @devVersion 5.0.0
  * @prodVersion 1.1.0
+ * @namespace GlobalCollapseManager
  * @lastModified 2025-03-12
  */
 
