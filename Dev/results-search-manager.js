@@ -1,44 +1,26 @@
 /**
-* @fileoverview [DEV ASSET] Dynamic Results Manager for Funnelback Search Integration
-* 
-* DEVELOPMENT VERSION - For backup development environment only.
-* 
-* This class manages dynamic content updates for search results, handling various
-* user interactions like facet selection, tab changes, and pagination. It uses
-* a MutationObserver to maintain functionality as content updates dynamically.
-* 
-* Features:
-* - Manages dynamic content updates via MutationObserver
-* - Handles multiple types of search result interactions
-* - Maintains event listeners across dynamic content changes
-* - Tracks search result link clicks for analytics
-* - Captures data-live-url attributes for accurate destination tracking
-* - Integrates with Funnelback search API via Vercel proxy
-* 
-* Dependencies:
-* - Requires DOM element with ID 'results'
-* - Requires Vercel proxy endpoint for Funnelback API access
-* - Requires various interactive elements with specific classes:
-*   - .facet-group__list
-*   - .tab-list__nav
-*   - .search-tools__button-group
-*   - .facet-group__clear
-*   - .facet-breadcrumb__link
-*   - .pagination__link
-*   etc.
-* 
-* Related Files:
-* - results-search-manager.js: Handles main search functionality
-* - header-search-manager.js: Handles initial search and redirects
-* 
-* @author Victor Chimenti
-* @version 5.0.0
-* @environment development
-* @status in-progress
-* @devVersion 5.0.0
-* @prodVersion 4.0.0
-* @lastModified 2025-03-12
-*/
+ * @fileoverview [DEV ASSET] Enhanced Results Search Manager with Analytics Integration
+ * 
+ * DEVELOPMENT VERSION - For backup development environment only.
+ * 
+ * This class manages the search results page functionality, handling both
+ * URL parameter-based searches and user-initiated searches. It integrates with
+ * Funnelback search services via a proxy server and manages the display of search results.
+ * 
+ * Added analytics features:
+ * - Tracks original search queries
+ * - Tracks clicked search results
+ * - Sends analytics data to proxy server
+ * - Maintains session data for query attribution
+ * 
+ * @author Victor Chimenti
+ * @version 5.0.0
+ * @environment development
+ * @status in-progress
+ * @devVersion 5.0.0
+ * @prodVersion 4.0.0
+ * @lastModified 2025-03-12
+ */
 
 class ResultsSearchManager {
     /**
