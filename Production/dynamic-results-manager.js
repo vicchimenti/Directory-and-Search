@@ -1,5 +1,7 @@
 /**
-* @fileoverview Dynamic Results Manager for Funnelback Search Integration
+* @fileoverview [PRODUCTION ASSET] Dynamic Results Manager for Funnelback Search Integration
+* 
+* PRODUCTION VERSION - Seattle University search implementation
 * 
 * This class manages dynamic content updates for search results, handling various
 * user interactions like facet selection, tab changes, and pagination. It uses
@@ -29,8 +31,13 @@
 * - results-search-manager.js: Handles main search functionality
 * - header-search-manager.js: Handles initial search and redirects
 * 
+* @namespace DynamicResultsManager
 * @author Victor Chimenti
-* @version 4.0.0
+* @version 5.0.0
+* @productionVersion 4.0.1
+* @environment production
+* @status stable
+* @license MIT
 * @lastModified 2025-03-10
 */
 
