@@ -19,6 +19,7 @@
  * @status in-progress
  * @devVersion 5.0.0
  * @prodVersion 4.0.0
+ * @namespace ResultsSearchManager
  * @lastModified 2025-03-12
  */
 
