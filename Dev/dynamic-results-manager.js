@@ -1,5 +1,7 @@
 /**
-* @fileoverview Dynamic Results Manager for Funnelback Search Integration
+* @fileoverview [DEV ASSET] Dynamic Results Manager for Funnelback Search Integration
+* 
+* DEVELOPMENT VERSION - For backup development environment only.
 * 
 * This class manages dynamic content updates for search results, handling various
 * user interactions like facet selection, tab changes, and pagination. It uses
@@ -30,8 +32,13 @@
 * - header-search-manager.js: Handles initial search and redirects
 * 
 * @author Victor Chimenti
-* @version 3.3.0
-* @lastModified 2025-03-07
+* @version 5.0.0
+* @environment development
+* @status in-progress
+* @devVersion 5.0.0
+* @prodVersion 4.0.0
+* @namespace DynamicResultsManager
+* @lastModified 2025-03-12
 */
 
 class DynamicResultsManager {
