@@ -28,7 +28,7 @@
  * @version 5.0.0
  * @environment development
  * @status in-progress
- * @devVersion 5.0.0
+ * @devVersion 5.0.1
  * @prodVersion 3.0.0
  * @namespace HeaderSearchManager
  * @lastModified 2025-03-12
@@ -49,7 +49,8 @@ class HeaderSearchManager {
             profile: '_default',
             minLength: 3,
             maxResults: 8,
-            suggestEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
+            // suggestEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
+            suggestEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
             ...config
         };
 
