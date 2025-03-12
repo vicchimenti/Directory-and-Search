@@ -17,7 +17,7 @@
  * @version 5.0.0
  * @environment development
  * @status in-progress
- * @devVersion 5.0.0
+ * @devVersion 5.0.1
  * @prodVersion 4.0.0
  * @namespace ResultsSearchManager
  * @lastModified 2025-03-12
@@ -35,7 +35,8 @@ class ResultsSearchManager {
         this.originalQuery = null;
         this.sessionId = this.#getOrCreateSessionId();
         this.analyticsEnabled = true;
-        this.proxyBaseUrl = 'https://funnelback-proxy-one.vercel.app/proxy';
+        // this.proxyBaseUrl = 'https://funnelback-proxy-one.vercel.app/proxy';
+        this.proxyBaseUrl = 'https://funnelback-proxy-dev.vercel.app/proxy';
         this.analyticsEndpoint = `${this.proxyBaseUrl}/analytics`;
         
         // Initialize search functionality
