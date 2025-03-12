@@ -55,6 +55,7 @@
  * @status in-progress
  * @devVersion 5.0.0
  * @prodVersion 4.1.0
+ * @namespace AutocompleteSearchManager
  * @lastModified 2025-03-12
  */
 
