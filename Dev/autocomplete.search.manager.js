@@ -1,5 +1,7 @@
 /**
- * @fileoverview Enhanced Autocomplete Search Manager for Funnelback Search Integration
+ * @fileoverview [DEV ASSET] Enhanced Autocomplete Search Manager for Funnelback Search Integration
+ * 
+ * DEVELOPMENT VERSION - For backup development environment only.
  * 
  * This class manages real-time search suggestions functionality, integrating with
  * Funnelback search services via a proxy server. It provides a unified search experience
@@ -48,7 +50,11 @@
  *
  * 
  * @author Victor Chimenti
- * @version 3.3.2
+ * @version 5.0.0
+ * @environment development
+ * @status in-progress
+ * @devVersion 5.0.0
+ * @prodVersion 4.1.0
  * @lastModified 2025-03-11
  */
 
