@@ -187,14 +187,14 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 ### Browser Compatibility
 
-- [ ] Test on Chrome
+- [x] Test on Chrome
 - [ ] Test on Firefox
 - [ ] Test on Safari
 - [ ] Test on Edge
 
 ### Device Testing
 
-- [ ] Test on desktop
+- [x] Test on desktop
 - [ ] Test on mobile devices
 - [ ] Test on tablets
 
