@@ -171,8 +171,9 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 ### To Do
 
-- [ ] Update Staff CTA
+- [x] Update Staff CTA
 - [ ] Add SVG to global search bar
+- [ ] Pagination Scroll
 
 ### Functionality Testing
 
