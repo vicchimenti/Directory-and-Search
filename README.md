@@ -169,6 +169,11 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 ## Post-Launch Verification (6:05-6:30 AM)
 
+### To Do
+
+- [ ] Update Staff CTA
+- [ ] Add SVG to global search bar
+
 ### Functionality Testing
 
 - [ ] Verify search input works
