@@ -149,10 +149,10 @@
                                             <#assign ctaLink = "/academics/all-programs" />
                                             <#assign ctaButton = "Browse Programs" />
                                         <#elseif selectedTab == "Faculty & Staff">
-                                            <#assign ctaHeading = "Meet Our People" />
-                                            <#assign ctaText = "Meet our expert faculty and dedicated staff." />
-                                            <#assign ctaLink = "/directory" />
-                                            <#assign ctaButton = "View Directory" />
+                                            <#assign ctaHeading = "Redhawk Hub" />
+                                            <#assign ctaText = "View resources for Seattle University faculty, staff and current students." />
+                                            <#assign ctaLink = "https://redhawks.sharepoint.com/sites/Intranet-Home" />
+                                            <#assign ctaButton = "Explore Resources" />
                                         <#elseif selectedTab == "News">
                                             <#assign ctaHeading = "Latest Updates" />
                                             <#assign ctaText = "Stay up-to-date with the latest news and research." />
