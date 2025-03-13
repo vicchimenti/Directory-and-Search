@@ -154,9 +154,9 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
 #### Ready to Push
 
-- [ ] dynamic-results-manager.js
-- [ ] header-search-manager.js
-- [ ] results-search-manager.js
+- [x] dynamic-results-manager.js
+- [x] header-search-manager.js
+- [x] results-search-manager.js
 - [ ] pageLayout-header.php
 - [ ] pageLayout-footer.php
 
