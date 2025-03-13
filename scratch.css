@@ -1,3 +1,16 @@
+header .site-search #searchForm input {
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+    background-image: url('/media/seattle-university/site-assets/icons/search.svg');
+}
+
+
+
+
+
+
+
 /* Suggestions Container */
 #autocomplete-suggestions {
     position: absolute;
