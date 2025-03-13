@@ -165,6 +165,7 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 - [x] Publish updated page layouts
 - [x] Publish updated JavaScript files
 - [x] Publish migrated content assets
+- [ ] Channel Publish
 
 ## Post-Launch Verification (6:05-6:30 AM)
 
