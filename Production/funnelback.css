@@ -1,6 +1,6 @@
 /* 
 *   Funnelback Stylesheet
-*   Version: 3.0.2
+*   Version: 3.0.3
 *   Date: 2025-01-05
 *   Author: Funnelback
 *   Description: Funnelback Stylesheet
@@ -40,7 +40,7 @@ header .site-search #searchForm input {
         width: 80%;
     }
 }
-.su-listing form {
+.su-listing form #concierge-search-form {
     flex-wrap: nowrap;
 }
 .searchArea input.on-page-sq-search  {
