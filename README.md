@@ -140,9 +140,9 @@ Header File Update (pageLayout-su-web-2023-6907517-header.php)
 
  Move code from Dev to Production site:
 
-- [ ] Funnelback Search > Site Assets > Common Header > Code Head → Site Assets > Code - Head
-- [ ] Funnelback Search > Site Assets > Common Header > Code Body → Site Assets > Code - Body Start
-- [ ] Funnelback Search > Site Assets > Common Header > Code Body End → Site Assets > Code - Body End
+- [x] Funnelback Search > Site Assets > Common Header > Code Head → Site Assets > Code - Head
+- [x] Funnelback Search > Site Assets > Common Header > Code Body → Site Assets > Code - Body Start
+- [x] Funnelback Search > Site Assets > Common Header > Code Body End → Site Assets > Code - Body End
 
 ### 4. Update JavaScript References (5:55 AM)
 
