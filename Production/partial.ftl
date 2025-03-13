@@ -17,9 +17,9 @@
  * The intended purpose of this template is to allow for partial integration
  * into a Content Management System (CMS).
  * 
- * @version 5.0.0
+ * @version 5.0.1
  * @author Victor Chimenti
- * @lastModified 2025-03-12
+ * @lastModified 2025-03-13
  */
 -->
 
