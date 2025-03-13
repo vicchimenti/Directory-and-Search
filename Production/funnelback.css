@@ -12,6 +12,7 @@
 
 /* Search bar input rules */
 
+
 @media print, screen and (min-width: 64.0625em) {
     .searchArea input.on-page-sq-search {
         width: 80%;
@@ -23,6 +24,14 @@
     border: 0;
     padding: .5rem;
     width: 100%;
+}
+
+header .site-search #searchForm input {
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 14px 14px;
+    padding-left: 35px;
+    background-image: url('/media/seattle-university/site-assets/icons/magnifying-glass-solid.svg');
 }
 
 /* search page input rules */
