@@ -56,7 +56,7 @@
 ### 1. Back Up Existing Google Search (5:30 AM)
 
 - [x] Create archive folder for existing Google search components
-- [ ] Move current Google search code to archive folder
+- [x] Move current Google search code to archive folder
 
 ### 2. Update Page Layouts
 
