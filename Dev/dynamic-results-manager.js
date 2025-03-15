@@ -35,10 +35,10 @@
 * @version 5.0.0
 * @environment development
 * @status in-progress
-* @devVersion 5.0.1
+* @devVersion 5.1.0
 * @prodVersion 4.0.0
 * @namespace DynamicResultsManager
-* @lastModified 2025-03-12
+* @lastModified 2025-03-15
 */
 
 class DynamicResultsManager {
@@ -53,7 +53,6 @@ class DynamicResultsManager {
         };
         
         // Analytics configuration
-        // this.proxyBaseUrl = 'https://funnelback-proxy-one.vercel.app/proxy';
         this.proxyBaseUrl = 'https://funnelback-proxy-dev.vercel.app/proxy';
         this.analyticsEndpoint = `${this.proxyBaseUrl}/analytics`;
         this.sessionId = this.#getOrCreateSessionId();
@@ -421,7 +420,8 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackResults(url, method) {
-        const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search';
+        // const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search';
+        const proxyUrl = `${this.proxyBaseUrl}/funnelback/search`; // Use base URL for all requests
         
         try {
             const queryString = url.includes('?') ? url.split('?')[1] : '';
@@ -456,7 +456,9 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackTools(url, method) {
-        const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/tools';
+        // const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/tools';
+        const proxyUrl = `${this.proxyBaseUrl}/funnelback/tools`;
+
         try {
             const queryString = new URLSearchParams({
                 path: url.split('/s/')[1],
@@ -482,8 +484,9 @@ class DynamicResultsManager {
      * @returns {Promise<string>} The HTML response text
      */
     async #fetchFunnelbackSpelling(url, method) {
-        const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/spelling';
-        
+        // const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/spelling';
+        const proxyUrl = `${this.proxyBaseUrl}/funnelback/spelling`; // Use base URL for all requests
+
         try {
             let queryString = url.includes('?') ? url.split('?')[1] : '';
             
