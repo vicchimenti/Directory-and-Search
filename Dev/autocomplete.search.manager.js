@@ -55,7 +55,7 @@
  * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.1.1
+ * @devVersion 5.1.2
  * @prodVersion 4.1.0
  * @lastModified 2025-03-21
  */
@@ -117,6 +117,7 @@ class AutocompleteSearchManager {
         this.submitButton = this.form.querySelector('#on-page-search-button');
         this.suggestionsContainer = document.getElementById('autocomplete-suggestions');
         this.resultsContainer = document.getElementById('results');
+        this.sessionId = this.#getOrCreateSessionId();
 
         console.log('DOM Elements:', {
             submitButton: this.submitButton ? '✓' : '✗',
