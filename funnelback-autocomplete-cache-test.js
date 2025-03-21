@@ -2,8 +2,8 @@ import http from 'k6/http';
 import { sleep, check } from 'k6';
 
 export let options = {
-  vus: 5, // Fewer concurrent users for a slower pace
-  duration: '3m', // Run for 3 minutes
+  vus: 3, // Keep concurrent users low to stay within rate limits
+  duration: '5m', // Run for 5 minutes to allow cache population over time
 };
 
 const BASE_URL = 'https://funnelback-proxy-dev.vercel.app/proxy';
@@ -73,5 +73,6 @@ export default function () {
   check(responses[1], { 'People suggestions returned': (r) => r.status === 200 });
   check(responses[2], { 'Program suggestions returned': (r) => r.status === 200 });
 
-  sleep(Math.random() * 3 + 2); // Slower pacing between 2-5 sec per request
+  // Slower pacing: ensure total request rate stays below 60 per minute
+  sleep(Math.random() * 6 + 5); // Sleep between 5-11 seconds
 }
