@@ -7,7 +7,7 @@
  * Funnelback search services via a proxy server. It provides a unified search experience
  * with three distinct suggestion types:
  * 1. General search suggestions
- * 2. Staff/Faculty profiles (limited to top 3 results)
+ * 2. Staff/Faculty profiles
  * 3. Academic programs
  * 
  * The manager implements a three-column layout optimized for quick selection and
@@ -50,13 +50,14 @@
  *
  * 
  * @author Victor Chimenti
- * @version 5.0.0
+ * @namespace AutocompleteSearchManager
+ * @version 5.1.0
+ * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.0.1
+ * @devVersion 5.1.1
  * @prodVersion 4.1.0
- * @namespace AutocompleteSearchManager
- * @lastModified 2025-03-12
+ * @lastModified 2025-03-21
  */
 
 class AutocompleteSearchManager {
@@ -128,6 +129,25 @@ class AutocompleteSearchManager {
 
         this.#init();
         console.groupEnd();
+    }
+
+    /**
+     * Gets or creates a session ID for analytics tracking.
+     * Stores the ID in sessionStorage for persistence across page loads.
+     * 
+     * @private
+     * @returns {string} A unique session ID
+     */
+    #getOrCreateSessionId() {
+        let sessionId = sessionStorage.getItem('searchSessionId');
+        
+        if (!sessionId) {
+            // Create a new session ID with timestamp and random string
+            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+            sessionStorage.setItem('searchSessionId', sessionId);
+        }
+        
+        return sessionId;
     }
 
     /**
