@@ -55,7 +55,7 @@
  * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.1.3
+ * @devVersion 5.1.4
  * @prodVersion 4.1.0
  * @lastModified 2025-03-21
  */
@@ -539,31 +539,62 @@ class AutocompleteSearchManager {
     
         // Add click handlers for all suggestion items
         this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
-            item.addEventListener('click', (event) => {
+            item.addEventListener('click', async (event) => {
                 const selectedText = item.querySelector('.suggestion-text').textContent;
                 const type = item.dataset.type;
                 const url = item.dataset.url;
-    
+                
+                // Extract additional data depending on suggestion type
+                let title = selectedText;
+                if (type === 'staff') {
+                    const roleElement = item.querySelector('.staff-role');
+                    const deptElement = item.querySelector('.staff-department');
+                    if (roleElement) {
+                        title = `${selectedText} (${roleElement.textContent})`;
+                    }
+                } else if (type === 'program') {
+                    const deptElement = item.querySelector('.suggestion-type');
+                    if (deptElement) {
+                        title = `${selectedText} - ${deptElement.textContent}`;
+                    }
+                }
+            
                 console.log('Suggestion Click:', {
                     type: 'mouse click',
                     itemType: type,
                     text: selectedText,
+                    title: title,
                     url: url || 'none'
                 });
             
+                // Always update the input field
                 this.inputField.value = selectedText;
+                
+                // Clear suggestions container
                 this.suggestionsContainer.innerHTML = '';
                 
-                // For staff and program items with URLs, let the link handle navigation
-                if ((type === 'staff' || type === 'program') && url && event.target.closest('a')) {
-                    return;
+                // Special handling for staff and program suggestions
+                if ((type === 'staff' || type === 'program') && url) {
+                    // Log the click
+                    await this.#logSuggestionClick(selectedText, type, url, title);
+                    
+                    // If the click was on a link element, let it handle navigation
+                    if (event.target.closest('a')) {
+                        // Then trigger a search in the background
+                        setTimeout(() => {
+                            this.#performSearch(selectedText).catch(err => 
+                                console.error('Background search error:', err)
+                            );
+                        }, 100);
+                        return; // Allow default navigation
+                    }
                 }
                 
-                // For all other cases, perform search
+                // For all other cases
                 event.preventDefault();
                 console.log('Initiating search request');
-                this.#performSearch(selectedText);
-            });
+                await this.#performSearch(selectedText);
+            });            
         });
         
         console.groupEnd();
