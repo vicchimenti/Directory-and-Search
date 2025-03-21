@@ -55,7 +55,7 @@
  * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.1.4
+ * @devVersion 5.1.5
  * @prodVersion 4.1.0
  * @lastModified 2025-03-21
  */
@@ -683,29 +683,55 @@ class AutocompleteSearchManager {
                     }
                 }
                 break;
-    
+
             case 'Enter':
                 if (activeItem) {
                     event.preventDefault();
                     const selectedText = activeItem.querySelector('.suggestion-text').textContent;
                     const type = activeItem.dataset.type;
                     const url = activeItem.dataset.url;
-            
-                    console.log('Suggestion Keyboard:', {
+                    
+                    // Get additional details for better analytics
+                    let title = selectedText;
+                    if (type === 'staff') {
+                        const roleElement = activeItem.querySelector('.staff-role');
+                        if (roleElement) {
+                            title = `${selectedText} (${roleElement.textContent})`;
+                        }
+                    } else if (type === 'program') {
+                        const deptElement = activeItem.querySelector('.suggestion-type');
+                        if (deptElement) {
+                            title = `${selectedText} - ${deptElement.textContent}`;
+                        }
+                    }
+
+                    console.log('Keyboard selection:', {
                         type: 'keyboard enter',
                         itemType: type,
                         text: selectedText,
+                        title: title,
                         url: url || 'none'
                     });
                     
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
                     
-                    // For staff and program items with URLs, open in new tab
+                    // For staff and program suggestions with URLs
                     if ((type === 'staff' || type === 'program') && url) {
+                        // Log the click
+                        this.#logSuggestionClick(selectedText, type, url, title);
+                        
+                        // Open in new tab
                         window.open(url, '_blank', 'noopener,noreferrer');
+                        
+                        // Also perform search in current window
+                        setTimeout(() => {
+                            this.#performSearch(selectedText).catch(err => 
+                                console.error('Background search error:', err)
+                            );
+                        }, 100);
                     } else {
-                        // For all other cases, perform search
+                        // For general suggestions, just search
                         console.log('Initiating search request');
                         this.#performSearch(selectedText);
                     }
