@@ -55,7 +55,7 @@
  * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.1.2
+ * @devVersion 5.1.3
  * @prodVersion 4.1.0
  * @lastModified 2025-03-21
  */
@@ -169,6 +169,57 @@ class AutocompleteSearchManager {
         // Ensure search button is always active and visible at initialization
         if (this.submitButton) {
             this.submitButton.classList.remove('empty-query');
+        }
+    }
+
+    async #logSuggestionClick(query, type, url, title = null) {
+        try {
+            // Prepare click data
+            const clickData = {
+                originalQuery: query,
+                clickedUrl: url,
+                clickedTitle: title || query,
+                clickType: type,  // 'staff', 'program', or 'suggestion'
+                clickPosition: -1,
+                sessionId: this.sessionId,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Sending suggestion click data:', clickData);
+            
+            // Determine endpoint based on environment
+            const baseUrl = this.config.endpoints.suggest.includes('dev') 
+                ? 'https://funnelback-proxy-dev.vercel.app/proxy' 
+                : 'https://funnelback-proxy-one.vercel.app/proxy';
+                
+            const endpoint = `${baseUrl}/analytics/click`;
+            
+            // Use sendBeacon for non-blocking operation
+            if (navigator.sendBeacon) {
+                const blob = new Blob([JSON.stringify(clickData)], {
+                    type: 'application/json'
+                });
+                return navigator.sendBeacon(endpoint, blob);
+            }
+            
+            // Fallback to fetch with keepalive
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': window.location.origin
+                },
+                body: JSON.stringify(clickData),
+                credentials: 'include',
+                keepalive: true
+            }).catch(error => {
+                console.error('Error sending click data:', error);
+            });
+            
+            return true;
+        } catch (error) {
+            console.error('Failed to log suggestion click:', error);
+            return false;
         }
     }
 
