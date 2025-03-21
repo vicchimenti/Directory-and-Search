@@ -55,7 +55,7 @@
  * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.1.5
+ * @devVersion 5.1.6
  * @prodVersion 4.1.0
  * @lastModified 2025-03-21
  */
@@ -322,18 +322,21 @@ class AutocompleteSearchManager {
             const generalParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.general,
-                profile: this.config.profile
+                profile: this.config.profile,
+                sessionId: this.sessionId
             });
 
             // Staff query only sends search term - server handles other params
             const peopleParams = new URLSearchParams({
-                query: query
+                query: query,
+                sessionId: this.sessionId
             });
 
             const programParams = new URLSearchParams({
                 query: query,
                 collection: this.config.collections.programs,
-                profile: this.config.profile
+                profile: this.config.profile,
+                sessionId: this.sessionId
             });
 
             console.log('Request Parameters:', {
