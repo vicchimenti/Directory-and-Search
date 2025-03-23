@@ -27,11 +27,14 @@
  * - Direct profile links for staff (opens in new tab)
  * - Fallback search functionality
  * - Loading states and error handling
+ * - Enhanced analytics with click tracking
+ * - Session-based tracking and management
  * 
  * Server Integration:
  * - Defers to server-side parameters for staff/faculty search
  * - Supports JSON endpoints for improved performance
  * - Handles rich metadata for staff profiles
+ * - Includes session ID tracking for analytics
  * 
  * Dependencies:
  * - Requires proxy endpoint for Funnelback API access
@@ -50,12 +53,12 @@
  * 
  * @namespace AutocompleteSearchManager
  * @author Victor Chimenti
- * @version 5.0.0
- * @productionVersion 4.1.1
+ * @version 5.1.0
+ * @productionVersion 5.0.0
  * @environment production
  * @status stable
  * @license MIT
- * @lastModified 2025-03-12
+ * @lastModified 2025-03-23
  */
 
 class AutocompleteSearchManager {
@@ -111,6 +114,7 @@ class AutocompleteSearchManager {
         this.submitButton = this.form.querySelector('#on-page-search-button');
         this.suggestionsContainer = document.getElementById('autocomplete-suggestions');
         this.resultsContainer = document.getElementById('results');
+        this.sessionId = this.#getOrCreateSessionId();
 
         console.log('DOM Elements:', {
             submitButton: this.submitButton ? '✓' : '✗',
@@ -123,6 +127,25 @@ class AutocompleteSearchManager {
 
         this.#init();
         console.groupEnd();
+    }
+
+    /**
+     * Gets or creates a session ID for analytics tracking.
+     * Stores the ID in sessionStorage for persistence across page loads.
+     * 
+     * @private
+     * @returns {string} A unique session ID
+     */
+    #getOrCreateSessionId() {
+        let sessionId = sessionStorage.getItem('searchSessionId');
+        
+        if (!sessionId) {
+            // Create a new session ID with timestamp and random string
+            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+            sessionStorage.setItem('searchSessionId', sessionId);
+        }
+        
+        return sessionId;
     }
 
     /**
@@ -143,6 +166,68 @@ class AutocompleteSearchManager {
         // Ensure search button is always active and visible at initialization
         if (this.submitButton) {
             this.submitButton.classList.remove('empty-query');
+        }
+    }
+
+    /**
+     * Logs suggestion clicks for analytics tracking.
+     * Uses sendBeacon API for non-blocking operation when available.
+     * 
+     * @private
+     * @param {string} query - The search query
+     * @param {string} type - The suggestion type (staff, program, suggestion)
+     * @param {string} url - The URL of the clicked suggestion
+     * @param {string} [title=null] - Optional title override for analytics
+     * @returns {Promise<boolean>} Success status of the logging operation
+     */
+    async #logSuggestionClick(query, type, url, title = null) {
+        try {
+            // Prepare click data
+            const clickData = {
+                originalQuery: query,
+                clickedUrl: url,
+                clickedTitle: title || query,
+                clickType: type,  // 'staff', 'program', or 'suggestion'
+                clickPosition: -1,
+                sessionId: this.sessionId,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Sending suggestion click data:', clickData);
+            
+            // Extract base URL from endpoints for consistency
+            const baseUrl = this.config.endpoints.suggest.substring(
+                0, this.config.endpoints.suggest.indexOf('/proxy/') + 7
+            );
+            
+            const endpoint = `${baseUrl}/analytics/click`;
+            
+            // Use sendBeacon for non-blocking operation
+            if (navigator.sendBeacon) {
+                const blob = new Blob([JSON.stringify(clickData)], {
+                    type: 'application/json'
+                });
+                return navigator.sendBeacon(endpoint, blob);
+            }
+            
+            // Fallback to fetch with keepalive
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Origin': window.location.origin
+                },
+                body: JSON.stringify(clickData),
+                credentials: 'include',
+                keepalive: true
+            }).catch(error => {
+                console.error('Error sending click data:', error);
+            });
+            
+            return true;
+        } catch (error) {
+            console.error('Failed to log suggestion click:', error);
+            return false;
         }
     }
 
@@ -245,18 +330,21 @@ class AutocompleteSearchManager {
             const generalParams = new URLSearchParams({
                 partial_query: query,
                 collection: this.config.collections.general,
-                profile: this.config.profile
+                profile: this.config.profile,
+                sessionId: this.sessionId
             });
 
             // Staff query only sends search term - server handles other params
             const peopleParams = new URLSearchParams({
-                query: query
+                query: query,
+                sessionId: this.sessionId
             });
 
             const programParams = new URLSearchParams({
                 query: query,
                 collection: this.config.collections.programs,
-                profile: this.config.profile
+                profile: this.config.profile,
+                sessionId: this.sessionId
             });
 
             console.log('Request Parameters:', {
@@ -350,7 +438,8 @@ class AutocompleteSearchManager {
             query: query,
             collection: this.config.collections.general,
             profile: this.config.profile,
-            form: 'partial'
+            form: 'partial',
+            sessionId: this.sessionId
         });
 
         try {
@@ -462,31 +551,62 @@ class AutocompleteSearchManager {
     
         // Add click handlers for all suggestion items
         this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach((item) => {
-            item.addEventListener('click', (event) => {
+            item.addEventListener('click', async (event) => {
                 const selectedText = item.querySelector('.suggestion-text').textContent;
                 const type = item.dataset.type;
                 const url = item.dataset.url;
-    
+                
+                // Extract additional data depending on suggestion type
+                let title = selectedText;
+                if (type === 'staff') {
+                    const roleElement = item.querySelector('.staff-role');
+                    const deptElement = item.querySelector('.staff-department');
+                    if (roleElement) {
+                        title = `${selectedText} (${roleElement.textContent})`;
+                    }
+                } else if (type === 'program') {
+                    const deptElement = item.querySelector('.suggestion-type');
+                    if (deptElement) {
+                        title = `${selectedText} - ${deptElement.textContent}`;
+                    }
+                }
+            
                 console.log('Suggestion Click:', {
                     type: 'mouse click',
                     itemType: type,
                     text: selectedText,
+                    title: title,
                     url: url || 'none'
                 });
             
+                // Always update the input field
                 this.inputField.value = selectedText;
+                
+                // Clear suggestions container
                 this.suggestionsContainer.innerHTML = '';
                 
-                // For staff and program items with URLs, let the link handle navigation
-                if ((type === 'staff' || type === 'program') && url && event.target.closest('a')) {
-                    return;
+                // Special handling for staff and program suggestions
+                if ((type === 'staff' || type === 'program') && url) {
+                    // Log the click
+                    await this.#logSuggestionClick(selectedText, type, url, title);
+                    
+                    // If the click was on a link element, let it handle navigation
+                    if (event.target.closest('a')) {
+                        // Then trigger a search in the background
+                        setTimeout(() => {
+                            this.#performSearch(selectedText).catch(err => 
+                                console.error('Background search error:', err)
+                            );
+                        }, 100);
+                        return; // Allow default navigation
+                    }
                 }
                 
-                // For all other cases, perform search
+                // For all other cases
                 event.preventDefault();
                 console.log('Initiating search request');
-                this.#performSearch(selectedText);
-            });
+                await this.#performSearch(selectedText);
+            });            
         });
         
         console.groupEnd();
@@ -575,29 +695,55 @@ class AutocompleteSearchManager {
                     }
                 }
                 break;
-    
+
             case 'Enter':
                 if (activeItem) {
                     event.preventDefault();
                     const selectedText = activeItem.querySelector('.suggestion-text').textContent;
                     const type = activeItem.dataset.type;
                     const url = activeItem.dataset.url;
-            
-                    console.log('Suggestion Keyboard:', {
+                    
+                    // Get additional details for better analytics
+                    let title = selectedText;
+                    if (type === 'staff') {
+                        const roleElement = activeItem.querySelector('.staff-role');
+                        if (roleElement) {
+                            title = `${selectedText} (${roleElement.textContent})`;
+                        }
+                    } else if (type === 'program') {
+                        const deptElement = activeItem.querySelector('.suggestion-type');
+                        if (deptElement) {
+                            title = `${selectedText} - ${deptElement.textContent}`;
+                        }
+                    }
+
+                    console.log('Keyboard selection:', {
                         type: 'keyboard enter',
                         itemType: type,
                         text: selectedText,
+                        title: title,
                         url: url || 'none'
                     });
                     
                     this.inputField.value = selectedText;
                     this.suggestionsContainer.innerHTML = '';
                     
-                    // For staff and program items with URLs, open in new tab
+                    // For staff and program suggestions with URLs
                     if ((type === 'staff' || type === 'program') && url) {
+                        // Log the click
+                        this.#logSuggestionClick(selectedText, type, url, title);
+                        
+                        // Open in new tab
                         window.open(url, '_blank', 'noopener,noreferrer');
+                        
+                        // Also perform search in current window
+                        setTimeout(() => {
+                            this.#performSearch(selectedText).catch(err => 
+                                console.error('Background search error:', err)
+                            );
+                        }, 100);
                     } else {
-                        // For all other cases, perform search
+                        // For general suggestions, just search
                         console.log('Initiating search request');
                         this.#performSearch(selectedText);
                     }
