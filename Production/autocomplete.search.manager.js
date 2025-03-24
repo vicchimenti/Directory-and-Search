@@ -53,12 +53,12 @@
  * 
  * @namespace AutocompleteSearchManager
  * @author Victor Chimenti
- * @version 5.1.0
+ * @version 5.1.1
  * @productionVersion 5.0.0
  * @environment production
  * @status stable
  * @license MIT
- * @lastModified 2025-03-23
+ * @lastModified 2025-03-24
  */
 
 class AutocompleteSearchManager {
@@ -199,8 +199,8 @@ class AutocompleteSearchManager {
             const baseUrl = this.config.endpoints.suggest.substring(
                 0, this.config.endpoints.suggest.indexOf('/proxy/') + 7
             );
-            
-            const endpoint = `${baseUrl}/analytics/click`;
+                        
+            const endpoint = `${baseUrl}analytics/click`;
             
             // Use sendBeacon for non-blocking operation
             if (navigator.sendBeacon) {
