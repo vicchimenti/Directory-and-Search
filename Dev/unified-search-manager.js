@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.1.3
+ * @version 2.1.4
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -256,22 +256,19 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Sets all search input fields on the page to the given value.
+     * Sets search input fields to the given value.
+     * Only populates inputs on the results page, not the header input.
      * 
      * @private
      * @param {string} query - The search query
      */
     #setAllSearchInputs(query) {
-        // Populate all search inputs on the page with the query
-        Object.keys(this.searchComponents).forEach(componentType => {
-            const input = this.searchComponents[componentType]?.input;
-            if (input) {
-                console.log(`Setting ${componentType} input value to: ${query}`);
-                input.value = query;
-                input.setAttribute('value', query);
-                input.dispatchEvent(new Event('change'));
-            }
-        });
+        if (this.config.isResultsPage && this.searchComponents.results?.input) {
+            console.log(`Setting results page input value to: ${query}`);
+            this.searchComponents.results.input.value = query;
+            this.searchComponents.results.input.setAttribute('value', query);
+            this.searchComponents.results.input.dispatchEvent(new Event('change'));
+        }
     }
 
     /**
