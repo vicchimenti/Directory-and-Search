@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.2.0
+ * @version 2.2.2
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -204,12 +204,12 @@ class UnifiedSearchManager {
     async handleURLParameters() {
         try {
             console.log("Handling URL parameters");
-
+    
             const urlParams = new URLSearchParams(window.location.search);
             const urlSearchQuery = urlParams.get('query');
-
+    
             console.log("URL search query:", urlSearchQuery);
-
+    
             if (urlSearchQuery) {
                 // Store original query for analytics
                 this.originalQuery = urlSearchQuery;
@@ -217,7 +217,17 @@ class UnifiedSearchManager {
                 // Set the value in all search inputs on the page
                 this.#setAllSearchInputs(urlSearchQuery);
                 
-                // Check for preloaded results
+                // First check local cache
+                const cachedResults = this.#getFromRecentSearchCache(urlSearchQuery);
+                if (cachedResults) {
+                    console.log("Using cached search results");
+                    if (this.searchComponents.results?.resultsContainer) {
+                        this.searchComponents.results.resultsContainer.innerHTML = cachedResults;
+                        return;
+                    }
+                }
+                
+                // Then check for preloaded results
                 const pendingSearchQuery = sessionStorage.getItem('pendingSearchQuery');
                 const preloadedResults = sessionStorage.getItem('preloadedSearchResults');
                 const preloadedTimestamp = sessionStorage.getItem('preloadedSearchTimestamp');
@@ -236,15 +246,20 @@ class UnifiedSearchManager {
                     
                     // Display the preloaded results
                     if (this.searchComponents.results?.resultsContainer) {
-                        this.searchComponents.results.resultsContainer.innerHTML = `
+                        const resultHTML = `
                             <div id="funnelback-search-container-response" class="funnelback-search-container">
                                 ${preloadedResults}
                             </div>
                         `;
+                        
+                        // Store in cache for future use
+                        this.#storeInRecentSearchCache(urlSearchQuery, resultHTML);
+                        
+                        this.searchComponents.results.resultsContainer.innerHTML = resultHTML;
                     }
                 } else {
-                    // No preloaded results, perform the search normally
-                    console.log("No preloaded results available, performing search");
+                    // No cached or preloaded results, perform the search normally
+                    console.log("No cached or preloaded results available, performing search");
                     await this.performFunnelbackSearch(urlSearchQuery);
                 }
             } else {
