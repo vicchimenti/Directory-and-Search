@@ -383,6 +383,7 @@ class UnifiedSearchManager {
 
     /**
      * Performs a search using the Funnelback API via proxy server.
+     * Checks local cache first and stores results in cache after fetching.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
@@ -401,10 +402,20 @@ class UnifiedSearchManager {
             console.error('Results container not found, cannot display search results');
             return;
         }
-    
+
         try {
             this.isLoading = true;
             this.#updateLoadingState(true);
+            
+            // Check cache first
+            const cachedResults = this.#getFromRecentSearchCache(searchQuery);
+            if (cachedResults) {
+                console.log('Using cached search results');
+                resultsContainer.innerHTML = cachedResults;
+                this.isLoading = false;
+                this.#updateLoadingState(false);
+                return;
+            }
             
             const searchParams = new URLSearchParams({
                 query: searchQuery,
@@ -413,21 +424,26 @@ class UnifiedSearchManager {
                 form: 'partial',
                 sessionId: this.sessionId
             });
-    
+
             const url = `${this.config.searchEndpoint}?${searchParams.toString()}`;
             console.log('Request URL:', url);
-    
+
             const response = await fetch(url);
             console.log('Proxy Response Status:', response.status);
             
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
             const text = await response.text();
-            resultsContainer.innerHTML = `
+            const resultHTML = `
                 <div id="funnelback-search-container-response" class="funnelback-search-container">
                     ${text}
                 </div>
             `;
+            
+            // Store in cache
+            this.#storeInRecentSearchCache(searchQuery, resultHTML);
+            
+            resultsContainer.innerHTML = resultHTML;
         } catch (error) {
             console.error('Search error:', error);
             resultsContainer.innerHTML = `
