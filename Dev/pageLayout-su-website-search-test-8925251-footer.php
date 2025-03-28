@@ -34,12 +34,10 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="<t4 type='media' id='9248119' formatter='path/*' />" type="module" defer></script>
-        <!-- results-search-manager.js -->
+        <script src="<t4 type='media' id='9291967' formatter='path/*' />" type="module" async></script>
+        <!-- unified-search-manager.js -->
         <script src="<t4 type='media' id='9248120' formatter='path/*' />" type="module" defer></script>
         <!-- dynamic-results-manager.js -->
-        <script src="<t4 type='media' id='9248122' formatter='path/*' />" type="module" defer></script>
-        <!-- header-search-manager.js -->
         <script src="<t4 type='media' id='9248121' formatter='path/*' />" type="module" defer></script>
         <!-- global-collapse-manager.js -->
         <script src="<t4 type='media' id='9248118' formatter='path/*' />" type="module" defer></script>
