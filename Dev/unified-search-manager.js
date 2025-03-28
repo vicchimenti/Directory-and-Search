@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.0.1
+ * @version 2.1.0
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -532,6 +532,11 @@ class UnifiedSearchManager {
      * @param {string} componentType - The type of component ('header' or 'results')
      */
     #displaySuggestions(suggestions, componentType) {
+        // Skip displaying suggestions for results page input - leave that to AutocompleteSearchManager
+        if (componentType === 'results') {
+            return;
+        }
+        
         const component = this.searchComponents[componentType];
         if (!component || !component.suggestionsContainer || !suggestions.length) {
             if (component?.suggestionsContainer) {
@@ -540,7 +545,7 @@ class UnifiedSearchManager {
             }
             return;
         }
-    
+
         const suggestionHTML = `
             <div class="header-suggestions-list">
                 ${suggestions.map((suggestion, index) => `
@@ -550,10 +555,10 @@ class UnifiedSearchManager {
                 `).join('')}
             </div>
         `;
-    
+
         component.suggestionsContainer.innerHTML = suggestionHTML;
         component.suggestionsContainer.hidden = false;
-    
+
         // Add click handlers for suggestion items
         component.suggestionsContainer.querySelectorAll('.header-suggestion-item').forEach((item) => {
             item.addEventListener('click', (event) => {
@@ -562,8 +567,15 @@ class UnifiedSearchManager {
                 component.suggestionsContainer.innerHTML = '';
                 component.suggestionsContainer.hidden = true;
                 
-                // Trigger search with the selected suggestion
-                this.#handleSearchAction(new Event('click', {cancelable: true}), componentType);
+                if (componentType === 'header') {
+                    // If we're in the header, trigger the redirect
+                    if (component.button) {
+                        component.button.click();
+                    } else {
+                        // In case button isn't available, handle search directly
+                        this.#handleSearchAction(new Event('click', {cancelable: true}), 'header');
+                    }
+                }
             });
         });
     }
