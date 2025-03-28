@@ -1,25 +1,24 @@
 /**
  * @fileoverview Unified Search Manager for Funnelback Search Integration
  * 
- * This class unifies header search and results search functionalities to reduce
- * latency and code duplication while maintaining context-specific behaviors.
- * In header mode, it provides simple autocomplete from suggest.js only.
- * In results mode, it handles the full search execution using Funnelback API.
+ * This class provides a universal search experience across the entire site.
+ * Rather than separating into "header" and "results" modes, it detects
+ * and manages all available search components wherever they appear.
  * 
  * Features:
- * - Unified approach to search functionality
- * - Context-aware initialization (header or results)
- * - Simple suggestions for header context
- * - Full search execution for results context
- * - Shared state management between contexts
- * - Reduced latency by avoiding unnecessary redirects
+ * - Single manager handles all search functionality sitewide
+ * - Adapts to available search elements on any page
+ * - Enables searching from any input point 
+ * - Supports both redirect flows and direct API searches
+ * - Preloads search results for faster experience
+ * - Shared state management between all search components
  * 
  * Dependencies:
- * - Requires DOM elements with specific IDs based on context
- * - Works with Funnelback proxy endpoints
+ * - Works with any search inputs and results containers on the page
+ * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 1.1.2
+ * @version 2.0.1
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -28,32 +27,29 @@
 class UnifiedSearchManager {
     /**
      * Initializes the Unified Search Manager.
-     * Determines context and sets up appropriate configuration and event listeners.
+     * Finds and initializes all search components on the page.
      * 
      * @param {Object} [config={}] - Configuration options
-     * @throws {Error} If required DOM elements are not found (error will be caught internally)
      */
     constructor(config = {}) {
         try {
             console.log('Starting UnifiedSearchManager constructor');
             
-            // Determine current context based on URL
+            // Determine if we're on the search results page
             const isResultsPage = window.location.pathname.includes('search-test');
             console.log('Current page is results page:', isResultsPage);
             
-            // Default configuration with context-specific overrides
+            // Default configuration
             this.config = {
-                mode: isResultsPage ? 'results' : 'header',
                 collection: 'seattleu~sp-search',
                 profile: '_default',
                 minLength: 3,
-                maxResults: isResultsPage ? 10 : 8,
+                maxResults: 8,
                 suggestEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
                 searchEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/search',
+                isResultsPage: isResultsPage,
                 ...config
             };
-
-            console.log(`Initializing UnifiedSearchManager in ${this.config.mode} mode`);
 
             // Initialize session tracking
             this.sessionId = this.#getOrCreateSessionId();
@@ -62,18 +58,16 @@ class UnifiedSearchManager {
             // Initialize state
             this.debounceTimeout = null;
             this.isLoading = false;
-
-            // Initialize DOM elements based on context
-            this.#initializeDOMElements();
             
-            // Initialize functionality based on context
-            if (this.config.mode === 'header') {
-                this.#initializeHeaderMode();
-            } else {
-                this.#initializeResultsMode();
-                
-                // Critical: Handle URL parameters immediately
-                console.log("Calling handleURLParameters from constructor");
+            // Initialize component references
+            this.searchComponents = {};
+            
+            // Find and initialize all search components on the page
+            this.#findAndInitializeSearchComponents();
+            
+            // If on results page, handle URL parameters and search
+            if (isResultsPage) {
+                // Handle URL parameters to execute the search
                 this.handleURLParameters();
             }
             
@@ -84,61 +78,95 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Initializes DOM elements based on current context.
+     * Finds all search components on the page and initializes them.
+     * This includes global header search and results page search.
      * 
      * @private
      */
-    #initializeDOMElements() {
-        try {
-            if (this.config.mode === 'header') {
-                // Header mode DOM elements
-                this.searchButton = document.getElementById('search-button');
-                this.searchInput = document.getElementById('search-input');
-                
-                // Create suggestions container if it doesn't exist
-                this.suggestionsContainer = document.getElementById('header-suggestions');
-                if (!this.suggestionsContainer) {
-                    this.suggestionsContainer = document.createElement('div');
-                    this.suggestionsContainer.id = 'header-suggestions';
-                    this.suggestionsContainer.className = 'header-suggestions-container';
-                    this.suggestionsContainer.setAttribute('role', 'listbox');
-                    this.suggestionsContainer.hidden = true;
-                    
-                    // Insert after search input
-                    if (this.searchInput) {
-                        this.searchInput.parentNode.insertBefore(
-                            this.suggestionsContainer,
-                            this.searchInput.nextSibling
-                        );
-                    }
-                }
-            } else {
-                // Results mode DOM elements
-                this.searchInput = document.getElementById('autocomplete-concierge-inputField');
-                this.form = this.searchInput ? this.searchInput.closest('form') : null;
-                this.submitButton = this.form ? this.form.querySelector('#on-page-search-button') : null;
-                this.suggestionsContainer = document.getElementById('autocomplete-suggestions');
-                this.resultsContainer = document.getElementById('results');
-            }
-
-            // Log DOM element initialization status
-            console.log('DOM Elements initialized:', {
-                mode: this.config.mode,
-                searchInput: this.searchInput ? '✓' : '✗',
-                searchButton: this.searchButton ? '✓' : '✗',
-                submitButton: this.submitButton ? '✓' : '✗',
-                suggestionsContainer: this.suggestionsContainer ? '✓' : '✗',
-                resultsContainer: this.resultsContainer ? '✓' : '✗'
-            });
+    #findAndInitializeSearchComponents() {
+        // Find header search components (may exist on any page)
+        const headerSearchInput = document.getElementById('search-input');
+        const headerSearchButton = document.getElementById('search-button');
+        
+        if (headerSearchInput && headerSearchButton) {
+            console.log('Found header search components');
             
-            // Warning if critical elements not found
-            if ((this.config.mode === 'header' && (!this.searchInput || !this.searchButton)) || 
-                (this.config.mode === 'results' && (!this.searchInput || !this.resultsContainer))) {
-                console.warn(`Required DOM elements not found for ${this.config.mode} mode`);
+            // Store references
+            this.searchComponents.header = {
+                input: headerSearchInput,
+                button: headerSearchButton,
+                container: null
+            };
+            
+            // Find or create suggestions container
+            let suggestionsContainer = document.getElementById('header-suggestions');
+            if (!suggestionsContainer) {
+                suggestionsContainer = document.createElement('div');
+                suggestionsContainer.id = 'header-suggestions';
+                suggestionsContainer.className = 'header-suggestions-container';
+                suggestionsContainer.setAttribute('role', 'listbox');
+                suggestionsContainer.hidden = true;
+                
+                // Insert after search input
+                headerSearchInput.parentNode.insertBefore(
+                    suggestionsContainer,
+                    headerSearchInput.nextSibling
+                );
             }
-        } catch (error) {
-            console.error('Error initializing DOM elements:', error);
+            
+            this.searchComponents.header.suggestionsContainer = suggestionsContainer;
+            
+            // Set up event listeners
+            headerSearchInput.addEventListener('input', (event) => this.#handleInput(event, 'header'));
+            headerSearchInput.addEventListener('keydown', (event) => this.#handleKeydown(event, 'header'));
+            headerSearchButton.addEventListener('click', (event) => this.#handleSearchAction(event, 'header'));
         }
+        
+        // Find results page components (only on search page)
+        if (this.config.isResultsPage) {
+            const resultsSearchInput = document.getElementById('autocomplete-concierge-inputField');
+            const resultsForm = resultsSearchInput?.closest('form');
+            const resultsSubmitButton = resultsForm?.querySelector('#on-page-search-button');
+            const suggestionsContainer = document.getElementById('autocomplete-suggestions');
+            const resultsContainer = document.getElementById('results');
+            
+            if (resultsSearchInput && resultsContainer) {
+                console.log('Found results page search components');
+                
+                // Store references
+                this.searchComponents.results = {
+                    input: resultsSearchInput,
+                    form: resultsForm,
+                    button: resultsSubmitButton,
+                    suggestionsContainer: suggestionsContainer,
+                    resultsContainer: resultsContainer
+                };
+                
+                // Set up event listeners
+                if (resultsForm) {
+                    resultsForm.addEventListener('submit', (event) => this.#handleSearchAction(event, 'results'));
+                }
+                
+                if (resultsSearchInput) {
+                    resultsSearchInput.addEventListener('input', (event) => this.#handleInput(event, 'results'));
+                    resultsSearchInput.addEventListener('keydown', (event) => this.#handleKeydown(event, 'results'));
+                }
+                
+                // Make sure search button is visible if it exists
+                if (resultsSubmitButton) {
+                    resultsSubmitButton.classList.remove('empty-query');
+                }
+            }
+        }
+        
+        // Set up document click listener for handling clicks outside search components
+        document.addEventListener('click', this.#handleClickOutside.bind(this));
+        
+        // Log component initialization status
+        console.log('Search components initialized:', {
+            header: !!this.searchComponents.header,
+            results: !!this.searchComponents.results
+        });
     }
 
     /**
@@ -161,64 +189,21 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Initializes functionality for header search mode.
-     * Sets up event listeners for search button and input for simple autocomplete.
+     * Gets the search query from the specified component's input field.
      * 
      * @private
-     */
-    #initializeHeaderMode() {
-        console.log('Initializing header mode');
-        
-        if (!this.searchButton || !this.searchInput) {
-            console.warn('Header search elements not found');
-            return;
-        }
-
-        // Set up event listeners
-        this.searchButton.addEventListener('click', this.#handleHeaderSearch);
-        this.searchInput.addEventListener('input', this.#handleInput.bind(this));
-        this.searchInput.addEventListener('keydown', this.#handleKeydown.bind(this));
-        
-        // Close suggestions when clicking outside
-        document.addEventListener('click', this.#handleClickOutside.bind(this));
-    }
-
-    /**
-     * Initializes functionality for results search mode.
-     * Sets up event listeners for search form and handles URL parameters.
-     * 
-     * @private
-     */
-    #initializeResultsMode() {
-        console.log('Initializing results mode');
-        
-        if (!this.searchInput || !this.resultsContainer) {
-            console.warn('Results search elements not found');
-            return;
-        }
-
-        if (this.form && this.submitButton) {
-            this.form.addEventListener('submit', this.#handleResultsSearch);
-            
-            // Make sure search button is visible
-            this.submitButton.classList.remove('empty-query');
-        }
-    }
-
-    /**
-     * Gets the current search query from the appropriate input field.
-     * 
-     * @private
+     * @param {string} componentType - The type of component ('header' or 'results')
      * @returns {string} The sanitized search query
      */
-    #getSearchQuery() {
-        if (!this.searchInput) return '';
-        return this.searchInput.value.trim();
+    #getSearchQuery(componentType) {
+        const component = this.searchComponents[componentType];
+        if (!component || !component.input) return '';
+        return component.input.value.trim();
     }
 
     /**
      * Handles search parameters from the URL.
-     * If a query parameter exists, it populates the search field and performs the search.
+     * If a query parameter exists, it populates search fields and performs the search.
      * 
      * @public
      * @returns {Promise<void>}
@@ -236,24 +221,39 @@ class UnifiedSearchManager {
                 // Store original query for analytics
                 this.originalQuery = urlSearchQuery;
                 
-                // Make sure the search input field exists
-                if (this.searchInput) {
-                    console.log("Setting search input value to:", urlSearchQuery);
-                    // Explicitly set the value using both property and attribute
-                    this.searchInput.value = urlSearchQuery;
-                    this.searchInput.setAttribute('value', urlSearchQuery);
-                    
-                    // Force a UI update
-                    this.searchInput.dispatchEvent(new Event('change'));
-                } else {
-                    console.error("Search input field not found!");
-                }
+                // Set the value in all search inputs on the page
+                this.#setAllSearchInputs(urlSearchQuery);
                 
-                // Explicitly perform the search with a slight delay to ensure DOM is ready
-                console.log("Triggering search for:", urlSearchQuery);
-                setTimeout(() => {
-                    this.performFunnelbackSearch(urlSearchQuery);
-                }, 300);
+                // Check for preloaded results
+                const pendingSearchQuery = sessionStorage.getItem('pendingSearchQuery');
+                const preloadedResults = sessionStorage.getItem('preloadedSearchResults');
+                const preloadedTimestamp = sessionStorage.getItem('preloadedSearchTimestamp');
+                
+                // Only use preloaded results if they exist, match the current query, and are recent (within 30 seconds)
+                const areResultsRecent = preloadedTimestamp && 
+                    (Date.now() - parseInt(preloadedTimestamp)) < 30000;
+                    
+                if (preloadedResults && pendingSearchQuery === urlSearchQuery && areResultsRecent) {
+                    console.log("Using preloaded search results");
+                    
+                    // Clear the preloaded data to prevent stale reuse
+                    sessionStorage.removeItem('pendingSearchQuery');
+                    sessionStorage.removeItem('preloadedSearchResults');
+                    sessionStorage.removeItem('preloadedSearchTimestamp');
+                    
+                    // Display the preloaded results
+                    if (this.searchComponents.results?.resultsContainer) {
+                        this.searchComponents.results.resultsContainer.innerHTML = `
+                            <div id="funnelback-search-container-response" class="funnelback-search-container">
+                                ${preloadedResults}
+                            </div>
+                        `;
+                    }
+                } else {
+                    // No preloaded results, perform the search normally
+                    console.log("No preloaded results available, performing search");
+                    await this.performFunnelbackSearch(urlSearchQuery);
+                }
             } else {
                 console.log("No query parameter found in URL");
             }
@@ -263,21 +263,58 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Handles the header search button click event.
-     * Validates input and triggers search.
+     * Sets all search input fields on the page to the given value.
      * 
      * @private
-     * @param {Event} event - The click event object
+     * @param {string} query - The search query
      */
-    #handleHeaderSearch = (event) => {
+    #setAllSearchInputs(query) {
+        // Populate all search inputs on the page with the query
+        Object.keys(this.searchComponents).forEach(componentType => {
+            const input = this.searchComponents[componentType]?.input;
+            if (input) {
+                console.log(`Setting ${componentType} input value to: ${query}`);
+                input.value = query;
+                input.setAttribute('value', query);
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    /**
+     * Handles search actions from any search component.
+     * Header search initiates preloading and redirects.
+     * Results page search performs API search directly.
+     * 
+     * @private
+     * @param {Event} event - The initiating event
+     * @param {string} componentType - The type of component ('header' or 'results')
+     */
+    #handleSearchAction = async (event) => {
         event.preventDefault();
-        const searchQuery = this.#getSearchQuery();
+        const componentType = event.currentTarget.closest('form')?.id === 'on-page-search-form' ? 'results' : 'header';
+        console.log(`Handling search action from ${componentType}`);
+        
+        const searchQuery = this.#getSearchQuery(componentType);
         
         // Validate search input
         if (!searchQuery) {
             alert('Please enter a search term');
             return;
         }
+
+        // If on results page, just perform the search
+        if (componentType === 'results' || this.config.isResultsPage) {
+            console.log('Performing direct search on results page');
+            await this.performFunnelbackSearch(searchQuery);
+            return;
+        }
+        
+        // If from header on non-results page, preload and redirect
+        console.log('Preloading search results and redirecting');
+        
+        // Start the search request immediately
+        this.#preloadSearchResults(searchQuery);
 
         // Construct search URL with parameters
         const searchParams = new URLSearchParams({
@@ -292,24 +329,43 @@ class UnifiedSearchManager {
     }
 
     /**
-     * Handles form submission in results mode.
-     * Prevents default submission and executes the search via API.
+     * Preloads search results by initiating a search request and storing the result
+     * in sessionStorage. The results page will check for and use these results.
      * 
      * @private
-     * @param {Event} event - The submit event
+     * @param {string} searchQuery - The search query to preload
      */
-    #handleResultsSearch = async(event) => {
-        console.log("Handling results search form submission");
+    async #preloadSearchResults(searchQuery) {
+        try {
+            // Create the search parameters
+            const searchParams = new URLSearchParams({
+                query: searchQuery,
+                collection: this.config.collection,
+                profile: this.config.profile,
+                form: 'partial',
+                sessionId: this.sessionId
+            });
 
-        event.preventDefault();
-        const searchQuery = this.#getSearchQuery();
-        
-        if (!searchQuery) {
-            alert('Please enter a search term');
-            return;
+            // Initiate the request
+            const fetchPromise = fetch(`${this.config.searchEndpoint}?${searchParams.toString()}`);
+            
+            // Store the query in sessionStorage
+            sessionStorage.setItem('pendingSearchQuery', searchQuery);
+            
+            // Start the fetch but don't await it - let it run in the background
+            fetchPromise.then(async response => {
+                if (response.ok) {
+                    const text = await response.text();
+                    sessionStorage.setItem('preloadedSearchResults', text);
+                    sessionStorage.setItem('preloadedSearchTimestamp', Date.now().toString());
+                    console.log('Search results preloaded successfully');
+                }
+            }).catch(error => {
+                console.error('Error preloading search results:', error);
+            });
+        } catch (error) {
+            console.error('Error in preloadSearchResults:', error);
         }
-
-        await this.performFunnelbackSearch(searchQuery);
     }
 
     /**
@@ -325,6 +381,13 @@ class UnifiedSearchManager {
         
         // Store original query for analytics tracking
         this.originalQuery = searchQuery;
+        
+        // Make sure we have a results container to show results in
+        const resultsContainer = this.searchComponents.results?.resultsContainer;
+        if (!resultsContainer) {
+            console.error('Results container not found, cannot display search results');
+            return;
+        }
     
         try {
             this.isLoading = true;
@@ -347,22 +410,18 @@ class UnifiedSearchManager {
             if (!response.ok) throw new Error(`Error: ${response.status}`);
             
             const text = await response.text();
-            if (this.resultsContainer) {
-                this.resultsContainer.innerHTML = `
-                    <div id="funnelback-search-container-response" class="funnelback-search-container">
-                        ${text}
-                    </div>
-                `;
-            }
+            resultsContainer.innerHTML = `
+                <div id="funnelback-search-container-response" class="funnelback-search-container">
+                    ${text}
+                </div>
+            `;
         } catch (error) {
             console.error('Search error:', error);
-            if (this.resultsContainer) {
-                this.resultsContainer.innerHTML = `
-                    <div class="error-message">
-                        <p>Sorry, we couldn't complete your search. ${error.message}</p>
-                    </div>
-                `;
-            }
+            resultsContainer.innerHTML = `
+                <div class="error-message">
+                    <p>Sorry, we couldn't complete your search. ${error.message}</p>
+                </div>
+            `;
         } finally {
             this.isLoading = false;
             this.#updateLoadingState(false);
@@ -376,10 +435,19 @@ class UnifiedSearchManager {
      * @param {boolean} isLoading - Whether the component is in a loading state
      */
     #updateLoadingState(isLoading) {
-        if (this.config.mode === 'results' && this.submitButton) {
-            this.submitButton.classList.toggle('loading', isLoading);
-            this.searchInput.disabled = isLoading;
-        }
+        // Update loading state for all buttons
+        Object.keys(this.searchComponents).forEach(componentType => {
+            const button = this.searchComponents[componentType]?.button;
+            const input = this.searchComponents[componentType]?.input;
+            
+            if (button) {
+                button.classList.toggle('loading', isLoading);
+            }
+            
+            if (input) {
+                input.disabled = isLoading;
+            }
+        });
     }
 
     /**
@@ -388,21 +456,25 @@ class UnifiedSearchManager {
      * 
      * @private
      * @param {InputEvent} event - The input event
+     * @param {string} componentType - The type of component ('header' or 'results')
      */
-    #handleInput(event) {
+    #handleInput(event, componentType) {
         const query = event.target.value.trim();
+        const component = this.searchComponents[componentType];
+        
+        if (!component || !component.suggestionsContainer) return;
         
         clearTimeout(this.debounceTimeout);
         
         if (query.length < this.config.minLength) {
-            this.suggestionsContainer.innerHTML = '';
-            this.suggestionsContainer.hidden = true;
+            component.suggestionsContainer.innerHTML = '';
+            component.suggestionsContainer.hidden = true;
             return;
         }
     
         // Debounce for queries
         this.debounceTimeout = setTimeout(() => {
-            this.#fetchSuggestions(query);
+            this.#fetchSuggestions(query, componentType);
         }, 200);
     }
 
@@ -411,13 +483,17 @@ class UnifiedSearchManager {
      * 
      * @private
      * @param {string} query - The search query
+     * @param {string} componentType - The type of component ('header' or 'results')
      */
-    async #fetchSuggestions(query) {
+    async #fetchSuggestions(query, componentType) {
+        const component = this.searchComponents[componentType];
+        if (!component || !component.suggestionsContainer) return;
+        
         try {
             // Basic validation
             if (!query || query.length < this.config.minLength) {
-                this.suggestionsContainer.innerHTML = '';
-                this.suggestionsContainer.hidden = true;
+                component.suggestionsContainer.innerHTML = '';
+                component.suggestionsContainer.hidden = true;
                 return;
             }
 
@@ -440,56 +516,54 @@ class UnifiedSearchManager {
             const suggestions = await response.json();
             
             // Display results (limited to maxResults)
-            // Note: For now, we're using the same display method for both contexts
-            // In the future, the results page might use the AutocompleteSearchManager instead
-            this.#displayHeaderSuggestions(suggestions.slice(0, this.config.maxResults));
+            this.#displaySuggestions(suggestions.slice(0, this.config.maxResults), componentType);
         } catch (error) {
             console.error('Suggestion fetch error:', error);
-            this.suggestionsContainer.innerHTML = '';
-            this.suggestionsContainer.hidden = true;
+            component.suggestionsContainer.innerHTML = '';
+            component.suggestionsContainer.hidden = true;
         }
     }
 
     /**
-     * Displays suggestions in header context (simple single-column layout).
+     * Displays suggestions for a specific component.
      * 
      * @private
      * @param {Array} suggestions - Array of suggestion objects
+     * @param {string} componentType - The type of component ('header' or 'results')
      */
-    #displayHeaderSuggestions(suggestions) {
-        if (!this.suggestionsContainer || !suggestions.length) {
-            this.suggestionsContainer.innerHTML = '';
-            this.suggestionsContainer.hidden = true;
+    #displaySuggestions(suggestions, componentType) {
+        const component = this.searchComponents[componentType];
+        if (!component || !component.suggestionsContainer || !suggestions.length) {
+            if (component?.suggestionsContainer) {
+                component.suggestionsContainer.innerHTML = '';
+                component.suggestionsContainer.hidden = true;
+            }
             return;
         }
     
         const suggestionHTML = `
             <div class="header-suggestions-list">
                 ${suggestions.map((suggestion, index) => `
-                    <div class="header-suggestion-item" role="option" data-index="${index}">
+                    <div class="header-suggestion-item" role="option" data-index="${index}" data-component="${componentType}">
                         <span class="suggestion-text">${suggestion.display || ''}</span>
                     </div>
                 `).join('')}
             </div>
         `;
     
-        this.suggestionsContainer.innerHTML = suggestionHTML;
-        this.suggestionsContainer.hidden = false;
+        component.suggestionsContainer.innerHTML = suggestionHTML;
+        component.suggestionsContainer.hidden = false;
     
         // Add click handlers for suggestion items
-        this.suggestionsContainer.querySelectorAll('.header-suggestion-item').forEach((item) => {
+        component.suggestionsContainer.querySelectorAll('.header-suggestion-item').forEach((item) => {
             item.addEventListener('click', (event) => {
                 const selectedText = item.querySelector('.suggestion-text').textContent;
-                this.searchInput.value = selectedText;
-                this.suggestionsContainer.innerHTML = '';
-                this.suggestionsContainer.hidden = true;
+                component.input.value = selectedText;
+                component.suggestionsContainer.innerHTML = '';
+                component.suggestionsContainer.hidden = true;
                 
                 // Trigger search with the selected suggestion
-                if (this.config.mode === 'header') {
-                    this.searchButton.click();
-                } else if (this.submitButton) {
-                    this.submitButton.click();
-                }
+                this.#handleSearchAction(new Event('click', {cancelable: true}), componentType);
             });
         });
     }
@@ -500,17 +574,18 @@ class UnifiedSearchManager {
      * 
      * @private
      * @param {KeyboardEvent} event - The keyboard event
+     * @param {string} componentType - The type of component ('header' or 'results')
      */
-    #handleKeydown(event) {
-        // Only handle keyboard navigation if suggestions are visible
-        if (this.suggestionsContainer.hidden) {
+    #handleKeydown(event, componentType) {
+        const component = this.searchComponents[componentType];
+        if (!component || !component.suggestionsContainer || component.suggestionsContainer.hidden) {
             return;
         }
 
-        const items = this.suggestionsContainer.querySelectorAll('.header-suggestion-item');
+        const items = component.suggestionsContainer.querySelectorAll('.header-suggestion-item');
         if (!items.length) return;
 
-        const activeItem = this.suggestionsContainer.querySelector('.header-suggestion-item.active');
+        const activeItem = component.suggestionsContainer.querySelector('.header-suggestion-item.active');
         let activeIndex = -1;
 
         if (activeItem) {
@@ -543,41 +618,43 @@ class UnifiedSearchManager {
                 if (activeItem) {
                     event.preventDefault();
                     const selectedText = activeItem.querySelector('.suggestion-text').textContent;
-                    this.searchInput.value = selectedText;
-                    this.suggestionsContainer.innerHTML = '';
-                    this.suggestionsContainer.hidden = true;
+                    component.input.value = selectedText;
+                    component.suggestionsContainer.innerHTML = '';
+                    component.suggestionsContainer.hidden = true;
                     
                     // Trigger search with the selected suggestion
-                    if (this.config.mode === 'header') {
-                        this.searchButton.click();
-                    } else if (this.submitButton) {
-                        this.submitButton.click();
-                    }
+                    this.#handleSearchAction(new Event('click', {cancelable: true}), componentType);
                 }
                 break;
 
             case 'Escape':
                 event.preventDefault();
-                this.suggestionsContainer.innerHTML = '';
-                this.suggestionsContainer.hidden = true;
-                this.searchInput.blur();
+                component.suggestionsContainer.innerHTML = '';
+                component.suggestionsContainer.hidden = true;
+                component.input.blur();
                 break;
         }
     }
 
     /**
-     * Handles clicks outside the autocomplete component.
-     * Closes the suggestions dropdown when clicking elsewhere.
+     * Handles clicks outside search components.
+     * Closes suggestion dropdowns when clicking elsewhere.
      * 
      * @private
      * @param {MouseEvent} event - The click event
      */
     #handleClickOutside(event) {
-        if (!this.searchInput?.contains(event.target) && 
-            !this.suggestionsContainer?.contains(event.target)) {
-            this.suggestionsContainer.innerHTML = '';
-            this.suggestionsContainer.hidden = true;
-        }
+        // For each component type, check if click was outside and hide suggestions if so
+        Object.keys(this.searchComponents).forEach(componentType => {
+            const component = this.searchComponents[componentType];
+            if (!component || !component.suggestionsContainer) return;
+            
+            if (!component.input?.contains(event.target) && 
+                !component.suggestionsContainer?.contains(event.target)) {
+                component.suggestionsContainer.innerHTML = '';
+                component.suggestionsContainer.hidden = true;
+            }
+        });
     }
 }
 
