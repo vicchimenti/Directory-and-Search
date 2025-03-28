@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.1.4
+ * @version 2.2.0
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -313,8 +313,8 @@ class UnifiedSearchManager {
             profile: this.config.profile
         });
 
-        // Redirect to results page
-        const redirectUrl = `/search-test/?${searchParams.toString()}`;
+        // Redirect to results page with hash to indicate preloaded results
+        const redirectUrl = `/search-test/?${searchParams.toString()}#preloaded`;
         window.location.href = redirectUrl;
     }
 
@@ -327,6 +327,12 @@ class UnifiedSearchManager {
      */
     async #preloadSearchResults(searchQuery) {
         try {
+            console.log('Starting search preloading for query:', searchQuery);
+            
+            // Store the query immediately
+            sessionStorage.setItem('pendingSearchQuery', searchQuery);
+            sessionStorage.setItem('preloadTimestamp', Date.now().toString());
+            
             // Create the search parameters
             const searchParams = new URLSearchParams({
                 query: searchQuery,
@@ -336,23 +342,40 @@ class UnifiedSearchManager {
                 sessionId: this.sessionId
             });
 
-            // Initiate the request
-            const fetchPromise = fetch(`${this.config.searchEndpoint}?${searchParams.toString()}`);
+            const url = `${this.config.searchEndpoint}?${searchParams.toString()}`;
+            console.log('Preloading URL:', url);
             
-            // Store the query in sessionStorage
-            sessionStorage.setItem('pendingSearchQuery', searchQuery);
+            // Use fetch with a timeout to ensure we don't block navigation too long
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 800); // 800ms timeout
             
-            // Start the fetch but don't await it - let it run in the background
-            fetchPromise.then(async response => {
+            try {
+                const response = await fetch(url, { 
+                    signal: controller.signal,
+                    credentials: 'same-origin'
+                });
+                
+                clearTimeout(timeoutId);
+                
                 if (response.ok) {
                     const text = await response.text();
+                    console.log('Preloaded results size:', text.length);
+                    
+                    // Store with timestamp
                     sessionStorage.setItem('preloadedSearchResults', text);
                     sessionStorage.setItem('preloadedSearchTimestamp', Date.now().toString());
                     console.log('Search results preloaded successfully');
+                } else {
+                    console.warn('Preload fetch failed with status:', response.status);
                 }
-            }).catch(error => {
-                console.error('Error preloading search results:', error);
-            });
+            } catch (fetchError) {
+                if (fetchError.name === 'AbortError') {
+                    console.log('Preload fetch aborted due to timeout');
+                } else {
+                    console.error('Preload fetch error:', fetchError);
+                }
+                clearTimeout(timeoutId);
+            }
         } catch (error) {
             console.error('Error in preloadSearchResults:', error);
         }
@@ -665,6 +688,94 @@ class UnifiedSearchManager {
                 component.suggestionsContainer.hidden = true;
             }
         });
+    }
+
+    /**
+     * Add simple localStorage-based caching for recent searches
+     * 
+     * @private
+     * @param {string} query - The search query to check in cache
+     * @returns {string|null} The cached results or null if not found
+     */
+    #getFromRecentSearchCache(query) {
+        try {
+            const cacheData = localStorage.getItem(`search_cache_${query}`);
+            if (!cacheData) return null;
+            
+            const { results, timestamp } = JSON.parse(cacheData);
+            
+            // Check if cache is still valid (10 minutes)
+            if (Date.now() - timestamp > 10 * 60 * 1000) {
+                localStorage.removeItem(`search_cache_${query}`);
+                return null;
+            }
+            
+            return results;
+        } catch (error) {
+            console.error('Error retrieving from cache:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Stores search results in the recent searches cache
+     * 
+     * @private
+     * @param {string} query - The search query
+     * @param {string} results - The HTML results to cache
+     */
+    #storeInRecentSearchCache(query, results) {
+        try {
+            const cacheData = JSON.stringify({
+                results,
+                timestamp: Date.now()
+            });
+            
+            localStorage.setItem(`search_cache_${query}`, cacheData);
+            
+            // Clean up old cache entries
+            this.#cleanupOldCacheEntries();
+        } catch (error) {
+            console.error('Error storing in cache:', error);
+        }
+    }
+
+    /**
+     * Cleans up old cache entries to prevent localStorage from filling up
+     * Keeps only the 10 most recent searches
+     * 
+     * @private
+     */
+    #cleanupOldCacheEntries() {
+        try {
+            const cacheKeys = [];
+            
+            // Collect all search cache entries
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('search_cache_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        cacheKeys.push({ key, timestamp: data.timestamp });
+                    } catch (e) {
+                        // Remove invalid entries
+                        localStorage.removeItem(key);
+                    }
+                }
+            }
+            
+            // Sort by timestamp (newest first)
+            cacheKeys.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Keep only the 10 most recent
+            if (cacheKeys.length > 10) {
+                cacheKeys.slice(10).forEach(item => {
+                    localStorage.removeItem(item.key);
+                });
+            }
+        } catch (error) {
+            console.error('Error cleaning cache:', error);
+        }
     }
 }
 
