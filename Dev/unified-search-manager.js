@@ -19,7 +19,7 @@
  * - Works with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 1.1.0
+ * @version 1.1.1
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -191,8 +191,11 @@ class UnifiedSearchManager {
             this.submitButton.classList.remove('empty-query');
         }
 
-        // Handle URL parameters on load
-        this.handleURLParameters();
+        // Critical: Handle URL parameters immediately
+        // This needs to run right away to execute the search
+        setTimeout(() => {
+            this.handleURLParameters();
+        }, 0);
     }
 
     /**
