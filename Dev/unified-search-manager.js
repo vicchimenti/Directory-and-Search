@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.2.2
+ * @version 2.2.3
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -757,17 +757,26 @@ class UnifiedSearchManager {
      */
     #storeInRecentSearchCache(query, results) {
         try {
+            console.log(`Attempting to store in cache: query=${query}, size=${results.length}`);
+            
+            // Try storing a small test value first
+            localStorage.setItem('test_storage', 'test');
+            console.log('Test storage successful');
+            
             const cacheData = JSON.stringify({
                 results,
                 timestamp: Date.now()
             });
             
             localStorage.setItem(`search_cache_${query}`, cacheData);
+            console.log(`Successfully stored in cache: query=${query}`);
             
             // Clean up old cache entries
             this.#cleanupOldCacheEntries();
         } catch (error) {
             console.error('Error storing in cache:', error);
+            console.error('Error name:', error.name);
+            console.error('Error message:', error.message);
         }
     }
 
