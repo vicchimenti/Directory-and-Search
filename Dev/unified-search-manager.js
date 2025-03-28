@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.1.2
+ * @version 2.1.3
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -116,7 +116,7 @@ class UnifiedSearchManager {
             
             this.searchComponents.header.suggestionsContainer = suggestionsContainer;
             
-            // Set up event listeners
+            // Set up event listeners for header search
             headerSearchInput.addEventListener('input', (event) => this.#handleInput(event, 'header'));
             headerSearchInput.addEventListener('keydown', (event) => this.#handleKeydown(event, 'header'));
             headerSearchButton.addEventListener('click', (event) => this.#handleSearchAction(event, 'header'));
@@ -127,7 +127,6 @@ class UnifiedSearchManager {
             const resultsSearchInput = document.getElementById('autocomplete-concierge-inputField');
             const resultsForm = resultsSearchInput?.closest('form');
             const resultsSubmitButton = resultsForm?.querySelector('#on-page-search-button');
-            const suggestionsContainer = document.getElementById('autocomplete-suggestions');
             const resultsContainer = document.getElementById('results');
             
             if (resultsSearchInput && resultsContainer) {
@@ -138,18 +137,12 @@ class UnifiedSearchManager {
                     input: resultsSearchInput,
                     form: resultsForm,
                     button: resultsSubmitButton,
-                    suggestionsContainer: suggestionsContainer,
                     resultsContainer: resultsContainer
                 };
                 
-                // Set up event listeners
+                // Only set up form submission handler for results page
                 if (resultsForm) {
                     resultsForm.addEventListener('submit', (event) => this.#handleSearchAction(event, 'results'));
-                }
-                
-                if (resultsSearchInput) {
-                    resultsSearchInput.addEventListener('input', (event) => this.#handleInput(event, 'results'));
-                    resultsSearchInput.addEventListener('keydown', (event) => this.#handleKeydown(event, 'results'));
                 }
                 
                 // Make sure search button is visible if it exists
