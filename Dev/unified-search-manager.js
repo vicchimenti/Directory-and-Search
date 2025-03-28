@@ -19,7 +19,7 @@
  * - Works with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 1.1.1
+ * @version 1.1.2
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -34,39 +34,52 @@ class UnifiedSearchManager {
      * @throws {Error} If required DOM elements are not found (error will be caught internally)
      */
     constructor(config = {}) {
-        // Determine current context based on URL
-        const isResultsPage = window.location.pathname.includes('search-test');
-        
-        // Default configuration with context-specific overrides
-        this.config = {
-            mode: isResultsPage ? 'results' : 'header',
-            collection: 'seattleu~sp-search',
-            profile: '_default',
-            minLength: 3,
-            maxResults: isResultsPage ? 10 : 8,
-            suggestEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
-            searchEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/search',
-            ...config
-        };
+        try {
+            console.log('Starting UnifiedSearchManager constructor');
+            
+            // Determine current context based on URL
+            const isResultsPage = window.location.pathname.includes('search-test');
+            console.log('Current page is results page:', isResultsPage);
+            
+            // Default configuration with context-specific overrides
+            this.config = {
+                mode: isResultsPage ? 'results' : 'header',
+                collection: 'seattleu~sp-search',
+                profile: '_default',
+                minLength: 3,
+                maxResults: isResultsPage ? 10 : 8,
+                suggestEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
+                searchEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/search',
+                ...config
+            };
 
-        console.log(`Initializing UnifiedSearchManager in ${this.config.mode} mode`);
+            console.log(`Initializing UnifiedSearchManager in ${this.config.mode} mode`);
 
-        // Initialize session tracking
-        this.sessionId = this.#getOrCreateSessionId();
-        this.originalQuery = null;
+            // Initialize session tracking
+            this.sessionId = this.#getOrCreateSessionId();
+            this.originalQuery = null;
 
-        // Initialize state
-        this.debounceTimeout = null;
-        this.isLoading = false;
+            // Initialize state
+            this.debounceTimeout = null;
+            this.isLoading = false;
 
-        // Initialize DOM elements based on context
-        this.#initializeDOMElements();
-        
-        // Initialize functionality based on context
-        if (this.config.mode === 'header') {
-            this.#initializeHeaderMode();
-        } else {
-            this.#initializeResultsMode();
+            // Initialize DOM elements based on context
+            this.#initializeDOMElements();
+            
+            // Initialize functionality based on context
+            if (this.config.mode === 'header') {
+                this.#initializeHeaderMode();
+            } else {
+                this.#initializeResultsMode();
+                
+                // Critical: Handle URL parameters immediately
+                console.log("Calling handleURLParameters from constructor");
+                this.handleURLParameters();
+            }
+            
+            console.log('UnifiedSearchManager constructor completed successfully');
+        } catch (error) {
+            console.error('Error in UnifiedSearchManager constructor:', error);
         }
     }
 
@@ -190,12 +203,6 @@ class UnifiedSearchManager {
             // Make sure search button is visible
             this.submitButton.classList.remove('empty-query');
         }
-
-        // Critical: Handle URL parameters immediately
-        // This needs to run right away to execute the search
-        setTimeout(() => {
-            this.handleURLParameters();
-        }, 0);
     }
 
     /**
@@ -217,20 +224,41 @@ class UnifiedSearchManager {
      * @returns {Promise<void>}
      */
     async handleURLParameters() {
-        console.log("Handling URL parameters");
+        try {
+            console.log("Handling URL parameters");
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlSearchQuery = urlParams.get('query');
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSearchQuery = urlParams.get('query');
 
-        if (urlSearchQuery && this.searchInput) {
-            // Store original query for analytics
-            this.originalQuery = urlSearchQuery;
-            
-            // Set the value in the input field
-            this.searchInput.value = urlSearchQuery;
-            
-            // Important: Execute the search immediately
-            await this.performFunnelbackSearch(urlSearchQuery);
+            console.log("URL search query:", urlSearchQuery);
+
+            if (urlSearchQuery) {
+                // Store original query for analytics
+                this.originalQuery = urlSearchQuery;
+                
+                // Make sure the search input field exists
+                if (this.searchInput) {
+                    console.log("Setting search input value to:", urlSearchQuery);
+                    // Explicitly set the value using both property and attribute
+                    this.searchInput.value = urlSearchQuery;
+                    this.searchInput.setAttribute('value', urlSearchQuery);
+                    
+                    // Force a UI update
+                    this.searchInput.dispatchEvent(new Event('change'));
+                } else {
+                    console.error("Search input field not found!");
+                }
+                
+                // Explicitly perform the search with a slight delay to ensure DOM is ready
+                console.log("Triggering search for:", urlSearchQuery);
+                setTimeout(() => {
+                    this.performFunnelbackSearch(urlSearchQuery);
+                }, 300);
+            } else {
+                console.log("No query parameter found in URL");
+            }
+        } catch (error) {
+            console.error("Error in handleURLParameters:", error);
         }
     }
 
@@ -553,9 +581,37 @@ class UnifiedSearchManager {
     }
 }
 
-// Initialize search manager
+// Make sure this script runs as soon as possible
+console.log('UnifiedSearchManager script loaded');
+
+// Simple initialization function
+function initUnifiedSearch() {
+    console.log('Initializing UnifiedSearchManager');
+    try {
+        // Create a global instance for debugging
+        window.unifiedSearchManager = new UnifiedSearchManager();
+        console.log('UnifiedSearchManager initialized successfully');
+    } catch (error) {
+        console.error('Error initializing UnifiedSearchManager:', error);
+        console.error(error.stack); // Log the full stack trace
+    }
+}
+
+// Initialize immediately if document is ready, otherwise wait
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    console.log('Document already ready, initializing immediately');
+    initUnifiedSearch();
+} else {
+    console.log('Document not ready, waiting for load event');
+    window.addEventListener('load', initUnifiedSearch);
+}
+
+// Also maintain the DOMContentLoaded listener for backward compatibility
 document.addEventListener('DOMContentLoaded', () => {
-    const searchManager = new UnifiedSearchManager();
+    if (!window.unifiedSearchManager) {
+        console.log('Initializing from DOMContentLoaded event');
+        initUnifiedSearch();
+    }
 });
 
 export default UnifiedSearchManager;
