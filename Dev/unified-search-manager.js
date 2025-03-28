@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.1.1
+ * @version 2.1.2
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -459,34 +459,6 @@ class UnifiedSearchManager {
      * @param {string} componentType - The type of component ('header' or 'results')
      */
     #handleInput(event, componentType) {
-        const query = event.target.value.trim();
-        const component = this.searchComponents[componentType];
-        
-        if (!component || !component.suggestionsContainer) return;
-        
-        clearTimeout(this.debounceTimeout);
-        
-        if (query.length < this.config.minLength) {
-            component.suggestionsContainer.innerHTML = '';
-            component.suggestionsContainer.hidden = true;
-            return;
-        }
-    
-        // Debounce for queries
-        this.debounceTimeout = setTimeout(() => {
-            this.#fetchSuggestions(query, componentType);
-        }, 200);
-    }
-
-    /**
-     * Handles input events with debouncing.
-     * Triggers suggestion fetching after user stops typing.
-     * 
-     * @private
-     * @param {InputEvent} event - The input event
-     * @param {string} componentType - The type of component ('header' or 'results')
-     */
-    #handleInput(event, componentType) {
         if (componentType === 'results') {
             return;
         }
@@ -621,6 +593,10 @@ class UnifiedSearchManager {
      * @param {string} componentType - The type of component ('header' or 'results')
      */
     #handleKeydown(event, componentType) {
+        if (componentType === 'results') {
+            return;
+        }
+        
         const component = this.searchComponents[componentType];
         if (!component || !component.suggestionsContainer || component.suggestionsContainer.hidden) {
             return;
