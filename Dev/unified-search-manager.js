@@ -19,7 +19,7 @@
  * - Works with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 1.0.1
+ * @version 1.1.0
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-28
@@ -223,8 +223,10 @@ class UnifiedSearchManager {
             // Store original query for analytics
             this.originalQuery = urlSearchQuery;
             
+            // Set the value in the input field
             this.searchInput.value = urlSearchQuery;
             
+            // Important: Execute the search immediately
             await this.performFunnelbackSearch(urlSearchQuery);
         }
     }
