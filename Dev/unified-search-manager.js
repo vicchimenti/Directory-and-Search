@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.3.2
+ * @devVersion 2.3.3
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -29,13 +29,13 @@
  * @lastModified 2025-03-29
  */
 
+/**
+ * Initializes the Unified Search Manager.
+ * Finds and initializes all search components on the page.
+ * 
+ * @param {Object} [config={}] - Configuration options
+ */
 class UnifiedSearchManager {
-    /**
-     * Initializes the Unified Search Manager.
-     * Finds and initializes all search components on the page.
-     * 
-     * @param {Object} [config={}] - Configuration options
-     */
     constructor(config = {}) {
         try {
             console.log('Starting UnifiedSearchManager constructor');
