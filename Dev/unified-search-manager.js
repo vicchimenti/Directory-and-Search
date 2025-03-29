@@ -18,7 +18,7 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.3.0
+ * @version 2.3.1
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-29
