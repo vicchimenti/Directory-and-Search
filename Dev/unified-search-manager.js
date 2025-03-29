@@ -18,10 +18,10 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.2.3
+ * @version 2.3.0
  * @namespace UnifiedSearchManager
  * @license MIT
- * @lastModified 2025-03-28
+ * @lastModified 2025-03-29
  */
 
 class UnifiedSearchManager {
@@ -197,6 +197,7 @@ class UnifiedSearchManager {
     /**
      * Handles search parameters from the URL.
      * If a query parameter exists, it populates search fields and performs the search.
+     * Optimized to prioritize search execution before UI updates.
      * 
      * @public
      * @returns {Promise<void>}
@@ -204,18 +205,15 @@ class UnifiedSearchManager {
     async handleURLParameters() {
         try {
             console.log("Handling URL parameters");
-    
+
             const urlParams = new URLSearchParams(window.location.search);
             const urlSearchQuery = urlParams.get('query');
-    
+
             console.log("URL search query:", urlSearchQuery);
-    
+
             if (urlSearchQuery) {
                 // Store original query for analytics
                 this.originalQuery = urlSearchQuery;
-                
-                // Set the value in all search inputs on the page
-                this.#setAllSearchInputs(urlSearchQuery);
                 
                 // First check local cache
                 const cachedResults = this.#getFromRecentSearchCache(urlSearchQuery);
@@ -223,6 +221,12 @@ class UnifiedSearchManager {
                     console.log("Using cached search results");
                     if (this.searchComponents.results?.resultsContainer) {
                         this.searchComponents.results.resultsContainer.innerHTML = cachedResults;
+                        
+                        // Update input field non-critically after displaying results
+                        setTimeout(() => {
+                            this.#setAllSearchInputs(urlSearchQuery);
+                        }, 0);
+                        
                         return;
                     }
                 }
@@ -256,11 +260,26 @@ class UnifiedSearchManager {
                         this.#storeInRecentSearchCache(urlSearchQuery, resultHTML);
                         
                         this.searchComponents.results.resultsContainer.innerHTML = resultHTML;
+                        
+                        // Update input field non-critically after displaying results
+                        setTimeout(() => {
+                            this.#setAllSearchInputs(urlSearchQuery);
+                        }, 0);
                     }
                 } else {
-                    // No cached or preloaded results, perform the search normally
+                    // No cached or preloaded results, perform the search immediately
                     console.log("No cached or preloaded results available, performing search");
-                    await this.performFunnelbackSearch(urlSearchQuery);
+                    
+                    // Start search request immediately without waiting to update input
+                    const searchPromise = this.performFunnelbackSearch(urlSearchQuery);
+                    
+                    // Update input field in parallel (doesn't block the search)
+                    setTimeout(() => {
+                        this.#setAllSearchInputs(urlSearchQuery);
+                    }, 0);
+                    
+                    // Wait for search to complete
+                    await searchPromise;
                 }
             } else {
                 console.log("No query parameter found in URL");
