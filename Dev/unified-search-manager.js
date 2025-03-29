@@ -418,10 +418,11 @@ class UnifiedSearchManager {
     /**
      * Performs a search using the Funnelback API via proxy server.
      * Checks local cache first and stores results in cache after fetching.
+     * Return value is now used by handleURLParameters for promise chaining.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>} Success indicator for promise chaining
      * @throws {Error} If the search request fails
      */
     async performFunnelbackSearch(searchQuery) {
@@ -434,7 +435,7 @@ class UnifiedSearchManager {
         const resultsContainer = this.searchComponents.results?.resultsContainer;
         if (!resultsContainer) {
             console.error('Results container not found, cannot display search results');
-            return;
+            return false;
         }
 
         try {
@@ -448,7 +449,7 @@ class UnifiedSearchManager {
                 resultsContainer.innerHTML = cachedResults;
                 this.isLoading = false;
                 this.#updateLoadingState(false);
-                return;
+                return true;
             }
             
             const searchParams = new URLSearchParams({
@@ -478,6 +479,7 @@ class UnifiedSearchManager {
             this.#storeInRecentSearchCache(searchQuery, resultHTML);
             
             resultsContainer.innerHTML = resultHTML;
+            return true;
         } catch (error) {
             console.error('Search error:', error);
             resultsContainer.innerHTML = `
@@ -485,6 +487,7 @@ class UnifiedSearchManager {
                     <p>Sorry, we couldn't complete your search. ${error.message}</p>
                 </div>
             `;
+            return false;
         } finally {
             this.isLoading = false;
             this.#updateLoadingState(false);
