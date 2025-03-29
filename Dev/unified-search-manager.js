@@ -26,7 +26,6 @@
  * @environment development
  * @status in-progress
  * @namespace UnifiedSearchManager
- * @license MIT
  * @lastModified 2025-03-29
  */
 
