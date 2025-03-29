@@ -1,5 +1,7 @@
 /**
- * @fileoverview Unified Search Manager for Funnelback Search Integration
+ * @fileoverview [DEV ASSET] Unified Search Manager for Funnelback Search Integration
+ * 
+ * DEVELOPMENT VERSION - For backup development environment only.
  * 
  * This class provides a universal search experience across the entire site.
  * Rather than separating into "header" and "results" modes, it detects
@@ -18,7 +20,11 @@
  * - Compatible with Funnelback proxy endpoints
  * 
  * @author Victor Chimenti
- * @version 2.3.1
+ * @version 5.0.0
+ * @devVersion 2.3.1
+ * @prodVersion 4.0.0
+ * @environment development
+ * @status in-progress
  * @namespace UnifiedSearchManager
  * @license MIT
  * @lastModified 2025-03-29
