@@ -1,7 +1,7 @@
 /**
  * @fileoverview [PRODUCTION ASSET] Unified Search Manager for Funnelback Search Integration
  * 
- * DEVELOPMENT VERSION - For backup development environment only.
+ * PRODUCTION VERSION - Seattle University search implementation
  * 
  * This class provides a universal search experience across the entire site.
  * Rather than separating into "header" and "results" modes, it detects
@@ -21,11 +21,11 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.3.3
- * @prodVersion 4.0.0
- * @environment development
- * @status in-progress
+ * @prodVersion 1.0.1
+ * @environment production
+ * @status stable
  * @namespace UnifiedSearchManager
+ * @license MIT
  * @lastModified 2025-03-29
  */
 
