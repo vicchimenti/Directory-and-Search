@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.4.3
+ * @devVersion 2.4.4
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -308,7 +308,7 @@ class UnifiedSearchManager {
      */
     #handleSearchAction = async (event) => {
         event.preventDefault();
-        const componentType = event.currentTarget.closest('form')?.id === 'on-page-search-form' ? 'results' : 'header';
+        const componentType = event.currentTarget?.closest('#on-page-search-form') ? 'results' : 'header';
         console.log(`Handling search action from ${componentType}`);
         
         const searchQuery = this.#getSearchQuery(componentType);
