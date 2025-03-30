@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.4.5
+ * @devVersion 2.4.6
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -383,13 +383,10 @@ class UnifiedSearchManager {
      * @throws {Error} If the search request fails
      */
     async performFunnelbackSearch(searchQuery, options = {}) {
-        console.log("Performing Funnelback search:", searchQuery, options);
+        console.log("Performing Funnelback search:", searchQuery);
         
         // Default options
-        const { 
-            source = 'results', 
-            skipCache = false 
-        } = options;
+        const { skipCache = false, source = 'unknown' } = options;
         
         // Store original query for analytics tracking
         this.originalQuery = searchQuery;
@@ -400,15 +397,13 @@ class UnifiedSearchManager {
             console.error('Results container not found, cannot display search results');
             return false;
         }
-
+    
         try {
             this.isLoading = true;
             this.#updateLoadingState(true);
             
-            // Fast path for initial page load from URL parameters
-            // Skip cache check for initial page load or when explicitly requested
-            if (!skipCache && source !== 'url') {
-                // Check cache for subsequent searches only
+            // Check cache only if not skipping
+            if (!skipCache) {
                 const cachedResults = this.#getFromRecentSearchCache(searchQuery);
                 if (cachedResults) {
                     console.log('Using cached search results');
@@ -425,12 +420,12 @@ class UnifiedSearchManager {
                 profile: this.config.profile,
                 form: 'partial',
                 sessionId: this.sessionId,
-                source: source // Add source for analytics
+                source: source // Add source parameter for analytics
             });
-
+    
             const url = `${this.config.searchEndpoint}?${searchParams.toString()}`;
             console.log('Request URL:', url);
-
+    
             const response = await fetch(url);
             console.log('Proxy Response Status:', response.status);
             
@@ -443,7 +438,7 @@ class UnifiedSearchManager {
                 </div>
             `;
             
-            // Store in cache (even if we skipped the check)
+            // Store in cache
             this.#storeInRecentSearchCache(searchQuery, resultHTML);
             
             resultsContainer.innerHTML = resultHTML;
