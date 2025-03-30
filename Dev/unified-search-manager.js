@@ -221,59 +221,21 @@ class UnifiedSearchManager {
                 // Store original query for analytics
                 this.originalQuery = urlSearchQuery;
                 
-                // Check for preloaded results first (these come from header redirects)
-                const pendingSearchQuery = sessionStorage.getItem('pendingSearchQuery');
-                const preloadedResults = sessionStorage.getItem('preloadedSearchResults');
-                const preloadedTimestamp = sessionStorage.getItem('preloadedSearchTimestamp');
+                // Perform direct search for URL parameters (skip cache check)
+                const searchPromise = this.performFunnelbackSearch(urlSearchQuery, {
+                    skipCache: true,
+                    source: 'url'
+                });
                 
-                // Only use preloaded results if they exist, match the current query, and are recent
-                const areResultsRecent = preloadedTimestamp && 
-                    (Date.now() - parseInt(preloadedTimestamp)) < 30000;
-                    
-                if (preloadedResults && pendingSearchQuery === urlSearchQuery && areResultsRecent) {
-                    console.log("Using preloaded search results");
-                    
-                    // Clear the preloaded data to prevent stale reuse
-                    sessionStorage.removeItem('pendingSearchQuery');
-                    sessionStorage.removeItem('preloadedSearchResults');
-                    sessionStorage.removeItem('preloadedSearchTimestamp');
-                    
-                    // Display the preloaded results
-                    if (this.searchComponents.results?.resultsContainer) {
-                        const resultHTML = `
-                            <div id="funnelback-search-container-response" class="funnelback-search-container">
-                                ${preloadedResults}
-                            </div>
-                        `;
-                        
-                        // Store in cache for future use
-                        this.#storeInRecentSearchCache(urlSearchQuery, resultHTML);
-                        
-                        this.searchComponents.results.resultsContainer.innerHTML = resultHTML;
-                        
-                        // Update input field non-critically after displaying results
-                        setTimeout(() => {
-                            this.#setAllSearchInputs(urlSearchQuery);
-                        }, 0);
+                // Update input field in parallel (doesn't block the search)
+                setTimeout(() => {
+                    if (this.searchComponents.results?.input) {
+                        this.searchComponents.results.input.value = urlSearchQuery;
                     }
-                } else {
-                    // No preloaded results, perform direct search with fast path
-                    console.log("No preloaded results, using fast path search");
-                    
-                    // Use the fast path by setting skipCache=true and source='url'
-                    const searchPromise = this.performFunnelbackSearch(urlSearchQuery, {
-                        skipCache: true,
-                        source: 'url'
-                    });
-                    
-                    // Update input field in parallel (doesn't block the search)
-                    setTimeout(() => {
-                        this.#setAllSearchInputs(urlSearchQuery);
-                    }, 0);
-                    
-                    // Wait for search to complete
-                    await searchPromise;
-                }
+                }, 0);
+                
+                // Wait for search to complete
+                await searchPromise;
             } else {
                 console.log("No query parameter found in URL");
             }
