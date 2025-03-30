@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.4.6
+ * @devVersion 2.4.8
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -36,11 +36,37 @@
  * @param {Object} [config={}] - Configuration options
  */
 class UnifiedSearchManager {
-    // Constructor with more robust error handling
+    // Static instance property to hold the singleton
+    static #instance = null;
+    
+    /**
+     * Static method to get the singleton instance
+     * @returns {UnifiedSearchManager} The singleton instance
+     */
+    static getInstance(config = {}) {
+        if (!UnifiedSearchManager.#instance) {
+            UnifiedSearchManager.#instance = new UnifiedSearchManager(config);
+        }
+        return UnifiedSearchManager.#instance;
+    }
+    
+    /**
+     * Constructor that checks if instance already exists
+     */
     constructor(config = {}) {
+        // If an instance already exists, return it instead of creating a new one
+        if (UnifiedSearchManager.#instance) {
+            console.log('UnifiedSearchManager already initialized, returning existing instance');
+            return UnifiedSearchManager.#instance;
+        }
+
+        // If no instance exists, create one
+        console.log('Starting UnifiedSearchManager constructor (new instance)');
+        
+        // Store this instance as the singleton
+        UnifiedSearchManager.#instance = this;
+        
         try {
-            console.log('Starting UnifiedSearchManager constructor');
-            
             // Determine if we're on the search results page
             const isResultsPage = window.location.pathname.includes('search-test');
             console.log('Current page is results page:', isResultsPage);
@@ -73,8 +99,9 @@ class UnifiedSearchManager {
             
             // If on results page, handle URL parameters and search
             if (isResultsPage) {
-                // Handle URL parameters to execute the search
-                this.handleURLParameters();
+                // Handle URL parameters to execute the search - with a slight delay
+                // to ensure DOM is fully ready
+                setTimeout(() => this.handleURLParameters(), 0);
             }
             
             console.log('UnifiedSearchManager constructor completed successfully');
@@ -838,15 +865,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Self-executing function that runs immediately when the file loads
-(async function() {
-    console.log('Initializing UnifiedSearchManager immediately');
+(function() {
+    // Create a flag to track initialization
+    if (window.unifiedSearchManagerInitialized) {
+        console.log('UnifiedSearchManager initialization already attempted, skipping');
+        return;
+    }
+    
+    // Set the flag to prevent multiple initializations
+    window.unifiedSearchManagerInitialized = true;
+    
+    console.log('Initializing UnifiedSearchManager via singleton');
     try {
-        // Create a global instance
-        window.unifiedSearchManager = new UnifiedSearchManager();
+        // Create a global instance using the singleton pattern
+        window.unifiedSearchManager = UnifiedSearchManager.getInstance();
         console.log('UnifiedSearchManager initialized successfully');
     } catch (error) {
         console.error('Error initializing UnifiedSearchManager:', error);
     }
 })();
 
-export default UnifiedSearchManager;
+// Export the class and getInstance method for module usage
+export default {
+    UnifiedSearchManager,
+    getInstance: UnifiedSearchManager.getInstance
+};
