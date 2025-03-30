@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.4.4
+ * @devVersion 2.4.5
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -36,6 +36,7 @@
  * @param {Object} [config={}] - Configuration options
  */
 class UnifiedSearchManager {
+    // Constructor with more robust error handling
     constructor(config = {}) {
         try {
             console.log('Starting UnifiedSearchManager constructor');
