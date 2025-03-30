@@ -422,16 +422,24 @@ class UnifiedSearchManager {
 
     /**
      * Performs a search using the Funnelback API via proxy server.
-     * Checks local cache first and stores results in cache after fetching.
-     * Return value is now used by handleURLParameters for promise chaining.
+     * Uses different paths for initial page load vs subsequent searches.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
+     * @param {Object} options - Additional options
+     * @param {string} options.source - Source of the query ('url', 'header', 'results')
+     * @param {boolean} options.skipCache - Whether to skip cache check
      * @returns {Promise<boolean>} Success indicator for promise chaining
      * @throws {Error} If the search request fails
      */
-    async performFunnelbackSearch(searchQuery) {
-        console.log("Performing Funnelback search:", searchQuery);
+    async performFunnelbackSearch(searchQuery, options = {}) {
+        console.log("Performing Funnelback search:", searchQuery, options);
+        
+        // Default options
+        const { 
+            source = 'results', 
+            skipCache = false 
+        } = options;
         
         // Store original query for analytics tracking
         this.originalQuery = searchQuery;
@@ -447,14 +455,18 @@ class UnifiedSearchManager {
             this.isLoading = true;
             this.#updateLoadingState(true);
             
-            // Check cache first
-            const cachedResults = this.#getFromRecentSearchCache(searchQuery);
-            if (cachedResults) {
-                console.log('Using cached search results');
-                resultsContainer.innerHTML = cachedResults;
-                this.isLoading = false;
-                this.#updateLoadingState(false);
-                return true;
+            // Fast path for initial page load from URL parameters
+            // Skip cache check for initial page load or when explicitly requested
+            if (!skipCache && source !== 'url') {
+                // Check cache for subsequent searches only
+                const cachedResults = this.#getFromRecentSearchCache(searchQuery);
+                if (cachedResults) {
+                    console.log('Using cached search results');
+                    resultsContainer.innerHTML = cachedResults;
+                    this.isLoading = false;
+                    this.#updateLoadingState(false);
+                    return true;
+                }
             }
             
             const searchParams = new URLSearchParams({
@@ -462,7 +474,8 @@ class UnifiedSearchManager {
                 collection: this.config.collection,
                 profile: this.config.profile,
                 form: 'partial',
-                sessionId: this.sessionId
+                sessionId: this.sessionId,
+                source: source // Add source for analytics
             });
 
             const url = `${this.config.searchEndpoint}?${searchParams.toString()}`;
@@ -480,7 +493,7 @@ class UnifiedSearchManager {
                 </div>
             `;
             
-            // Store in cache
+            // Store in cache (even if we skipped the check)
             this.#storeInRecentSearchCache(searchQuery, resultHTML);
             
             resultsContainer.innerHTML = resultHTML;
