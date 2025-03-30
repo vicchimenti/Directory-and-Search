@@ -210,38 +210,22 @@ class UnifiedSearchManager {
     async handleURLParameters() {
         try {
             console.log("Handling URL parameters");
-
+    
             const urlParams = new URLSearchParams(window.location.search);
             const urlSearchQuery = urlParams.get('query');
-
+    
             console.log("URL search query:", urlSearchQuery);
-
+    
             if (urlSearchQuery) {
                 // Store original query for analytics
                 this.originalQuery = urlSearchQuery;
                 
-                // First check local cache
-                const cachedResults = this.#getFromRecentSearchCache(urlSearchQuery);
-                if (cachedResults) {
-                    console.log("Using cached search results");
-                    if (this.searchComponents.results?.resultsContainer) {
-                        this.searchComponents.results.resultsContainer.innerHTML = cachedResults;
-                        
-                        // Update input field non-critically after displaying results
-                        setTimeout(() => {
-                            this.#setAllSearchInputs(urlSearchQuery);
-                        }, 0);
-                        
-                        return;
-                    }
-                }
-                
-                // Then check for preloaded results
+                // Check for preloaded results first (these come from header redirects)
                 const pendingSearchQuery = sessionStorage.getItem('pendingSearchQuery');
                 const preloadedResults = sessionStorage.getItem('preloadedSearchResults');
                 const preloadedTimestamp = sessionStorage.getItem('preloadedSearchTimestamp');
                 
-                // Only use preloaded results if they exist, match the current query, and are recent (within 30 seconds)
+                // Only use preloaded results if they exist, match the current query, and are recent
                 const areResultsRecent = preloadedTimestamp && 
                     (Date.now() - parseInt(preloadedTimestamp)) < 30000;
                     
@@ -272,11 +256,14 @@ class UnifiedSearchManager {
                         }, 0);
                     }
                 } else {
-                    // No cached or preloaded results, perform the search immediately
-                    console.log("No cached or preloaded results available, performing search");
+                    // No preloaded results, perform direct search with fast path
+                    console.log("No preloaded results, using fast path search");
                     
-                    // Start search request immediately without waiting to update input
-                    const searchPromise = this.performFunnelbackSearch(urlSearchQuery);
+                    // Use the fast path by setting skipCache=true and source='url'
+                    const searchPromise = this.performFunnelbackSearch(urlSearchQuery, {
+                        skipCache: true,
+                        source: 'url'
+                    });
                     
                     // Update input field in parallel (doesn't block the search)
                     setTimeout(() => {
