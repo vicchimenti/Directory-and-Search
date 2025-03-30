@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.4.8
+ * @devVersion 2.5.0
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -864,26 +864,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Self-executing function that runs immediately when the file loads
-(function() {
-    // Create a flag to track initialization
-    if (window.unifiedSearchManagerInitialized) {
-        console.log('UnifiedSearchManager initialization already attempted, skipping');
-        return;
-    }
-    
-    // Set the flag to prevent multiple initializations
-    window.unifiedSearchManagerInitialized = true;
-    
-    console.log('Initializing UnifiedSearchManager via singleton');
-    try {
-        // Create a global instance using the singleton pattern
-        window.unifiedSearchManager = UnifiedSearchManager.getInstance();
-        console.log('UnifiedSearchManager initialized successfully');
-    } catch (error) {
-        console.error('Error initializing UnifiedSearchManager:', error);
-    }
-})();
+// Simple initialization - create the instance when the module loads
+console.log('UnifiedSearchManager script loaded');
+window.unifiedSearchManager = UnifiedSearchManager.getInstance();
 
 // Export the class and getInstance method for module usage
 export default {
