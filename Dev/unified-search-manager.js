@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.4.2
+ * @devVersion 2.4.3
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -878,5 +878,17 @@ document.addEventListener('DOMContentLoaded', () => {
         initUnifiedSearch();
     }
 });
+
+// Self-executing function that runs immediately when the file loads
+(async function() {
+    console.log('Initializing UnifiedSearchManager immediately');
+    try {
+        // Create a global instance
+        window.unifiedSearchManager = new UnifiedSearchManager();
+        console.log('UnifiedSearchManager initialized successfully');
+    } catch (error) {
+        console.error('Error initializing UnifiedSearchManager:', error);
+    }
+})();
 
 export default UnifiedSearchManager;
