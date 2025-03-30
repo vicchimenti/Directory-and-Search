@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.5.0
+ * @devVersion 2.5.1
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
@@ -99,8 +99,7 @@ class UnifiedSearchManager {
             
             // If on results page, handle URL parameters and search
             if (isResultsPage) {
-                // Handle URL parameters to execute the search - with a slight delay
-                // to ensure DOM is fully ready
+                // Handle URL parameters to execute the search
                 setTimeout(() => this.handleURLParameters(), 0);
             }
             
