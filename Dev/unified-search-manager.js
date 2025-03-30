@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.3.3
+ * @devVersion 2.4.2
  * @prodVersion 4.0.0
  * @environment development
  * @status in-progress
