@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @prodVersion 2.1.0
+ * @prodVersion 2.1.1
  * @environment production
  * @status stable
  * @namespace UnifiedSearchManager
@@ -77,8 +77,8 @@ class UnifiedSearchManager {
                 profile: '_default',
                 minLength: 3,
                 maxResults: 8,
-                suggestEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
-                searchEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/search',
+                suggestEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
+                searchEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
                 isResultsPage: isResultsPage,
                 ...config
             };
