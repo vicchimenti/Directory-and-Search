@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @prodVersion 2.1.1
+ * @prodVersion 2.1.2
  * @environment production
  * @status stable
  * @namespace UnifiedSearchManager
@@ -304,7 +304,6 @@ class UnifiedSearchManager {
         
         // Validate search input
         if (!searchQuery) {
-            alert('Please enter a search term');
             return;
         }
 
