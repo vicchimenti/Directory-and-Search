@@ -21,7 +21,7 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @prodVersion 1.1.0
+ * @prodVersion 2.1.0
  * @environment production
  * @status stable
  * @namespace UnifiedSearchManager
@@ -36,10 +36,37 @@
  * @param {Object} [config={}] - Configuration options
  */
 class UnifiedSearchManager {
+    // Static instance property to hold the singleton
+    static #instance = null;
+    
+    /**
+     * Static method to get the singleton instance
+     * @returns {UnifiedSearchManager} The singleton instance
+     */
+    static getInstance(config = {}) {
+        if (!UnifiedSearchManager.#instance) {
+            UnifiedSearchManager.#instance = new UnifiedSearchManager(config);
+        }
+        return UnifiedSearchManager.#instance;
+    }
+    
+    /**
+     * Constructor that checks if instance already exists
+     */
     constructor(config = {}) {
+        // If an instance already exists, return it instead of creating a new one
+        if (UnifiedSearchManager.#instance) {
+            console.log('UnifiedSearchManager already initialized, returning existing instance');
+            return UnifiedSearchManager.#instance;
+        }
+
+        // If no instance exists, create one
+        console.log('Starting UnifiedSearchManager constructor (new instance)');
+        
+        // Store this instance as the singleton
+        UnifiedSearchManager.#instance = this;
+        
         try {
-            console.log('Starting UnifiedSearchManager constructor');
-            
             // Determine if we're on the search results page
             const isResultsPage = window.location.pathname.includes('search');
             console.log('Current page is results page:', isResultsPage);
@@ -73,7 +100,7 @@ class UnifiedSearchManager {
             // If on results page, handle URL parameters and search
             if (isResultsPage) {
                 // Handle URL parameters to execute the search
-                this.handleURLParameters();
+                setTimeout(() => this.handleURLParameters(), 0);
             }
             
             console.log('UnifiedSearchManager constructor completed successfully');
@@ -210,82 +237,31 @@ class UnifiedSearchManager {
     async handleURLParameters() {
         try {
             console.log("Handling URL parameters");
-
+    
             const urlParams = new URLSearchParams(window.location.search);
             const urlSearchQuery = urlParams.get('query');
-
+    
             console.log("URL search query:", urlSearchQuery);
-
+    
             if (urlSearchQuery) {
                 // Store original query for analytics
                 this.originalQuery = urlSearchQuery;
                 
-                // First check local cache
-                const cachedResults = this.#getFromRecentSearchCache(urlSearchQuery);
-                if (cachedResults) {
-                    console.log("Using cached search results");
-                    if (this.searchComponents.results?.resultsContainer) {
-                        this.searchComponents.results.resultsContainer.innerHTML = cachedResults;
-                        
-                        // Update input field non-critically after displaying results
-                        setTimeout(() => {
-                            this.#setAllSearchInputs(urlSearchQuery);
-                        }, 0);
-                        
-                        return;
-                    }
-                }
+                // Perform direct search for URL parameters (skip cache check)
+                const searchPromise = this.performFunnelbackSearch(urlSearchQuery, {
+                    skipCache: true,
+                    source: 'url'
+                });
                 
-                // Then check for preloaded results
-                const pendingSearchQuery = sessionStorage.getItem('pendingSearchQuery');
-                const preloadedResults = sessionStorage.getItem('preloadedSearchResults');
-                const preloadedTimestamp = sessionStorage.getItem('preloadedSearchTimestamp');
-                
-                // Only use preloaded results if they exist, match the current query, and are recent (within 30 seconds)
-                const areResultsRecent = preloadedTimestamp && 
-                    (Date.now() - parseInt(preloadedTimestamp)) < 30000;
-                    
-                if (preloadedResults && pendingSearchQuery === urlSearchQuery && areResultsRecent) {
-                    console.log("Using preloaded search results");
-                    
-                    // Clear the preloaded data to prevent stale reuse
-                    sessionStorage.removeItem('pendingSearchQuery');
-                    sessionStorage.removeItem('preloadedSearchResults');
-                    sessionStorage.removeItem('preloadedSearchTimestamp');
-                    
-                    // Display the preloaded results
-                    if (this.searchComponents.results?.resultsContainer) {
-                        const resultHTML = `
-                            <div id="funnelback-search-container-response" class="funnelback-search-container">
-                                ${preloadedResults}
-                            </div>
-                        `;
-                        
-                        // Store in cache for future use
-                        this.#storeInRecentSearchCache(urlSearchQuery, resultHTML);
-                        
-                        this.searchComponents.results.resultsContainer.innerHTML = resultHTML;
-                        
-                        // Update input field non-critically after displaying results
-                        setTimeout(() => {
-                            this.#setAllSearchInputs(urlSearchQuery);
-                        }, 0);
+                // Update input field in parallel (doesn't block the search)
+                setTimeout(() => {
+                    if (this.searchComponents.results?.input) {
+                        this.searchComponents.results.input.value = urlSearchQuery;
                     }
-                } else {
-                    // No cached or preloaded results, perform the search immediately
-                    console.log("No cached or preloaded results available, performing search");
-                    
-                    // Start search request immediately without waiting to update input
-                    const searchPromise = this.performFunnelbackSearch(urlSearchQuery);
-                    
-                    // Update input field in parallel (doesn't block the search)
-                    setTimeout(() => {
-                        this.#setAllSearchInputs(urlSearchQuery);
-                    }, 0);
-                    
-                    // Wait for search to complete
-                    await searchPromise;
-                }
+                }, 0);
+                
+                // Wait for search to complete
+                await searchPromise;
             } else {
                 console.log("No query parameter found in URL");
             }
@@ -321,7 +297,7 @@ class UnifiedSearchManager {
      */
     #handleSearchAction = async (event) => {
         event.preventDefault();
-        const componentType = event.currentTarget.closest('form')?.id === 'on-page-search-form' ? 'results' : 'header';
+        const componentType = event.currentTarget?.closest('#on-page-search-form') ? 'results' : 'header';
         console.log(`Handling search action from ${componentType}`);
         
         const searchQuery = this.#getSearchQuery(componentType);
@@ -422,16 +398,21 @@ class UnifiedSearchManager {
 
     /**
      * Performs a search using the Funnelback API via proxy server.
-     * Checks local cache first and stores results in cache after fetching.
-     * Return value is now used by handleURLParameters for promise chaining.
+     * Uses different paths for initial page load vs subsequent searches.
      * 
      * @public
      * @param {string} searchQuery - The search query to perform
+     * @param {Object} options - Additional options
+     * @param {string} options.source - Source of the query ('url', 'header', 'results')
+     * @param {boolean} options.skipCache - Whether to skip cache check
      * @returns {Promise<boolean>} Success indicator for promise chaining
      * @throws {Error} If the search request fails
      */
-    async performFunnelbackSearch(searchQuery) {
+    async performFunnelbackSearch(searchQuery, options = {}) {
         console.log("Performing Funnelback search:", searchQuery);
+        
+        // Default options
+        const { skipCache = false, source = 'unknown' } = options;
         
         // Store original query for analytics tracking
         this.originalQuery = searchQuery;
@@ -442,19 +423,21 @@ class UnifiedSearchManager {
             console.error('Results container not found, cannot display search results');
             return false;
         }
-
+    
         try {
             this.isLoading = true;
             this.#updateLoadingState(true);
             
-            // Check cache first
-            const cachedResults = this.#getFromRecentSearchCache(searchQuery);
-            if (cachedResults) {
-                console.log('Using cached search results');
-                resultsContainer.innerHTML = cachedResults;
-                this.isLoading = false;
-                this.#updateLoadingState(false);
-                return true;
+            // Check cache only if not skipping
+            if (!skipCache) {
+                const cachedResults = this.#getFromRecentSearchCache(searchQuery);
+                if (cachedResults) {
+                    console.log('Using cached search results');
+                    resultsContainer.innerHTML = cachedResults;
+                    this.isLoading = false;
+                    this.#updateLoadingState(false);
+                    return true;
+                }
             }
             
             const searchParams = new URLSearchParams({
@@ -462,12 +445,13 @@ class UnifiedSearchManager {
                 collection: this.config.collection,
                 profile: this.config.profile,
                 form: 'partial',
-                sessionId: this.sessionId
+                sessionId: this.sessionId,
+                source: source // Add source parameter for analytics
             });
-
+    
             const url = `${this.config.searchEndpoint}?${searchParams.toString()}`;
             console.log('Request URL:', url);
-
+    
             const response = await fetch(url);
             console.log('Proxy Response Status:', response.status);
             
@@ -879,4 +863,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-export default UnifiedSearchManager;
+// Simple initialization - create the instance when the module loads
+console.log('UnifiedSearchManager script loaded');
+window.unifiedSearchManager = UnifiedSearchManager.getInstance();
+
+// Export the class and getInstance method for module usage
+export default {
+    UnifiedSearchManager,
+    getInstance: UnifiedSearchManager.getInstance
+};
