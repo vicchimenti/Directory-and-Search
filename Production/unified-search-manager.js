@@ -21,12 +21,12 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @prodVersion 1.0.1
+ * @prodVersion 1.1.0
  * @environment production
  * @status stable
  * @namespace UnifiedSearchManager
  * @license MIT
- * @lastModified 2025-03-29
+ * @lastModified 2025-04-01
  */
 
 /**
@@ -41,7 +41,7 @@ class UnifiedSearchManager {
             console.log('Starting UnifiedSearchManager constructor');
             
             // Determine if we're on the search results page
-            const isResultsPage = window.location.pathname.includes('search-test');
+            const isResultsPage = window.location.pathname.includes('search');
             console.log('Current page is results page:', isResultsPage);
             
             // Default configuration
@@ -353,7 +353,7 @@ class UnifiedSearchManager {
         });
 
         // Redirect to results page with hash to indicate preloaded results
-        const redirectUrl = `/search-test/?${searchParams.toString()}#preloaded`;
+        const redirectUrl = `/search/?${searchParams.toString()}#preloaded`;
         window.location.href = redirectUrl;
     }
 
