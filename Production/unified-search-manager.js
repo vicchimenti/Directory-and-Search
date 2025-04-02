@@ -1,7 +1,7 @@
 /**
- * @fileoverview [DEV ASSET] Unified Search Manager for Funnelback Search Integration
+ * @fileoverview [PRODUCTION ASSET] Unified Search Manager for Funnelback Search Integration
  * 
- * DEVELOPMENT VERSION - For backup development environment only.
+ * PRODUCTION VERSION - Seattle University search implementation
  * 
  * This class provides a universal search experience across the entire site.
  * Rather than separating into "header" and "results" modes, it detects
@@ -21,12 +21,12 @@
  * 
  * @author Victor Chimenti
  * @version 5.0.0
- * @devVersion 2.5.1
- * @prodVersion 4.0.0
- * @environment development
- * @status in-progress
+ * @prodVersion 2.1.2
+ * @environment production
+ * @status stable
  * @namespace UnifiedSearchManager
- * @lastModified 2025-03-29
+ * @license MIT
+ * @lastModified 2025-04-01
  */
 
 /**
@@ -68,7 +68,7 @@ class UnifiedSearchManager {
         
         try {
             // Determine if we're on the search results page
-            const isResultsPage = window.location.pathname.includes('search-test');
+            const isResultsPage = window.location.pathname.includes('search');
             console.log('Current page is results page:', isResultsPage);
             
             // Default configuration
@@ -77,8 +77,8 @@ class UnifiedSearchManager {
                 profile: '_default',
                 minLength: 3,
                 maxResults: 8,
-                suggestEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/suggest',
-                searchEndpoint: 'https://funnelback-proxy-dev.vercel.app/proxy/funnelback/search',
+                suggestEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/suggest',
+                searchEndpoint: 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search',
                 isResultsPage: isResultsPage,
                 ...config
             };
@@ -304,7 +304,6 @@ class UnifiedSearchManager {
         
         // Validate search input
         if (!searchQuery) {
-            alert('Please enter a search term');
             return;
         }
 
@@ -329,7 +328,7 @@ class UnifiedSearchManager {
         });
 
         // Redirect to results page with hash to indicate preloaded results
-        const redirectUrl = `/search-test/?${searchParams.toString()}#preloaded`;
+        const redirectUrl = `/search/?${searchParams.toString()}#preloaded`;
         window.location.href = redirectUrl;
     }
 
