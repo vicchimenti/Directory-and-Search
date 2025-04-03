@@ -36,6 +36,9 @@
         <!-- t4-extras.js -->
         <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
         <!-- Frontend Search API Integration -->
+        <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js" async defer></script>
+        <!-- Frontend Search Autocomplete -->
+
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
