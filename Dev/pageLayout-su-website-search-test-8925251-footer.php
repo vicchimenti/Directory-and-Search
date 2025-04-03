@@ -34,15 +34,8 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="<t4 type='media' id='9291967' formatter='path/*' />" type="module" fetchpriority="high"></script>
-        <!-- unified-search-manager.js -->
-        <script src="<t4 type='media' id='9248118' formatter='path/*' />" type="module" defer></script>
-        <!-- autocomplete-search-manager.js -->
-        <script src="<t4 type='media' id='9248120' formatter='path/*' />" type="module" defer></script>
-        <!-- dynamic-results-manager.js -->
-        <script src="<t4 type='media' id='9248121' formatter='path/*' />" type="module" defer></script>
-        <!-- global-collapse-manager.js -->
-
+        <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
+        <!-- Frontend Search API Integration -->
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
