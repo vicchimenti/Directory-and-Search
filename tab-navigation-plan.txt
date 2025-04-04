@@ -1,0 +1,168 @@
+Seattle University Search Interface Tab Navigation Fix Plan
+Problem Statement
+The current search interface has competing JavaScript files handling click events that cause:
+
+Page reloads when clicking on tabs
+Unwanted URL parameter updates
+Poor user experience with navigation
+
+Root Causes Identified
+
+Multiple Event Handlers: Both integration.js and search-bundle.js are attaching competing event handlers
+URL Manipulation: Both scripts update URL parameters without coordination
+Lack of Integration: Our new modular approach isn't properly integrated with existing code
+
+Comprehensive Solution Plan
+Phase 1: Immediate Fix (1-2 days)
+
+Create an Interface Override Script
+
+Develop a single script that runs before other scripts
+Override key global functions before they're used:
+
+window.performSearch
+window.updateUrl/window.updateSearchUrl
+
+
+Add this script to the page before other search scripts
+
+
+Implement Navigation State Management
+
+Create a global state object: window.searchNavigationState
+Track navigation types: regular search vs. tab navigation
+Prevent URL updates for tab navigation specifically
+
+
+
+Phase 2: Refactor Existing Scripts (3-5 days)
+
+integration.js
+
+Remove direct DOM event handling for tabs
+Add extension points for other modules
+Update to use central state management
+
+
+search-bundle.js
+
+Refactor to reduce duplication with integration.js
+Remove tab navigation logic
+Implement proper event bubbling control
+
+
+Consolidate URL Management
+
+Create a single source of truth for URL manipulation
+Add flags for preventing certain URL updates
+
+
+
+Phase 3: Complete Modular Integration (1 week)
+
+Proper Module Loading Order
+
+Define clear initialization sequence
+Establish event priority hierarchy
+Add module registration system
+
+
+Shared Event Bus
+
+Implement pub/sub pattern for cross-module communication
+Allow modules to register interest in specific events
+Prevent event propagation conflicts
+
+
+Common Configuration
+
+Consolidate configuration across all modules
+Create proper namespacing
+Allow selective overrides
+
+
+
+Implementation Specifics
+Override Script (Phase 1)
+javascriptCopy// search-interface-override.js - Load this FIRST
+(function() {
+  // Capture original functions before they're defined
+  const originalFunctions = {
+    performSearch: window.performSearch,
+    updateUrl: window.updateUrl || window.updateSearchUrl
+  };
+
+  // Create global state
+  window.searchNavigationState = {
+    isTabNavigation: false,
+    currentTab: null,
+    preventUrlUpdate: false
+  };
+
+  // Override functions
+  window.performSearch = function(query, container, sessionId) {
+    // Special handling for tab navigation
+    if (query && query.includes('form=partial') && 
+        (query.includes('tab=') || query.includes('Tab='))) {
+      window.searchNavigationState.isTabNavigation = true;
+      window.searchNavigationState.preventUrlUpdate = true;
+    }
+    
+    // Call original if it exists, otherwise implement minimal version
+    if (typeof originalFunctions.performSearch === 'function') {
+      return originalFunctions.performSearch(query, container, sessionId);
+    }
+  };
+
+  window.updateUrl = window.updateSearchUrl = function(query) {
+    // Skip URL updates for tab navigation
+    if (window.searchNavigationState.preventUrlUpdate) {
+      window.searchNavigationState.preventUrlUpdate = false;
+      return;
+    }
+    
+    // Call original if it exists
+    if (typeof originalFunctions.updateUrl === 'function') {
+      return originalFunctions.updateUrl(query);
+    }
+  };
+})();
+DOM-Level Tab Handling
+javascriptCopydocument.addEventListener('click', function(e) {
+  // Identify tab clicks
+  const tabElement = e.target.closest('a[role="tab"], .tab__button, .tab-list__nav a');
+  
+  if (tabElement) {
+    // Mark as tab navigation to prevent URL updates
+    window.searchNavigationState.isTabNavigation = true;
+    window.searchNavigationState.preventUrlUpdate = true;
+    window.searchNavigationState.currentTab = tabElement.getAttribute('id') || 
+                                             tabElement.getAttribute('data-tab-id') ||
+                                             tabElement.textContent.trim();
+  }
+}, true); // Use capture phase to run before other handlers
+Deployment Strategy
+
+Phased Rollout:
+
+Deploy Phase 1 immediately to fix critical issues
+Test thoroughly in development before proceeding
+Implement Phases 2-3 incrementally
+
+
+Testing Strategy:
+
+Create comprehensive test suite for tab navigation
+Test across all major browsers
+Verify behavior with JavaScript debugging
+
+
+Monitoring:
+
+Add enhanced logging for navigation events
+Track user interaction patterns
+Monitor for regression issues
+
+
+
+This plan addresses the root causes while providing both immediate fixes and long-term improvements to the search interface architecture.
