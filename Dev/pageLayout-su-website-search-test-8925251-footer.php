@@ -38,6 +38,8 @@
         <!-- Frontend Search API Integration -->
         <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js" async defer></script>
         <!-- Frontend Search Autocomplete -->
+        <script type="module" src="https://su-search-dev.vercel.app/js/search-index.js"></script>
+        <!-- Search Module Integration -->
 
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
