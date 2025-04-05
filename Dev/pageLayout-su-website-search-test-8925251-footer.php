@@ -36,10 +36,13 @@
         <!-- t4-extras.js -->
         <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
         <!-- Frontend Search API Integration -->
+        <script src="https://su-search-dev.vercel.app/js/session-manager-browser.js" defer></script>
+        <!-- Session Manager Integration -->
         <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js" async></script>
         <!-- Frontend Search Autocomplete -->
         <script type="module" src="https://su-search-dev.vercel.app/js/search-index.js"></script>
         <!-- Search Module Integration -->
+
 
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
