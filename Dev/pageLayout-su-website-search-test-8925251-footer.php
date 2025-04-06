@@ -34,8 +34,8 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="https://su-search-dev.vercel.app/lib/SessionManager.js" fetchpriority="high"></script>
-        <!-- Session Manager -->
+        <script src="https://su-search-dev.vercel.app/js/SessionService.js" fetchpriority="high"></script>
+        <!-- Session Service Manager -->
         <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
         <!-- Frontend Search API Integration -->
         <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js" async></script>
