@@ -45,7 +45,7 @@ const searchTerms = [
   "tuition remission", "room reservation", "isa galligar", "e accounts", "pre med",
   "careers at seattle university", "controllers office", "costco scholars",
   "statistics tutors", "principal post master certificate", "accounting", "philosophy",
-  "kinesiology", "law"
+  "kinesiology", "law", "wcc", "west coast conference"
 ];
 
 // Generate a sessionId similar to the frontend

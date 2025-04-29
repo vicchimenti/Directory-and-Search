@@ -48,7 +48,7 @@ const searchTerms = [
   "school psychology", "major", "architecture", "summer programs", "timelycare", "cost",
   "financial aid appeal", "scholarship universe", "law", "basketball", "biolo",
   "center for faculty development", "connectsu", "marine conservation biology bs",
-  "computer engineering bs"
+  "computer engineering bs", "wcc", "west coast conference"
 ];
 
 // Generate a sessionId to mimic real user analytics tracking
