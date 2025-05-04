@@ -1,4 +1,4 @@
-                    </article>
+</article>
                 </main>
             </div>
             <!-- .page-wrapper -->
@@ -34,13 +34,13 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="https://su-search-dev.vercel.app/js/SessionService.js" fetchpriority="high"></script>
+        <script src="https://su-search.vercel.app/js/SessionService.js" fetchpriority="high"></script>
         <!-- Session Service Manager -->
-        <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
+        <script src="https://su-search.vercel.app/integration.js" defer></script>
         <!-- Frontend Search API Integration -->
-        <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js" async></script>
+        <script src="https://su-search.vercel.app/search-page-autocomplete.js" async></script>
         <!-- Frontend Search Autocomplete -->
-        <script type="module" src="https://su-search-dev.vercel.app/js/search-index.js"></script>
+        <script type="module" src="https://su-search.vercel.app/js/search-index.js"></script>
         <!-- Search Module Integration -->
 
 

@@ -18,9 +18,10 @@
         <!-- handlebars.min.js -->
         <script nomodule src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
         <!-- es6-promise.auto.min.js -->
+        <!-- Partial Scripts -->
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/stencils.js"></script>
         <script src="https://dxp-us-search.funnelback.squiz.cloud/s/resources/seattleu~sp-search/_default/js/handlebars-helpers.js"></script>
-        <!-- Partial Scripts -->
+        <!-- End Partial Scripts -->
         <script src="<t4 type='media' id='8723392' formatter='path/*' />" defer></script>
         <!-- flats.min.js -->
         <script src="<t4 type='media' id='6907524' formatter='path/*' />" defer></script>
@@ -33,14 +34,16 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="https://su-search-dev.vercel.app/js/SessionService.js" fetchpriority="high"></script>
+        <script src="https://su-search.vercel.app/js/SessionService.js" fetchpriority="high"></script>
         <!-- Session Service Manager -->
-        <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
+        <script src="https://su-search.vercel.app/integration.js" defer></script>
         <!-- Frontend Search API Integration -->
-        <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js" async></script>
+        <script src="https://su-search.vercel.app/search-page-autocomplete.js" async></script>
         <!-- Frontend Search Autocomplete -->
-        <script type="module" src="https://su-search-dev.vercel.app/js/search-index.js"></script>
+        <script type="module" src="https://su-search.vercel.app/js/search-index.js"></script>
         <!-- Search Module Integration -->
+
+
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
