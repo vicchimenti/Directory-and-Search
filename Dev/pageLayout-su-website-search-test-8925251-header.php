@@ -31,11 +31,6 @@
     <!-- Preloads -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;1,500;1,800&amp;family=Oswald:wght@300;700&amp;family=Roboto+Slab:wght@200;300&amp;display=swap" as="style" crossorigin />
     <link rel="preload" href="/media/seattle-university/site-assets/css/theme.min.css" as="style" />
-    <link rel="preload" href="https://su-search-dev.vercel.app/js/SessionService.js" as="script">
-    <link rel="preload" href="https://su-search-dev.vercel.app/search-bundle.js" as="script">
-
-    <!-- Prefetch -->
-    <link rel="prefetch" href="/search-test/">
 
     <!-- Custom Head Code -->
     <t4 type="navigation" name="V10 - Custom Header Code" id="1014" />
