@@ -9918,3 +9918,68 @@ input[type="search"].on-page-sq-search::-webkit-search-cancel-button:hover {
     flex-shrink: 0; /* Prevent button from shrinking */
   }
 }
+
+
+/* Ensure search input maintains same styling as text input */
+input[type="search"].on-page-sq-search,
+input[type="search"].autocomplete-concierge__input {
+  /* Reset browser-specific styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  
+  /* Match your existing text input styling */
+  background-color: #262626;
+  color: #fff;
+  border: none;
+  border-radius: .625rem 0 0 .625rem;
+  padding: .75rem 1.75em;
+}
+
+/* Form container layout */
+.su-listing form #concierge-search-form,
+.autocomplete-concierge__form {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+/* Ensure input takes most width but leaves room for button */
+.searchArea input.on-page-sq-search,
+input[type="search"].on-page-sq-search,
+input[type="search"].autocomplete-concierge__input {
+  flex: 1;
+  width: auto;
+}
+
+/* Button should not shrink */
+#on-page-search-button,
+.search-submit-button,
+.autocomplete-concierge__submit {
+  flex-shrink: 0;
+  background-color: #262626;
+  border-radius: 0 .625rem .625rem 0;
+}
+
+@media (max-width: 767px) {
+    /* Ensure form maintains flex layout on mobile */
+    .su-listing form #concierge-search-form,
+    .autocomplete-concierge__form {
+      display: flex;
+      flex-wrap: nowrap;
+    }
+    
+    /* Adjust padding if needed to be more compact on mobile */
+    input[type="search"].on-page-sq-search,
+    input[type="search"].autocomplete-concierge__input {
+      padding: .75rem 1rem;
+    }
+    
+    /* Ensure button remains visible and properly styled */
+    #on-page-search-button,
+    .search-submit-button,
+    .autocomplete-concierge__submit {
+      display: flex !important;
+      padding: .75rem;
+    }
+  }
