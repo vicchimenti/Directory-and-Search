@@ -1,12 +1,12 @@
-/* 
+/**
 *   Funnelback Stylesheet
-*   Version: 3.0.3
+*   Version: 3.2.0
 *   Date: 2025-01-05
 *   Author: Funnelback
-*   Description: Funnelback Stylesheet
-*   Last Updated: 2025-03-13
+*   Description: Funnelback Stylesheet Development Environment
+*   Last Updated: 2025-05-08
 *   Last Updated By: Vic
-*   Added local styles from code content type /search-test/
+*   /search-test/
 *
 * */
 
@@ -9103,3 +9103,34 @@ button#on-page-search-button svg,
         max-height: 60vh;
     }
 }
+
+.su-listing input.on-page-sq-search[type=search] {
+    background-color: #1f1f1f;
+    border-color: transparent;
+    color: #ffffff;
+    background-repeat: no-repeat;
+    background-position: 24px 50%;
+    background-image: url("data:image/svg+xml,%3Csvg fill='none' height='16' viewBox='0 0 16 16' width='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m14.7656 14.6738-3.9258-3.9258c.8497-1.02534 1.3184-2.3437 1.3184-3.77925 0-3.33984-2.7539-6.09375-6.09375-6.09375-3.36914 0-6.06445 2.75391-6.06445 6.09375 0 3.36915 2.72461 6.09375 6.06445 6.09375 1.40625 0 2.72461-.4687 3.7793-1.3184l3.92575 3.9258c.1465.1465.3223.2051.5274.2051.1758 0 .3515-.0586.4687-.2051.293-.2637.293-.7031 0-.9961zm-13.35935-7.70505c0-2.57813 2.08008-4.6875 4.6875-4.6875 2.57813 0 4.68745 2.10937 4.68745 4.6875 0 2.60742-2.10932 4.68745-4.68745 4.68745-2.60742 0-4.6875-2.08003-4.6875-4.68745z' fill='%238ae0f2'/%3E%3C/svg%3E");
+    background-size: 16px 16px;
+    padding-left: 60px;
+  }
+
+
+/* Keep input and button on same line on mobile */
+@media (max-width: 767px) {
+    .su-listing form #concierge-search-form {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+    
+    .searchArea input.on-page-sq-search {
+      flex: 1;
+      width: auto; /* Override any fixed width */
+      margin-right: 5px; /* Add a small gap between input and button */
+    }
+    
+    #on-page-search-button {
+      flex-shrink: 0; /* Prevent button from shrinking */
+    }
+  }
