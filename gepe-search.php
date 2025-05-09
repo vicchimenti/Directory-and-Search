@@ -60,7 +60,7 @@ $rangeFilters = array();
         <div class="filter-feedback">
         <div class="grid-container">     
         <span id="starthere"></span>          
-            <div id="searchoptions-filters" class="active-filters" role="search" data-t4-ajax-group="gepe-courseSearch" aria-label="Deselect Filters">
+            <div id="searchoptions-filters" class="active-filters" role="search" data-t4-ajax-group="courseSearch" aria-label="Deselect Filters">
             <div id="event-filters" class="active-filters--list" >
                     <span>Active filters:</span>
                     <?php $i = 0; ?>
