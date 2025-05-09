@@ -1,4 +1,4 @@
-<div id="search-results" class="page page--full-width program-listing" data-t4-ajax-group="gepe-courseSearch" role="main">
+<div id="search-results" class="page page--full-width program-listing" data-t4-ajax-group="courseSearch" role="main">
   <article class="listing-page">
     <section class="su-listing ea-listing">
       <!-- Cards container -->
