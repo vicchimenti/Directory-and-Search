@@ -5,7 +5,7 @@ $categoryFilters = array('coursehours','courseenrollment', 'coursesubject');
 $rangeFilters = array();
 ?>
 <section class="su-listing">
-    <div id="searchoptionsGeneric" role="search" class="su-listing--form-wrapper bg--dark global-padding--8x" data-t4-ajax-group="gepe-courseSearch" >
+    <div id="searchoptionsGeneric" role="search" class="su-listing--form-wrapper bg--dark global-padding--8x" data-t4-ajax-group="courseSearch" >
         <div class="grid-container">
             <h2> Professional Education Course Finder</h2>
         </div>
