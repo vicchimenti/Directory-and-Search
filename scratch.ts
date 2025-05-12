@@ -110,11 +110,6 @@ export function once<T extends (...args: any[]) => any>(
  * @param url - The URL to check
  * @returns Whether this is a tab content request
  */
-/**
- * Check if a request is for tab content
- * @param url - The URL to check
- * @returns Whether this is a tab content request
- */
 export function isTabRequest(url: string): boolean {
     if (!url) return false;
 
