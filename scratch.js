@@ -1,647 +1,1185 @@
 /**
-* @fileoverview Dynamic Results Manager for Funnelback Search Integration
-* 
-* This class manages dynamic content updates for search results, handling various
-* user interactions like facet selection, tab changes, and pagination. It uses
-* a MutationObserver to maintain functionality as content updates dynamically.
-* 
-* Features:
-* - Manages dynamic content updates via MutationObserver
-* - Handles multiple types of search result interactions
-* - Maintains event listeners across dynamic content changes
-* - Tracks search result link clicks for analytics
-* - Captures data-live-url attributes for accurate destination tracking
-* - Integrates with Funnelback search API via Vercel proxy
-* 
-* Dependencies:
-* - Requires DOM element with ID 'results'
-* - Requires Vercel proxy endpoint for Funnelback API access
-* - Requires various interactive elements with specific classes:
-*   - .facet-group__list
-*   - .tab-list__nav
-*   - .search-tools__button-group
-*   - .facet-group__clear
-*   - .facet-breadcrumb__link
-*   - .pagination__link
-*   etc.
-* 
-* Related Files:
-* - results-search-manager.js: Handles main search functionality
-* - header-search-manager.js: Handles initial search and redirects
-* 
-* @author Victor Chimenti
-* @version 3.2.1
-* @lastModified 2025-03-06
-*/
-
-class DynamicResultsManager {
-    /**
-     * Initializes the Dynamic Results Manager.
-     * Sets up mutation observer and event listeners if on search test page.
-     */
+ * @fileoverview Search Manager Architecture
+ *
+ * This architecture provides a modular approach to handling search functionality.
+ * It consists of a core manager that coordinates feature-specific modules.
+ *
+ * Features:
+ * - Modular design with dynamic loading
+ * - Centralized event delegation
+ * - Optimized performance through targeted updates
+ * - Comprehensive analytics tracking
+ * - IP resolution for accurate client tracking
+ * - Reconnection capability after inactivity periods
+ *
+ * @author Victor Chimenti
+ * @version 3.3.0
+ * @license MIT
+ * @lastModified 2025-05-13
+ * 
+ */
+class SearchManager {
     constructor() {
-        this.observerConfig = {
-            childList: true,
-            subtree: true
+        this.config = {
+            proxyBaseUrl: "https://funnelback-proxy-dev.vercel.app/proxy",
+            enabledModules: ["tabs", "facets", "pagination", "spelling", "analytics", "collapse"],
+            observerConfig: {
+                childList: true,
+                subtree: true,
+            },
+            searchInputSelector: "#autocomplete-concierge-inputField",
+            resultsContainerSelector: "#results",
+            defaultResultsPerPage: 10,
+            // IP resolution configuration
+            enableIpTracking: true,
+            ipMismatchThreshold: 3, // Max number of IP changes before forced session refresh
+            analyticsEndpoints: {
+                click: "/analytics/click",
+                batch: "/analytics/clicks-batch",
+                supplement: "/analytics/supplement",
+                session: "/analytics/",
+            },
+            // Reconnection configuration
+            reconnection: {
+                enabled: true,
+                inactivityThreshold: 10 * 60 * 1000, // 10 minutes in milliseconds
+                maxRetries: 3,
+                retryDelay: 1000, // 1 second between retries
+            },
         };
-        
-        // Analytics configuration
-        this.analyticsEndpoint = 'https://funnelback-proxy-one.vercel.app/proxy/analytics/click';
-        this.sessionId = this.#getOrCreateSessionId();
+
+        // Module registry
+        this.modules = {};
+
+        // State
+        this.sessionId = null;
+        this.clientIp = null;
         this.originalQuery = null;
-        
-        if (window.location.pathname.includes('search-test')) {
-            this.#initializeObserver();
-            
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.#setupDynamicListeners();
-                    this.#startObserving();
-                    this.#ensureSearchButtonIconVisibility();
-                    this.#extractOriginalQuery();
-                });
-            } else {
-                this.#setupDynamicListeners();
-                this.#startObserving();
-                this.#ensureSearchButtonIconVisibility();
-                this.#extractOriginalQuery();
-            }
+        this.isInitialized = false;
+        this.lastIpCheckTime = 0;
+        this.lastActivityTime = Date.now(); // Track user activity for reconnection
+        this.reconnectionAttempts = 0;
+        this.connectionState = "active"; // active, reconnecting, failed
+    }
+
+    /**
+     * Initialize the search manager with configuration
+     * @param {Object} options - Configuration options
+     */
+    init(options = {}) {
+        // Prevent multiple initializations
+        if (this.isInitialized) {
+            return this;
+        }
+
+        // Merge configuration
+        this.config = {
+            ...this.config,
+            ...options,
+            // Merge nested reconnection config if provided
+            reconnection: {
+                ...this.config.reconnection,
+                ...(options.reconnection || {}),
+            },
+        };
+
+        // Initialize if on search page
+        if (window.location.pathname.includes("search")) {
+            this.initialize();
+            this.isInitialized = true;
+        }
+
+        return this;
+    }
+
+    /**
+     * Initialize the search manager and all enabled modules
+     */
+    async initialize() {
+        // Initialize session and IP information
+        await this.initializeSessionAndIp();
+
+        // Extract query from URL or input
+        this.extractOriginalQuery();
+
+        // Set up observer for dynamic content
+        this.initializeObserver();
+
+        // Initialize modules
+        await this.loadModules();
+
+        // Start observing for DOM changes
+        this.startObserving();
+
+        // Set up activity tracking
+        this.setupActivityTracking();
+
+        // Single initialization message for production
+        console.log("Seattle University Search initialized");
+    }
+
+    /**
+     * Set up event listeners to track user activity
+     */
+    setupActivityTracking() {
+        if (typeof window === "undefined" || !this.config.reconnection.enabled) {
+            return;
+        }
+
+        // Track user activity to detect when user returns after inactivity
+        const activityEvents = [
+            "mousedown",
+            "keydown",
+            "scroll",
+            "touchstart",
+            "click",
+            "focus",
+        ];
+
+        // Use event delegation on document to catch all activity
+        activityEvents.forEach((eventType) => {
+            document.addEventListener(
+                eventType,
+                this.handleUserActivity.bind(this),
+                { passive: true }
+            );
+        });
+
+        // Handle activity specifically on search inputs for more targeted tracking
+        const searchInputs = document.querySelectorAll(
+            this.config.searchInputSelector + ", #search-input"
+        );
+        searchInputs.forEach((input) => {
+            input.addEventListener("focus", this.handleSearchInputFocus.bind(this));
+            input.addEventListener("input", this.handleUserActivity.bind(this));
+        });
+
+        // Set the initial activity time
+        this.updateActivityTimestamp();
+
+        console.log("Activity tracking initialized for reconnection support");
+    }
+
+    /**
+     * Handle user activity events
+     * @param {Event} event - The activity event
+     */
+    handleUserActivity(event) {
+        this.updateActivityTimestamp();
+
+        // Check connection state when user becomes active
+        if (this.shouldCheckConnection()) {
+            this.verifyAndRefreshConnection();
         }
     }
 
     /**
-     * Extracts the original search query from the URL or search input
-     * @private
+     * Handle search input focus specifically
+     * Always check connection on search input focus
+     * @param {Event} event - The focus event
      */
-    #extractOriginalQuery() {
+    handleSearchInputFocus(event) {
+        this.updateActivityTimestamp();
+
+        // Always verify connection when focusing search
+        this.verifyAndRefreshConnection();
+    }
+
+    /**
+     * Update the activity timestamp
+     */
+    updateActivityTimestamp() {
+        this.lastActivityTime = Date.now();
+    }
+
+    /**
+     * Determine if we should check connection state
+     * @returns {boolean} Whether to check connection
+     */
+    shouldCheckConnection() {
+        // If reconnection is disabled, never check
+        if (!this.config.reconnection.enabled) {
+            return false;
+        }
+
+        // If already reconnecting or failed, don't check again
+        if (this.connectionState === "reconnecting" ||
+            this.connectionState === "failed") {
+            return false;
+        }
+
+        // Get elapsed time since last check
+        const timeSinceIpCheck = Date.now() - this.lastIpCheckTime;
+        const inactivityThreshold = this.config.reconnection.inactivityThreshold;
+
+        // Check connection if we've been inactive for the threshold period
+        return timeSinceIpCheck > inactivityThreshold;
+    }
+
+    /**
+     * Verify connection state and refresh if necessary
+     * @returns {Promise<boolean>} Whether connection is verified
+     */
+    async verifyAndRefreshConnection() {
+        try {
+            // Update state to reconnecting
+            this.connectionState = "reconnecting";
+            console.log("[RECONNECT] Verifying connection state...");
+
+            // Reset the IP check timestamp regardless of outcome
+            this.lastIpCheckTime = Date.now();
+
+            // Refresh session info - will throw an error if connection issue
+            await this.refreshSessionIpInfo();
+
+            // If we get here, connection is good
+            this.connectionState = "active";
+            this.reconnectionAttempts = 0;
+            console.log("[RECONNECT] Connection verified successfully");
+            return true;
+        } catch (error) {
+            // If here, connection verification failed
+            console.error("[RECONNECT] Connection verification failed:", error);
+            this.connectionState = "failed";
+
+            // Try to recover with retry logic
+            return this.performReconnection();
+        }
+    }
+
+    /**
+     * Perform reconnection after failure
+     * @returns {Promise<boolean>} Whether reconnection succeeded
+     */
+    async performReconnection() {
+        if (this.reconnectionAttempts >= this.config.reconnection.maxRetries) {
+            console.error("[RECONNECT] Max reconnection attempts reached");
+            return false;
+        }
+
+        try {
+            // Increment attempts
+            this.reconnectionAttempts++;
+
+            // Wait before retry
+            await new Promise(resolve =>
+                setTimeout(resolve, this.config.reconnection.retryDelay)
+            );
+
+            console.log(
+                `[RECONNECT] Attempt ${this.reconnectionAttempts} of ${this.config.reconnection.maxRetries}...`
+            );
+
+            // Try to reconnect by forcing a complete session refresh
+            // but preserve the original session ID for analytics continuity
+            const originalSessionId = this.sessionId;
+
+            // Force refresh all connection state
+            if (window.SessionService) {
+                // Reinitialize SessionService but keep same ID
+                await window.SessionService.initialize(originalSessionId);
+
+                // Get refreshed session data
+                this.sessionId = window.SessionService.getSessionId() || originalSessionId;
+                this.clientIp = window.SessionService.getSessionIp();
+            } else {
+                // If no SessionService, try direct fetch
+                try {
+                    const clientInfo = await this.fetchClientIp();
+                    if (clientInfo && clientInfo.ip) {
+                        this.clientIp = clientInfo.ip;
+                    }
+                } catch (ipError) {
+                    // Silent error handling
+                }
+            }
+
+            // Update timestamp
+            this.lastIpCheckTime = Date.now();
+
+            // Update connection state
+            this.connectionState = "active";
+            console.log("[RECONNECT] Successfully reconnected");
+            return true;
+        } catch (error) {
+            console.error("[RECONNECT] Reconnection attempt failed:", error);
+
+            // Retry recursively if attempts remain
+            if (this.reconnectionAttempts < this.config.reconnection.maxRetries) {
+                return this.performReconnection();
+            }
+
+            // Max retries reached
+            this.connectionState = "failed";
+            return false;
+        }
+    }
+
+    /**
+     * Initialize session ID and client IP using SessionService
+     */
+    async initializeSessionAndIp() {
+        try {
+            // Check if SessionService is available
+            if (window.SessionService) {
+                // Get session ID from SessionService - the single source of truth
+                this.sessionId = window.SessionService.getSessionId();
+
+                // Get IP information if enabled
+                if (this.config.enableIpTracking) {
+                    // Try to get from SessionService first
+                    this.clientIp = window.SessionService.getSessionIp();
+
+                    if (!this.clientIp) {
+                        // If not available from SessionService, trigger a verification which will fetch it
+                        try {
+                            // Refresh the session to ensure we have IP information
+                            await this.refreshSessionIpInfo();
+                            this.clientIp = window.SessionService.getSessionIp();
+                        } catch (ipError) {
+                            // Silent error handling
+                        }
+                    }
+                }
+            } else {
+                // Fallback if SessionService is not available
+                this.sessionId = this.generateSessionId();
+
+                if (this.config.enableIpTracking) {
+                    // Try to fetch IP directly if SessionService not available
+                    try {
+                        const clientInfo = await this.fetchClientIp();
+                        if (clientInfo && clientInfo.ip) {
+                            this.clientIp = clientInfo.ip;
+                        }
+                    } catch (ipError) {
+                        // Silent error handling
+                    }
+                }
+            }
+
+            // Update last IP check time
+            this.lastIpCheckTime = Date.now();
+
+            // Also update last activity time
+            this.lastActivityTime = Date.now();
+        } catch (error) {
+            // Fallback to basic session ID for graceful degradation
+            this.sessionId = this.generateSessionId();
+        }
+    }
+
+    /**
+     * Refresh session IP information - called when needed
+     * @returns {Promise<void>}
+     */
+    async refreshSessionIpInfo() {
+        try {
+            // Update last check time
+            this.lastIpCheckTime = Date.now();
+
+            if (window.SessionService) {
+                // Use SessionService to refresh session with IP info
+                await window.SessionService.initialize();
+                this.sessionId = window.SessionService.getSessionId();
+                this.clientIp = window.SessionService.getSessionIp();
+            } else {
+                // Direct fallback if SessionService not available
+                try {
+                    const clientInfo = await this.fetchClientIp();
+                    if (clientInfo && clientInfo.ip) {
+                        this.clientIp = clientInfo.ip;
+                    }
+                } catch (ipError) {
+                    // Silent error handling
+                }
+            }
+        } catch (error) {
+            // Rethrow to signal connection issues
+            console.error("[RECONNECT] Error refreshing session info:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Generate a new session ID (fallback if SessionService unavailable)
+     * @returns {string} New session ID
+     */
+    generateSessionId() {
+        return (
+            "sess_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9)
+        );
+    }
+
+    /**
+     * Fetch client IP directly from client-info API
+     * @returns {Promise<Object>} Client IP information
+     */
+    async fetchClientIp() {
+        try {
+            const response = await fetch("/api/client-info");
+            if (!response.ok) {
+                throw new Error(`Failed to fetch client IP: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            // Silent error handling
+            return null;
+        }
+    }
+
+    /**
+     * Mask IP address for logging (privacy)
+     * @param {string} ip - IP address to mask
+     * @returns {string} Masked IP address
+     */
+    maskIp(ip) {
+        if (!ip) return null;
+
+        try {
+            // IPv4 address
+            if (ip.includes(".")) {
+                const parts = ip.split(".");
+                if (parts.length === 4) {
+                    return `${parts[0]}.${parts[1]}.*.*`;
+                }
+            }
+            // IPv6 address
+            else if (ip.includes(":")) {
+                const parts = ip.split(":");
+                if (parts.length > 2) {
+                    return `${parts[0]}:${parts[1]}:****:****`;
+                }
+            }
+
+            // Unknown format, return first 4 chars followed by asterisks
+            return ip.substring(0, 4) + "*".repeat(Math.max(0, ip.length - 4));
+        } catch (error) {
+            return "***.***.***";
+        }
+    }
+
+    /**
+     * Load all enabled modules dynamically
+     */
+    async loadModules() {
+        const modulePromises = this.config.enabledModules.map(
+            async (moduleName) => {
+                try {
+                    // Dynamic import the module
+                    const module = await import(`./${moduleName}-manager.js`);
+                    const ModuleClass = module.default;
+
+                    // Initialize the module
+                    this.modules[moduleName] = new ModuleClass(this);
+                } catch (error) {
+                    // Silent error handling
+                }
+            }
+        );
+
+        // Wait for all modules to load
+        await Promise.all(modulePromises);
+    }
+
+    /**
+     * Extract the original search query from URL or search input
+     */
+    extractOriginalQuery() {
         // Try to get query from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const urlQuery = urlParams.get('query');
-        
+        const urlQuery = urlParams.get("query");
+
         if (urlQuery) {
             this.originalQuery = urlQuery;
             return;
         }
-        
+
         // Try to get query from search input field
-        const searchInput = document.getElementById('autocomplete-concierge-inputField');
+        const searchInput = document.querySelector(this.config.searchInputSelector);
         if (searchInput && searchInput.value) {
             this.originalQuery = searchInput.value;
         }
     }
-    
-    /**
-     * Gets or creates a session ID for analytics tracking
-     * @private
-     * @returns {string} Session ID
-     */
-    #getOrCreateSessionId() {
-        let sessionId = sessionStorage.getItem('searchSessionId');
-        
-        if (!sessionId) {
-            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
-            sessionStorage.setItem('searchSessionId', sessionId);
-        }
-        
-        return sessionId;
-    }
 
     /**
-     * Ensures search button icon remains visible.
-     * Uses only class manipulation for better accessibility.
-     * @private
+     * Get session ID - should be called by modules rather than accessing this.sessionId directly
+     * Ensures consistent session ID usage across the application
+     * @returns {string|null} Session ID or null if unavailable
      */
-    #ensureSearchButtonIconVisibility() {
-        const searchButton = document.getElementById('on-page-search-button');
-        if (searchButton) {
-            // Remove any classes that might hide the icon
-            searchButton.classList.remove('empty-query');
-            
-            // Add a class to ensure visibility
-            searchButton.classList.add('icon-visible');
-            
-            const searchIcon = searchButton.querySelector('svg');
-            if (searchIcon) {
-                // Remove any classes that might hide the icon
-                searchIcon.classList.remove('hidden');
-                
-                // Add a class to ensure visibility
-                searchIcon.classList.add('visible');
+    getSessionId() {
+        // If SessionService is available, always use that as source of truth
+        if (window.SessionService) {
+            const sessionId = window.SessionService.getSessionId();
+            // Update our cached value
+            if (sessionId) {
+                this.sessionId = sessionId;
             }
+            return sessionId;
         }
+
+        // Fallback to our cached value
+        return this.sessionId;
     }
 
     /**
-     * Initializes the MutationObserver to watch for DOM changes.
-     * 
-     * @private
+     * Get client IP - should be called by modules rather than accessing this.clientIp directly
+     * @returns {string|null} Client IP or null if unavailable
      */
-    #initializeObserver() {
+    getClientIp() {
+        // If not enabled, return null
+        if (!this.config.enableIpTracking) {
+            return null;
+        }
+
+        // If SessionService is available, always use that as source of truth
+        if (window.SessionService) {
+            const clientIp = window.SessionService.getSessionIp();
+            // Update our cached value
+            if (clientIp) {
+                this.clientIp = clientIp;
+            }
+            return clientIp;
+        }
+
+        // Fallback to our cached value
+        return this.clientIp;
+    }
+
+    /**
+     * Initialize the MutationObserver to watch for DOM changes
+     */
+    initializeObserver() {
         this.observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                // Skip mutations that might affect the search button
-                if (mutation.target && 
-                    (mutation.target.id === 'on-page-search-button' || 
-                     mutation.target.closest('#on-page-search-button'))) {
-                    return;
-                }
-                
-                if (mutation.type === 'childList') {
-                    this.#attachEventListenersToNewContent(mutation.addedNodes);
+                if (mutation.type === "childList") {
+                    // Notify all modules about DOM changes
+                    Object.values(this.modules).forEach((module) => {
+                        if (typeof module.handleDomChanges === "function") {
+                            module.handleDomChanges(mutation.addedNodes);
+                        }
+                    });
                 }
             });
-            
-            // After processing mutations, ensure search button icon remains visible
-            this.#ensureSearchButtonIconVisibility();
         });
     }
- 
+
     /**
-     * Starts observing the results container for changes.
-     * 
-     * @private
+     * Start observing the results container for changes
      */
-    #startObserving() {
-        const resultsContainer = document.getElementById('results');
+    startObserving() {
+        const resultsContainer = document.querySelector(
+            this.config.resultsContainerSelector
+        );
         if (resultsContainer) {
-            this.observer.observe(resultsContainer, this.observerConfig);
-            console.log('Observer started watching results container');
-            
-            // Add periodic check for search button visibility
-            this.iconCheckInterval = setInterval(() => {
-                this.#ensureSearchButtonIconVisibility();
-            }, 1000); // Check every second
+            this.observer.observe(resultsContainer, this.config.observerConfig);
         } else {
-            console.warn('Results container not found, waiting for it to appear');
-            this.#waitForResultsContainer();
+            this.waitForResultsContainer();
         }
     }
- 
+
     /**
-     * Waits for the results container to appear in the DOM.
-     * 
-     * @private
+     * Wait for the results container to appear in the DOM
      */
-    #waitForResultsContainer() {
+    waitForResultsContainer() {
         const bodyObserver = new MutationObserver((mutations, obs) => {
-            const resultsContainer = document.getElementById('results');
+            const resultsContainer = document.querySelector(
+                this.config.resultsContainerSelector
+            );
             if (resultsContainer) {
                 obs.disconnect();
-                this.observer.observe(resultsContainer, this.observerConfig);
-                console.log('Results container found and observer started');
+                this.observer.observe(resultsContainer, this.config.observerConfig);
             }
         });
- 
+
         bodyObserver.observe(document.body, {
             childList: true,
-            subtree: true
+            subtree: true,
         });
     }
- 
+
     /**
-     * Attaches event listeners to newly added content.
-     * 
-     * @private
-     * @param {NodeList} nodes - The newly added DOM nodes
+     * Sanitize a string value to ensure it contains no line breaks
+     * or special characters that could break the JSON
+     * @param {string} value - The value to sanitize
+     * @returns {string} Sanitized value
      */
-    #attachEventListenersToNewContent(nodes) {
-        if (!nodes?.length) return;
-    
-        nodes.forEach(node => {
-            if (node?.nodeType === Node.ELEMENT_NODE) {
-                // Selectors for interactive elements
-                const elements = node.querySelectorAll([
-                    '.facet-group__list a',
-                    '.tab-list__nav a', 
-                    '.search-tools__button-group a',
-                    'a.facet-group__clear',
-                    '.facet-breadcrumb__link',
-                    '.facet-breadcrumb__item',
-                    'a.related-links__link',
-                    '.query-blending__highlight',
-                    '.search-spelling-suggestions__link',
-                    'a.pagination__link'
-                ].join(', '));
-    
-                elements.forEach(element => {
-                    if (element) {
-                        element.removeEventListener('click', this.#handleDynamicClick);
-                        element.addEventListener('click', this.#handleDynamicClick);
+    sanitizeValue(value) {
+        if (typeof value !== "string") {
+            return value;
+        }
+
+        // Replace line breaks, tabs, and control characters with spaces
+        let sanitized = value
+            .replace(/[\r\n\t\f\v]+/g, " ")
+            .replace(/\s+/g, " ") // Normalize spaces
+            .trim(); // Remove leading/trailing whitespace
+
+        // Remove common counter patterns that might be in the text
+        sanitized = sanitized.replace(/\s*\(\d+\)$/g, ""); // Remove " (26)" at the end
+        sanitized = sanitized.replace(/\s*\[\d+\]$/g, ""); // Remove " [26]" at the end
+        sanitized = sanitized.replace(/\s*\(\d+\)/g, ""); // Remove "(26)" anywhere
+
+        return sanitized;
+    }
+
+    /**
+     * Fetch data from Funnelback API via proxy
+     * @param {string} url - The original Funnelback URL
+     * @param {string} type - The type of request (search, tools, spelling)
+     * @returns {Promise<string>} The HTML response
+     */
+    async fetchFromProxy(url, type = "search") {
+        const endpoint = `${this.config.proxyBaseUrl}/funnelback/${type}`;
+
+        try {
+            let queryString;
+            let fullUrl;
+
+            // Ensure we have the latest session ID and client IP
+            await this.checkAndRefreshIdentifiers();
+
+            // Process based on request type
+            switch (type) {
+                case "search":
+                    // Extract query string
+                    queryString = url.includes("?") ? url.split("?")[1] : "";
+
+                    // Parse and sanitize query parameters
+                    const searchParams = new URLSearchParams(queryString);
+
+                    // Remove any existing sessionId and clientIp parameters
+                    searchParams.delete("sessionId");
+                    searchParams.delete("clientIp");
+
+                    // Add our canonical sessionId
+                    const sessionId = this.getSessionId();
+                    if (sessionId) {
+                        searchParams.append("sessionId", sessionId);
                     }
-                });
-                
-                // Specifically add listeners to search result links (h3 links)
-                const resultLinks = node.querySelectorAll('.fb-result h3 a, .search-result-item h3 a, .listing-item__title a');
-                resultLinks.forEach(link => {
-                    if (link) {
-                        link.removeEventListener('click', this.#handleResultLinkClick);
-                        link.addEventListener('click', this.#handleResultLinkClick);
+
+                    // Add client IP if available and enabled
+                    const clientIp = this.getClientIp();
+                    if (this.config.enableIpTracking && clientIp) {
+                        searchParams.append("clientIp", clientIp);
                     }
-                });
-            }
-        });
-    }
- 
-    /**
-     * Sets up event listeners for dynamic content.
-     * 
-     * @private
-     */
-    #setupDynamicListeners() {
-        console.log("DynamicResultsManager: setupDynamicListeners");
-        document.removeEventListener('click', this.#handleDynamicClick);
-        document.addEventListener('click', this.#handleDynamicClick);
-        
-        // Set up delegation for result link clicks
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            resultsContainer.removeEventListener('click', this.#handleResultLinkDelegation);
-            resultsContainer.addEventListener('click', this.#handleResultLinkDelegation);
-        }
-    }
-    
-    /**
-     * Handles delegated click events for search result links.
-     * This approach ensures we catch all result links, even those added dynamically.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     */
-    #handleResultLinkDelegation = (e) => {
-        // Check if click was on a search result link
-        const resultLink = e.target.closest('.fb-result h3 a, .search-result-item h3 a, .listing-item__title a');
-        if (resultLink) {
-            this.#handleResultLinkClick(e, resultLink);
-        }
-    }
-    
-    /**
-     * Specifically handles clicks on search result links for analytics tracking.
-     * Captures data-live-url attribute for accurate destination tracking.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} link - The clicked result link element
-     */
-    #handleResultLinkClick = (e, link) => {
-        // Don't prevent default navigation - let the user go to the result
-        
-        // Only proceed if we have a query and link
-        if (!this.originalQuery || !link) return;
-        
-        try {
-            // Get link details
-            const href = link.getAttribute('href') || '';
-            const dataLiveUrl = link.getAttribute('data-live-url') || href;
-            const title = link.innerText.trim() || '';
-            
-            // Get position information if possible
-            let position = -1;
-            const resultItem = link.closest('.fb-result, .search-result-item, .listing-item');
-            if (resultItem) {
-                const allResults = Array.from(document.querySelectorAll('.fb-result, .search-result-item, .listing-item'));
-                position = allResults.indexOf(resultItem) + 1;
-            }
-            
-            console.log(`Result link clicked: "${title}" - ${dataLiveUrl} (position ${position})`);
-            
-            // Prepare analytics data
-            const clickData = {
-                originalQuery: this.originalQuery,
-                clickedUrl: dataLiveUrl, // Using data-live-url for accurate destination
-                clickedTitle: title,
-                clickPosition: position,
-                sessionId: this.sessionId,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Send analytics data (non-blocking)
-            this.#sendClickData(clickData);
-            
-        } catch (error) {
-            console.error('Error tracking result link click:', error);
-            // Don't block navigation even if tracking fails
-        }
-    }
-    
-    /**
-     * Sends click data to the analytics endpoint.
-     * Uses sendBeacon for non-blocking operation to avoid delaying navigation.
-     * 
-     * @private
-     * @param {Object} clickData - Data about the clicked result
-     */
-    #sendClickData(clickData) {
-        try {
-            // Use sendBeacon if available (works during page unload)
-            if (navigator.sendBeacon) {
-                const blob = new Blob([JSON.stringify(clickData)], {
-                    type: 'application/json'
-                });
-                
-                navigator.sendBeacon(this.analyticsEndpoint, blob);
-                return;
-            }
-            
-            // Fallback to fetch with keepalive
-            fetch(this.analyticsEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(clickData),
-                keepalive: true // This allows the request to outlive the page
-            }).catch(error => {
-                console.error('Error sending click data:', error);
-            });
-        } catch (error) {
-            console.error('Failed to send click data:', error);
-        }
-    }
- 
-    /**
-     * Main click handler for all dynamic content interactions.
-     * Routes clicks to appropriate handlers based on element clicked.
-     * 
-     * @private
-     * @param {Event} e - The click event object
-     */
-    #handleDynamicClick = async(e) => {
-        try {
-            const handlers = {
-                '.facet-group__list a': this.#handleFacetAnchor,
-                '.tab-list__nav a': this.#handleTab,
-                '.search-tools__button-group a': this.#handleSearchTools,
-                'a.facet-group__clear': this.#handleClearFacet,
-                '.facet-breadcrumb__link': this.#handleClearFacet,
-                '.facet-breadcrumb__item': this.#handleClearFacet,
-                'a.related-links__link': this.#handleClick,
-                '.query-blending__highlight': this.#handleClick,
-                '.search-spelling-suggestions__link': this.#handleSpellingClick,
-                'a.pagination__link': this.#handleClick
-            };
- 
-            for (const [selector, handler] of Object.entries(handlers)) {
-                const matchedElement = e.target.closest(selector);
-                if (matchedElement) {
-                    e.preventDefault();
-                    console.log("DynamicResultsManager: handleDynamicClick");
-                    console.log("element", matchedElement);
-                    await handler.call(this, e, matchedElement);
+
+                    // Construct the full URL
+                    fullUrl = `${endpoint}?${searchParams.toString()}`;
                     break;
+
+                case "tools":
+                    // Get path from URL
+                    const path = url.split("/s/")[1];
+
+                    // Create parameters object
+                    const toolsParams = new URLSearchParams({
+                        path,
+                    });
+
+                    // Add session ID if available
+                    const toolsSessionId = this.getSessionId();
+                    if (toolsSessionId) {
+                        toolsParams.append("sessionId", toolsSessionId);
+                    }
+
+                    // Add client IP if available and enabled
+                    const toolsClientIp = this.getClientIp();
+                    if (this.config.enableIpTracking && toolsClientIp) {
+                        toolsParams.append("clientIp", toolsClientIp);
+                    }
+
+                    // Construct the full URL
+                    fullUrl = `${endpoint}?${toolsParams.toString()}`;
+                    break;
+
+                case "spelling":
+                    // Extract query string
+                    queryString = url.includes("?") ? url.split("?")[1] : "";
+
+                    // Parse parameters
+                    const spellingParams = new URLSearchParams(queryString);
+
+                    // Remove any existing sessionId and clientIp parameters
+                    spellingParams.delete("sessionId");
+                    spellingParams.delete("clientIp");
+
+                    // Add our canonical sessionId
+                    const spellingSessionId = this.getSessionId();
+                    if (spellingSessionId) {
+                        spellingParams.append("sessionId", spellingSessionId);
+                    }
+
+                    // Add client IP if available and enabled
+                    const spellingClientIp = this.getClientIp();
+                    if (this.config.enableIpTracking && spellingClientIp) {
+                        spellingParams.append("clientIp", spellingClientIp);
+                    }
+
+                    // Construct the full URL
+                    fullUrl = `${endpoint}?${spellingParams.toString()}`;
+                    break;
+
+                default:
+                    throw new Error(`Unknown request type: ${type}`);
+            }
+
+            const response = await fetch(fullUrl);
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+            }
+
+            return await response.text();
+        } catch (error) {
+            // Check if this is a connection issue that might benefit from reconnection
+            if (this.config.reconnection.enabled) {
+                console.warn(`[RECONNECT] Error during fetch (${type}): ${error.message}`);
+
+                // Try to reconnect if this might be a session timeout issue
+                const reconnected = await this.verifyAndRefreshConnection();
+
+                if (reconnected) {
+                    // Retry the fetch after reconnection
+                    try {
+                        console.log(`[RECONNECT] Retrying ${type} fetch after reconnection`);
+                        // Recursively call this method again now that we've reconnected
+                        return await this.fetchFromProxy(url, type);
+                    } catch (retryError) {
+                        console.error(`[RECONNECT] Retry failed: ${retryError.message}`);
+                    }
                 }
             }
-        } catch (error) {
-            console.warn('Error in handleDynamicClick:', error);
+
+            // If reconnection disabled, failed, or retry failed, return error message
+            return `<p>Error fetching ${type} request. Please try again later.</p>`;
         }
     }
- 
+
     /**
-     * Fetches results from Funnelback API via proxy.
-     * Maps the original Funnelback URL parameters to the proxy endpoint.
-     * 
-     * @private
-     * @param {string} url - The original Funnelback URL to fetch from
-     * @param {string} method - The HTTP method to use
-     * @returns {Promise<string>} The HTML response text
+     * Check and refresh session ID and client IP if necessary
+     * @returns {Promise<void>}
      */
-    async #fetchFunnelbackResults(url, method) {
-        const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/search';
-        
-        try {
-            const queryString = url.includes('?') ? url.split('?')[1] : '';
-            const fullUrl = `${proxyUrl}?${queryString}&sessionId=${this.sessionId}`; // Add session ID for tracking
-            const response = await fetch(fullUrl);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            
-            const newContent = await response.text();
-            
-            // Update the original query if needed
-            const urlParams = new URLSearchParams(queryString);
-            const newQuery = urlParams.get('query');
-            if (newQuery) {
-                this.originalQuery = newQuery;
-                console.log(`Updated original query to: ${this.originalQuery}`);
+    async checkAndRefreshIdentifiers() {
+        // Always update activity timestamp when checking identifiers
+        this.updateActivityTimestamp();
+
+        // If reconnection is enabled, check connection state based on inactivity
+        if (this.config.reconnection.enabled) {
+            const now = Date.now();
+            const inactivityPeriod = now - this.lastActivityTime;
+            const checkThreshold = this.config.reconnection.inactivityThreshold;
+
+            // Check if we need to verify connection due to inactivity
+            if (inactivityPeriod > checkThreshold) {
+                console.log(
+                    `[RECONNECT] Detected ${Math.round(inactivityPeriod / 1000)}s inactivity period, verifying connection`
+                );
+
+                try {
+                    // Try to verify and refresh the connection
+                    await this.verifyAndRefreshConnection();
+                } catch (error) {
+                    // Connection refresh failed, but we'll continue anyway
+                    console.error("[RECONNECT] Failed to refresh connection:", error);
+                }
+
+                // Update activity time even if verification failed
+                this.updateActivityTimestamp();
+                return;
             }
-            
-            return newContent;
-        } catch (error) {
-            console.error(`Error with ${method} request:`, error);
-            return `<p>Error fetching ${method} tabbed request. Please try again later.</p>`;
+        }
+
+        // Check if we need to refresh IP information (once per hour)
+        // This is the original behavior, maintained for compatibility
+        const now = Date.now();
+        const timeSinceLastCheck = now - this.lastIpCheckTime;
+
+        if (this.config.enableIpTracking && timeSinceLastCheck > 60 * 60 * 1000) {
+            await this.refreshSessionIpInfo();
         }
     }
- 
+
     /**
-     * Fetches tool-specific results from Funnelback API via proxy.
-     * Handles specialized tool endpoints through the proxy service.
-     * 
-     * @private
-     * @param {string} url - The original Funnelback tools URL
-     * @param {string} method - The HTTP method to use
-     * @returns {Promise<string>} The HTML response text
+     * Get the connection state
+     * @returns {string} Current connection state
      */
-    async #fetchFunnelbackTools(url, method) {
-        const proxyUrl = 'https://https://funnelback-proxy-one.vercel.app/proxy/funnelback/tools';
+    getConnectionState() {
+        return this.connectionState;
+    }
+
+    /**
+     * Reset reconnection attempts counter
+     */
+    resetReconnectionAttempts() {
+        this.reconnectionAttempts = 0;
+        this.connectionState = "active";
+    }
+
+    /**
+     * Mask a string for logging (for privacy)
+     * @param {string} str - String to mask
+     * @returns {string} Masked string
+     */
+    maskString(str) {
+        if (!str) return "null";
+        if (str.length <= 8) return str;
+
+        return (
+            str.substring(0, 4) +
+            "*".repeat(str.length - 8) +
+            str.substring(str.length - 4)
+        );
+    }
+
+    /**
+     * Update the results container with new content
+     * @param {string} html - The HTML content to display
+     */
+    updateResults(html) {
+        const resultsContainer = document.querySelector(
+            this.config.resultsContainerSelector
+        );
+        if (resultsContainer) {
+            resultsContainer.innerHTML = `
+        <div id="funnelback-search-container-response" class="funnelback-search-container">
+          ${html || "No results found."}
+        </div>
+      `;
+
+            // Scroll to results if not in viewport and page is not already at the top
+            if (!this.isElementInViewport(resultsContainer) && window.scrollY > 0) {
+                resultsContainer.scrollInView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }
+        }
+    }
+
+    /**
+     * Check if an element is visible in the viewport
+     * @param {Element} el - The element to check
+     * @returns {boolean} True if element is in viewport
+     */
+    isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <=
+            (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+    /**
+     * Send analytics data to the appropriate endpoint
+     * @param {Object} data - The analytics data to send
+     */
+    sendAnalyticsData(data) {
         try {
-            const queryString = new URLSearchParams({
-                path: url.split('/s/')[1],
-                sessionId: this.sessionId
+            // Ensure we have the latest session ID and client IP
+            // No await here as we don't want to block analytics
+            this.checkAndRefreshIdentifiers().catch(() => {
+                // Silent error handling
             });
-            const fullUrl = `${proxyUrl}?${queryString}`;
-            const response = await fetch(fullUrl);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            return await response.text();
-        } catch (error) {
-            console.error(`Error with ${method} request:`, error);
-            return `<p>Error fetching ${method} tools request. Please try again later.</p>`;
-        }
-    }
- 
-    /**
-     * Fetches spelling suggestions from Funnelback API via proxy.
-     * Uses a dedicated spelling endpoint that ensures proper parameter handling.
-     * 
-     * @private
-     * @param {string} url - The original Funnelback spelling URL
-     * @param {string} method - The HTTP method to use
-     * @returns {Promise<string>} The HTML response text
-     */
-    async #fetchFunnelbackSpelling(url, method) {
-        const proxyUrl = 'https://funnelback-proxy-one.vercel.app/proxy/funnelback/spelling';
-        
-        try {
-            let queryString = url.includes('?') ? url.split('?')[1] : '';
-            
-            // Add session ID if not already present
-            const params = new URLSearchParams(queryString);
-            if (!params.has('sessionId')) {
-                params.append('sessionId', this.sessionId);
-                queryString = params.toString();
+
+            // Create a deep copy of the data to modify
+            const analyticsData = JSON.parse(JSON.stringify(data));
+
+            // Only include sessionId if available
+            const sessionId = this.getSessionId();
+            if (sessionId) {
+                analyticsData.sessionId = sessionId;
             }
-            
-            const fullUrl = `${proxyUrl}?${queryString}`;
-            console.log('Making spelling proxy request to:', fullUrl);
-            
-            const response = await fetch(fullUrl);
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            
-            // Update query if needed
-            const newQuery = params.get('query');
-            if (newQuery) {
-                this.originalQuery = newQuery;
+
+            // Add client IP if available and enabled
+            const clientIp = this.getClientIp();
+            if (this.config.enableIpTracking && clientIp) {
+                analyticsData.clientIp = clientIp;
             }
-            
-            return await response.text();
+
+            // Add timestamp if missing
+            if (!analyticsData.timestamp) {
+                analyticsData.timestamp = new Date().toISOString();
+            }
+
+            // Determine endpoint and prepare data format based on data type
+            let endpoint;
+            let formattedData;
+
+            // Extract the type from analyticsData and store it
+            const dataType = analyticsData.type;
+
+            // IMPORTANT: Remove the type field from analyticsData as this is only used
+            // for routing and is not expected by the backend endpoints
+            delete analyticsData.type;
+
+            // Format data according to endpoint requirements
+            if (dataType === "click") {
+                // Format data for click endpoint
+                endpoint = `${this.config.proxyBaseUrl}${this.config.analyticsEndpoints.click}`;
+
+                // Convert from originalQuery to query if needed
+                if (analyticsData.originalQuery && !analyticsData.query) {
+                    analyticsData.query = analyticsData.originalQuery;
+                    delete analyticsData.originalQuery;
+                }
+
+                // Ensure required fields for click endpoint in a flat structure
+                formattedData = {
+                    originalQuery:
+                        analyticsData.originalQuery ||
+                        analyticsData.query ||
+                        this.originalQuery ||
+                        "",
+                    clickedUrl: analyticsData.clickedUrl || analyticsData.url || "",
+                    clickedTitle: analyticsData.clickedTitle || analyticsData.title || "",
+                    clickPosition:
+                        analyticsData.clickPosition || analyticsData.position || -1,
+                    sessionId: analyticsData.sessionId || undefined,
+                    timestamp: analyticsData.timestamp,
+                    clickType: analyticsData.clickType || "search",
+                    // Add client IP if available
+                    ...(analyticsData.clientIp
+                        ? { clientIp: analyticsData.clientIp }
+                        : {}),
+                };
+
+                // Sanitize all string values
+                formattedData.originalQuery = this.sanitizeValue(
+                    formattedData.originalQuery
+                );
+                formattedData.clickedUrl = this.sanitizeValue(formattedData.clickedUrl);
+                formattedData.clickedTitle = this.sanitizeValue(
+                    formattedData.clickedTitle
+                );
+                formattedData.clickType = this.sanitizeValue(formattedData.clickType);
+            } else if (dataType === "batch") {
+                // Format data for batch clicks endpoint
+                endpoint = `${this.config.proxyBaseUrl}${this.config.analyticsEndpoints.batch}`;
+
+                // Format batch data for clicks-batch endpoint
+                formattedData = {
+                    clicks: (analyticsData.clicks || []).map((click) => {
+                        const formattedClick = {
+                            originalQuery:
+                                click.originalQuery || click.query || this.originalQuery || "",
+                            clickedUrl: click.clickedUrl || click.url || "",
+                            clickedTitle: click.clickedTitle || click.title || "",
+                            clickPosition: click.clickPosition || click.position || -1,
+                            sessionId: sessionId || undefined,
+                            timestamp: click.timestamp || analyticsData.timestamp,
+                            clickType: click.clickType || "search",
+                            // Add client IP if available
+                            ...(clientIp ? { clientIp: clientIp } : {}),
+                        };
+
+                        // Sanitize all string values
+                        formattedClick.originalQuery = this.sanitizeValue(
+                            formattedClick.originalQuery
+                        );
+                        formattedClick.clickedUrl = this.sanitizeValue(
+                            formattedClick.clickedUrl
+                        );
+                        formattedClick.clickedTitle = this.sanitizeValue(
+                            formattedClick.clickedTitle
+                        );
+                        formattedClick.clickType = this.sanitizeValue(
+                            formattedClick.clickType
+                        );
+
+                        return formattedClick;
+                    }),
+                };
+            } else {
+                // For all other types (facet, pagination, tab, spelling), use supplement endpoint
+                endpoint = `${this.config.proxyBaseUrl}${this.config.analyticsEndpoints.supplement}`;
+
+                // For supplement endpoint, make sure we're using query (not originalQuery)
+                // and include enrichmentData as expected by the backend
+                if (analyticsData.originalQuery && !analyticsData.query) {
+                    analyticsData.query = analyticsData.originalQuery;
+                    delete analyticsData.originalQuery;
+                }
+
+                // Ensure we have a valid query
+                if (!analyticsData.query) {
+                    analyticsData.query = this.originalQuery || "";
+                }
+
+                // Sanitize query
+                analyticsData.query = this.sanitizeValue(analyticsData.query);
+
+                // Create a properly formatted object for supplement endpoint
+                formattedData = {
+                    query: analyticsData.query,
+                    sessionId: analyticsData.sessionId,
+                    // Add client IP if available
+                    ...(analyticsData.clientIp
+                        ? { clientIp: analyticsData.clientIp }
+                        : {}),
+                };
+
+                // Add resultCount if provided
+                if (analyticsData.resultCount !== undefined) {
+                    formattedData.resultCount = analyticsData.resultCount;
+                }
+
+                // Process enrichmentData if provided
+                if (analyticsData.enrichmentData) {
+                    // Create a clean enrichmentData object
+                    const cleanEnrichmentData = {};
+
+                    // Copy actionType
+                    if (analyticsData.enrichmentData.actionType) {
+                        cleanEnrichmentData.actionType = this.sanitizeValue(
+                            analyticsData.enrichmentData.actionType
+                        );
+                    }
+
+                    // For tab changes, only include tabName (not tabId)
+                    if (
+                        cleanEnrichmentData.actionType === "tab" &&
+                        analyticsData.enrichmentData.tabName
+                    ) {
+                        cleanEnrichmentData.tabName = this.sanitizeValue(
+                            analyticsData.enrichmentData.tabName
+                        );
+                    }
+
+                    // For facet selections
+                    if (cleanEnrichmentData.actionType === "facet") {
+                        if (analyticsData.enrichmentData.facetName) {
+                            cleanEnrichmentData.facetName = this.sanitizeValue(
+                                analyticsData.enrichmentData.facetName
+                            );
+                        }
+                        if (analyticsData.enrichmentData.facetValue) {
+                            cleanEnrichmentData.facetValue = this.sanitizeValue(
+                                analyticsData.enrichmentData.facetValue
+                            );
+                        }
+                        if (analyticsData.enrichmentData.action) {
+                            cleanEnrichmentData.action = this.sanitizeValue(
+                                analyticsData.enrichmentData.action
+                            );
+                        }
+                    }
+
+                    // For pagination
+                    if (
+                        cleanEnrichmentData.actionType === "pagination" &&
+                        analyticsData.enrichmentData.pageNumber !== undefined
+                    ) {
+                        cleanEnrichmentData.pageNumber =
+                            analyticsData.enrichmentData.pageNumber;
+                    }
+
+                    // For spelling suggestions
+                    if (
+                        cleanEnrichmentData.actionType === "spelling" &&
+                        analyticsData.enrichmentData.suggestedQuery
+                    ) {
+                        cleanEnrichmentData.suggestedQuery = this.sanitizeValue(
+                            analyticsData.enrichmentData.suggestedQuery
+                        );
+                    }
+
+                    // Include timestamp if provided
+                    if (analyticsData.enrichmentData.timestamp) {
+                        cleanEnrichmentData.timestamp =
+                            analyticsData.enrichmentData.timestamp;
+                    }
+
+                    // Add the cleaned enrichmentData to formattedData
+                    formattedData.enrichmentData = cleanEnrichmentData;
+                }
+            }
+
+            // Send the data using sendBeacon if available (works during page unload)
+            if (navigator.sendBeacon) {
+                const blob = new Blob([JSON.stringify(formattedData)], {
+                    type: "application/json",
+                });
+
+                const success = navigator.sendBeacon(endpoint, blob);
+                if (!success) {
+                    this.sendAnalyticsWithFetch(endpoint, formattedData);
+                }
+                return;
+            }
+
+            // Fallback to fetch with keepalive
+            this.sendAnalyticsWithFetch(endpoint, formattedData);
         } catch (error) {
-            console.error(`Error with ${method} request:`, error);
-            return `<p>Error fetching ${method} spelling request. Please try again later.</p>`;
+            // Silent error handling
         }
     }
- 
+
     /**
-     * Handles generic click events.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} element - The clicked element
+     * Send analytics data using fetch API (fallback) with detailed error handling
+     * @param {string} endpoint - The API endpoint
+     * @param {Object} data - The formatted data to send
      */
-    async #handleClick(e, element) {
-        console.log("DynamicResultsManager: handleClick");
-        
-        const href = element.getAttribute('href');
-        if (href) {
-            const response = await this.#fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">
-                    ${response || "No results found."}
-                </div>
-            `;
- 
-            document.getElementById('on-page-search-input')?.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
+    sendAnalyticsWithFetch(endpoint, data) {
+        fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Origin: window.location.origin,
+            },
+            body: JSON.stringify(data),
+            credentials: "include",
+            keepalive: true,
+        }).catch(() => {
+            // Silent error handling
+        });
     }
- 
+
     /**
-     * Handles spelling suggestion clicks.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} element - The clicked element
-     */
-    async #handleSpellingClick(e, element) {
-        const href = element.getAttribute('href');
-        if (href) {
-            const response = await this.#fetchFunnelbackSpelling(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">
-                    ${response || "No spelling results found."}
-                </div>
-            `;
-        }
-    }
- 
-    /**
-     * Handles facet anchor clicks.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} element - The clicked element
-     */
-    async #handleFacetAnchor(e, element) {
-        const facetAnchor = e.target.closest('.facet-group__list a');
-        const facetHref = facetAnchor.getAttribute('href');
-        if (facetHref) {
-            const response = await this.#fetchFunnelbackResults(facetHref, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">
-                    ${response || "No facet results found."}
-                </div>
-            `;
-        }
-    }
- 
-    /**
-     * Handles tab clicks.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} element - The clicked element
-     */
-    async #handleTab(e, element) {
-        const href = element.getAttribute('href');
-        if (href) {
-            const response = await this.#fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">
-                    ${response || "No tab results found."}
-                </div>
-            `;
-        }
-    }
- 
-    /**
-     * Handles search tools clicks.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} element - The clicked element
-     */
-    async #handleSearchTools(e, element) {
-        const href = element.getAttribute('href');
-        if (href) {
-            const response = await this.#fetchFunnelbackTools(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">
-                    ${response || "No tool results found."}
-                </div>
-            `;
-        }
-    }
- 
-    /**
-     * Handles clear facet clicks.
-     * 
-     * @private
-     * @param {Event} e - The click event
-     * @param {Element} element - The clicked element
-     */
-    async #handleClearFacet(e, element) {
-        const href = element.getAttribute('href');
-        if (href) {
-            const response = await this.#fetchFunnelbackResults(href, 'GET');
-            document.getElementById('results').innerHTML = `
-                <div class="funnelback-search-container">
-                    ${response || "No results found."}
-                </div>
-            `;
-        }
-    }
- 
-    /**
-     * Cleans up event listeners and observers.
-     * Should be called when the component is being removed.
-     * 
-     * @public
+     * Clean up resources when the manager is destroyed
      */
     destroy() {
+        // Disconnect observer
         if (this.observer) {
             this.observer.disconnect();
         }
-        if (this.iconCheckInterval) {
-            clearInterval(this.iconCheckInterval);
+
+        // Clean up activity tracking
+        if (typeof window !== "undefined" && this.config.reconnection.enabled) {
+            const activityEvents = [
+                "mousedown",
+                "keydown",
+                "scroll",
+                "touchstart",
+                "click",
+                "focus",
+            ];
+
+            activityEvents.forEach((eventType) => {
+                document.removeEventListener(eventType, this.handleUserActivity);
+            });
+
+            const searchInputs = document.querySelectorAll(
+                this.config.searchInputSelector + ", #search-input"
+            );
+            searchInputs.forEach((input) => {
+                input.removeEventListener("focus", this.handleSearchInputFocus);
+                input.removeEventListener("input", this.handleUserActivity);
+            });
         }
-        document.removeEventListener('click', this.#handleDynamicClick);
-        
-        const resultsContainer = document.getElementById('results');
-        if (resultsContainer) {
-            resultsContainer.removeEventListener('click', this.#handleResultLinkDelegation);
-        }
+
+        // Destroy all modules
+        Object.values(this.modules).forEach((module) => {
+            if (typeof module.destroy === "function") {
+                module.destroy();
+            }
+        });
     }
- }
- 
- // Initialize singleton instance
- const dynamicResults = new DynamicResultsManager();
- export default dynamicResults;
+}
+
+// Export as a singleton
+const searchManager = new SearchManager();
+export default searchManager;
