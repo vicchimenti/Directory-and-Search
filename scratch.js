@@ -1,1185 +1,1554 @@
 /**
- * @fileoverview Search Manager Architecture
+ * @fileoverview Frontend Search Integration Script
  *
- * This architecture provides a modular approach to handling search functionality.
- * It consists of a core manager that coordinates feature-specific modules.
+ * This script integrates the frontend search API with the Seattle University website.
+ * It enhances the existing search functionality by proxying requests through the new API
+ * while maintaining compatibility with the current UI components.
  *
- * Features:
- * - Modular design with dynamic loading
- * - Centralized event delegation
- * - Optimized performance through targeted updates
- * - Comprehensive analytics tracking
- * - IP resolution for accurate client tracking
- * - Reconnection capability after inactivity periods
- *
- * @author Victor Chimenti
- * @version 3.3.0
  * @license MIT
+ * @author Victor Chimenti
+ * @version 2.8.0
  * @lastModified 2025-05-13
- * 
  */
-class SearchManager {
-    constructor() {
-        this.config = {
-            proxyBaseUrl: "https://funnelback-proxy-dev.vercel.app/proxy",
-            enabledModules: ["tabs", "facets", "pagination", "spelling", "analytics", "collapse"],
-            observerConfig: {
-                childList: true,
-                subtree: true,
-            },
-            searchInputSelector: "#autocomplete-concierge-inputField",
-            resultsContainerSelector: "#results",
-            defaultResultsPerPage: 10,
-            // IP resolution configuration
-            enableIpTracking: true,
-            ipMismatchThreshold: 3, // Max number of IP changes before forced session refresh
-            analyticsEndpoints: {
-                click: "/analytics/click",
-                batch: "/analytics/clicks-batch",
-                supplement: "/analytics/supplement",
-                session: "/analytics/",
-            },
-            // Reconnection configuration
-            reconnection: {
-                enabled: true,
-                inactivityThreshold: 10 * 60 * 1000, // 10 minutes in milliseconds
-                maxRetries: 3,
-                retryDelay: 1000, // 1 second between retries
-            },
-        };
 
-        // Module registry
-        this.modules = {};
+(function () {
+  // Logging system configuration
+  const LOG_LEVELS = {
+    ERROR: 0,
+    WARN: 1,
+    INFO: 2,
+    DEBUG: 3,
+  };
 
-        // State
-        this.sessionId = null;
-        this.clientIp = null;
-        this.originalQuery = null;
-        this.isInitialized = false;
-        this.lastIpCheckTime = 0;
-        this.lastActivityTime = Date.now(); // Track user activity for reconnection
-        this.reconnectionAttempts = 0;
-        this.connectionState = "active"; // active, reconnecting, failed
+  // Default log level is INFO but can be overridden via URL parameter
+  let currentLogLevel = LOG_LEVELS.INFO;
+
+  // Configuration for the frontend API
+  const config = {
+    apiBaseUrl: "https://su-search-dev.vercel.app",
+    proxyBaseUrl: "https://funnelback-proxy-dev.vercel.app/proxy",
+    collection: "seattleu~sp-search",
+    profile: "_default",
+    minQueryLength: 3,
+    debounceTime: 200,
+    prefetchDebounceTime: 300, // Slightly longer debounce for prefetch
+    prefetchMinQueryLength: 4, // Require slightly longer query for prefetch
+    cacheTTL: 300, // 5 minutes default TTL
+    logLevel: currentLogLevel, // Default log level
+    // Reconnection configuration
+    reconnection: {
+      enabled: true,
+      inactivityThreshold: 10 * 60 * 1000, // 10 minutes in milliseconds
+      maxRetries: 3,
+      retryDelay: 1000, // 1 second between retries
+    },
+  };
+
+  // Cache last activity timestamp
+  let lastActivityTime = Date.now();
+  let reconnectionState = "active"; // active, reconnecting, failed
+  let reconnectionAttempts = 0;
+
+  // Make config available globally
+  window.seattleUConfig = window.seattleUConfig || {};
+  window.seattleUConfig.search = {
+    ...config,
+    ...window.seattleUConfig?.search,
+  };
+
+  /**
+   * Log a message with the appropriate level
+   * @param {string} message - The message to log
+   * @param {number} level - The log level (0=ERROR, 1=WARN, 2=INFO, 3=DEBUG)
+   * @param {any} [data] - Optional data to include
+   */
+  function log(message, level = LOG_LEVELS.INFO, data) {
+    if (level > currentLogLevel) return;
+
+    const prefix = getLogPrefix(level);
+
+    if (data !== undefined) {
+      console.log(`${prefix} ${message}`, data);
+    } else {
+      console.log(`${prefix} ${message}`);
+    }
+  }
+
+  /**
+   * Get the prefix for a log message based on level
+   * @param {number} level - The log level
+   * @returns {string} The prefix
+   */
+  function getLogPrefix(level) {
+    switch (level) {
+      case LOG_LEVELS.ERROR:
+        return "[Integration-ERROR]";
+      case LOG_LEVELS.WARN:
+        return "[Integration-WARN]";
+      case LOG_LEVELS.INFO:
+        return "[Integration-INFO]";
+      case LOG_LEVELS.DEBUG:
+        return "[Integration-DEBUG]";
+      default:
+        return "[Integration]";
+    }
+  }
+
+  /**
+   * Set the log level
+   * @param {number} level - The log level to set
+   */
+  function setLogLevel(level) {
+    currentLogLevel = level;
+    config.logLevel = level;
+    log(`Log level set to ${level}`, LOG_LEVELS.INFO);
+  }
+
+  // Enable debug logging if URL has debug parameter
+  if (new URLSearchParams(window.location.search).has("debug_search")) {
+    setLogLevel(LOG_LEVELS.DEBUG);
+    log("Debug logging enabled", LOG_LEVELS.INFO);
+  }
+
+  // Initialize on DOM ready
+  document.addEventListener("DOMContentLoaded", function () {
+    log("DOM content loaded, initializing search integration", LOG_LEVELS.INFO);
+
+    // Detect environment
+    const isResultsPage = window.location.pathname.includes("search-test");
+    log(
+      `Current page type: ${isResultsPage ? "search results" : "regular"}`,
+      LOG_LEVELS.INFO
+    );
+
+    // Find search components
+    const searchComponents = findSearchComponents();
+    log("Found search components", LOG_LEVELS.DEBUG, searchComponents);
+
+    // Set up conditional preloading for search resources
+    setupConditionalPreloading();
+
+    // Set up activity tracking for reconnection
+    setupActivityTracking();
+
+    // Set up integrations based on detected components
+    if (searchComponents.header) {
+      setupHeaderSearch(searchComponents.header);
     }
 
-    /**
-     * Initialize the search manager with configuration
-     * @param {Object} options - Configuration options
-     */
-    init(options = {}) {
-        // Prevent multiple initializations
-        if (this.isInitialized) {
-            return this;
-        }
+    if (isResultsPage && searchComponents.results) {
+      setupResultsSearch(searchComponents.results);
 
-        // Merge configuration
-        this.config = {
-            ...this.config,
-            ...options,
-            // Merge nested reconnection config if provided
-            reconnection: {
-                ...this.config.reconnection,
-                ...(options.reconnection || {}),
-            },
-        };
+      // Process URL parameters for initial search
+      const cacheFirst =
+        window.SessionService &&
+        window.SessionService.getLastSearchQuery &&
+        window.SessionService._detectSearchRedirect &&
+        window.SessionService._detectSearchRedirect();
 
-        // Initialize if on search page
-        if (window.location.pathname.includes("search")) {
-            this.initialize();
-            this.isInitialized = true;
-        }
-
-        return this;
+      processUrlParameters(searchComponents.results, cacheFirst);
     }
 
-    /**
-     * Initialize the search manager and all enabled modules
-     */
-    async initialize() {
-        // Initialize session and IP information
-        await this.initializeSessionAndIp();
+    log("Search integration initialization complete", LOG_LEVELS.INFO);
+  });
 
-        // Extract query from URL or input
-        this.extractOriginalQuery();
-
-        // Set up observer for dynamic content
-        this.initializeObserver();
-
-        // Initialize modules
-        await this.loadModules();
-
-        // Start observing for DOM changes
-        this.startObserving();
-
-        // Set up activity tracking
-        this.setupActivityTracking();
-
-        // Single initialization message for production
-        console.log("Seattle University Search initialized");
+  /**
+   * Set up activity tracking to detect when user returns after inactivity
+   */
+  function setupActivityTracking() {
+    if (!config.reconnection.enabled) {
+      return;
     }
 
-    /**
-     * Set up event listeners to track user activity
-     */
-    setupActivityTracking() {
-        if (typeof window === "undefined" || !this.config.reconnection.enabled) {
-            return;
-        }
+    log("Setting up activity tracking for reconnection support", LOG_LEVELS.INFO);
 
-        // Track user activity to detect when user returns after inactivity
-        const activityEvents = [
-            "mousedown",
-            "keydown",
-            "scroll",
-            "touchstart",
-            "click",
-            "focus",
-        ];
+    // Define activity events to track
+    const activityEvents = [
+      "mousedown",
+      "keydown",
+      "scroll",
+      "touchstart",
+      "click",
+      "focus",
+    ];
 
-        // Use event delegation on document to catch all activity
-        activityEvents.forEach((eventType) => {
-            document.addEventListener(
-                eventType,
-                this.handleUserActivity.bind(this),
-                { passive: true }
-            );
-        });
+    // Use event delegation on document
+    activityEvents.forEach(eventType => {
+      document.addEventListener(eventType, handleUserActivity, { passive: true });
+    });
 
-        // Handle activity specifically on search inputs for more targeted tracking
-        const searchInputs = document.querySelectorAll(
-            this.config.searchInputSelector + ", #search-input"
-        );
-        searchInputs.forEach((input) => {
-            input.addEventListener("focus", this.handleSearchInputFocus.bind(this));
-            input.addEventListener("input", this.handleUserActivity.bind(this));
-        });
+    // Set initial timestamp
+    updateActivityTimestamp();
 
-        // Set the initial activity time
-        this.updateActivityTimestamp();
+    log("Activity tracking initialized", LOG_LEVELS.INFO);
+  }
 
-        console.log("Activity tracking initialized for reconnection support");
+  /**
+   * Handle user activity event
+   * @param {Event} event - Browser event
+   */
+  function handleUserActivity(event) {
+    // Update timestamp
+    updateActivityTimestamp();
+
+    // Check if we should verify connection
+    if (shouldCheckConnection()) {
+      // If SearchManager is available, use it
+      if (window.SearchManager && typeof window.SearchManager.verifyAndRefreshConnection === 'function') {
+        window.SearchManager.verifyAndRefreshConnection()
+          .then(success => {
+            log(`Connection verification via SearchManager: ${success ? 'success' : 'failed'}`, LOG_LEVELS.INFO);
+          })
+          .catch(error => {
+            log(`Connection check error: ${error.message}`, LOG_LEVELS.ERROR);
+          });
+      } else {
+        // Otherwise try to verify directly
+        verifyConnection();
+      }
+    }
+  }
+
+  /**
+   * Update activity timestamp
+   */
+  function updateActivityTimestamp() {
+    lastActivityTime = Date.now();
+  }
+
+  /**
+   * Check if connection verification is needed based on inactivity
+   * @returns {boolean} Whether to check connection
+   */
+  function shouldCheckConnection() {
+    // Skip if reconnection disabled
+    if (!config.reconnection.enabled) {
+      return false;
     }
 
-    /**
-     * Handle user activity events
-     * @param {Event} event - The activity event
-     */
-    handleUserActivity(event) {
-        this.updateActivityTimestamp();
-
-        // Check connection state when user becomes active
-        if (this.shouldCheckConnection()) {
-            this.verifyAndRefreshConnection();
-        }
+    // Skip if already reconnecting
+    if (reconnectionState === "reconnecting" || reconnectionState === "failed") {
+      return false;
     }
 
-    /**
-     * Handle search input focus specifically
-     * Always check connection on search input focus
-     * @param {Event} event - The focus event
-     */
-    handleSearchInputFocus(event) {
-        this.updateActivityTimestamp();
+    // Check inactivity period
+    const now = Date.now();
+    const inactivityPeriod = now - lastActivityTime;
+    
+    // Check connection if inactive for threshold period
+    return inactivityPeriod > config.reconnection.inactivityThreshold;
+  }
 
-        // Always verify connection when focusing search
-        this.verifyAndRefreshConnection();
-    }
-
-    /**
-     * Update the activity timestamp
-     */
-    updateActivityTimestamp() {
-        this.lastActivityTime = Date.now();
-    }
-
-    /**
-     * Determine if we should check connection state
-     * @returns {boolean} Whether to check connection
-     */
-    shouldCheckConnection() {
-        // If reconnection is disabled, never check
-        if (!this.config.reconnection.enabled) {
-            return false;
-        }
-
-        // If already reconnecting or failed, don't check again
-        if (this.connectionState === "reconnecting" ||
-            this.connectionState === "failed") {
-            return false;
-        }
-
-        // Get elapsed time since last check
-        const timeSinceIpCheck = Date.now() - this.lastIpCheckTime;
-        const inactivityThreshold = this.config.reconnection.inactivityThreshold;
-
-        // Check connection if we've been inactive for the threshold period
-        return timeSinceIpCheck > inactivityThreshold;
-    }
-
-    /**
-     * Verify connection state and refresh if necessary
-     * @returns {Promise<boolean>} Whether connection is verified
-     */
-    async verifyAndRefreshConnection() {
+  /**
+   * Verify connection state and refresh if necessary
+   * @returns {Promise<boolean>} Whether connection is verified
+   */
+  async function verifyConnection() {
+    try {
+      // Set state to reconnecting
+      reconnectionState = "reconnecting";
+      log("[RECONNECT] Verifying connection state...", LOG_LEVELS.INFO);
+      
+      // Check if SessionService is available
+      if (window.SessionService && typeof window.SessionService.initialize === 'function') {
+        // Use SessionService for verification - preserve session ID
+        const originalSessionId = window.SessionService.getSessionId();
+        
+        // Reinitialize with same ID
+        await window.SessionService.initialize(originalSessionId);
+        
+        // If we get here, connection is good
+        reconnectionState = "active";
+        reconnectionAttempts = 0;
+        log("[RECONNECT] Connection verified successfully", LOG_LEVELS.INFO);
+        return true;
+      } else {
+        // No SessionService, use a test request
         try {
-            // Update state to reconnecting
-            this.connectionState = "reconnecting";
-            console.log("[RECONNECT] Verifying connection state...");
-
-            // Reset the IP check timestamp regardless of outcome
-            this.lastIpCheckTime = Date.now();
-
-            // Refresh session info - will throw an error if connection issue
-            await this.refreshSessionIpInfo();
-
-            // If we get here, connection is good
-            this.connectionState = "active";
-            this.reconnectionAttempts = 0;
-            console.log("[RECONNECT] Connection verified successfully");
+          // Perform a lightweight request to verify connectivity
+          const response = await fetch(`${config.apiBaseUrl}/api/client-info`, {
+            method: "HEAD",
+            cache: "no-store",
+            headers: { "X-Connection-Test": "true" }
+          });
+          
+          if (response.ok) {
+            reconnectionState = "active";
+            reconnectionAttempts = 0;
+            log("[RECONNECT] Connection test successful", LOG_LEVELS.INFO);
             return true;
-        } catch (error) {
-            // If here, connection verification failed
-            console.error("[RECONNECT] Connection verification failed:", error);
-            this.connectionState = "failed";
-
-            // Try to recover with retry logic
-            return this.performReconnection();
+          } else {
+            throw new Error(`Test request failed: ${response.status}`);
+          }
+        } catch (requestError) {
+          log(`[RECONNECT] Connection test failed: ${requestError.message}`, LOG_LEVELS.ERROR);
+          throw requestError;
         }
+      }
+    } catch (error) {
+      log(`[RECONNECT] Connection verification failed: ${error.message}`, LOG_LEVELS.ERROR);
+      reconnectionState = "failed";
+      
+      // Try to recover
+      return performReconnection();
     }
+  }
 
-    /**
-     * Perform reconnection after failure
-     * @returns {Promise<boolean>} Whether reconnection succeeded
-     */
-    async performReconnection() {
-        if (this.reconnectionAttempts >= this.config.reconnection.maxRetries) {
-            console.error("[RECONNECT] Max reconnection attempts reached");
-            return false;
-        }
-
-        try {
-            // Increment attempts
-            this.reconnectionAttempts++;
-
-            // Wait before retry
-            await new Promise(resolve =>
-                setTimeout(resolve, this.config.reconnection.retryDelay)
-            );
-
-            console.log(
-                `[RECONNECT] Attempt ${this.reconnectionAttempts} of ${this.config.reconnection.maxRetries}...`
-            );
-
-            // Try to reconnect by forcing a complete session refresh
-            // but preserve the original session ID for analytics continuity
-            const originalSessionId = this.sessionId;
-
-            // Force refresh all connection state
-            if (window.SessionService) {
-                // Reinitialize SessionService but keep same ID
-                await window.SessionService.initialize(originalSessionId);
-
-                // Get refreshed session data
-                this.sessionId = window.SessionService.getSessionId() || originalSessionId;
-                this.clientIp = window.SessionService.getSessionIp();
-            } else {
-                // If no SessionService, try direct fetch
-                try {
-                    const clientInfo = await this.fetchClientIp();
-                    if (clientInfo && clientInfo.ip) {
-                        this.clientIp = clientInfo.ip;
-                    }
-                } catch (ipError) {
-                    // Silent error handling
-                }
-            }
-
-            // Update timestamp
-            this.lastIpCheckTime = Date.now();
-
-            // Update connection state
-            this.connectionState = "active";
-            console.log("[RECONNECT] Successfully reconnected");
-            return true;
-        } catch (error) {
-            console.error("[RECONNECT] Reconnection attempt failed:", error);
-
-            // Retry recursively if attempts remain
-            if (this.reconnectionAttempts < this.config.reconnection.maxRetries) {
-                return this.performReconnection();
-            }
-
-            // Max retries reached
-            this.connectionState = "failed";
-            return false;
-        }
+  /**
+   * Perform reconnection after failure
+   * @returns {Promise<boolean>} Whether reconnection succeeded
+   */
+  async function performReconnection() {
+    if (reconnectionAttempts >= config.reconnection.maxRetries) {
+      log("[RECONNECT] Max reconnection attempts reached", LOG_LEVELS.ERROR);
+      return false;
     }
-
-    /**
-     * Initialize session ID and client IP using SessionService
-     */
-    async initializeSessionAndIp() {
-        try {
-            // Check if SessionService is available
-            if (window.SessionService) {
-                // Get session ID from SessionService - the single source of truth
-                this.sessionId = window.SessionService.getSessionId();
-
-                // Get IP information if enabled
-                if (this.config.enableIpTracking) {
-                    // Try to get from SessionService first
-                    this.clientIp = window.SessionService.getSessionIp();
-
-                    if (!this.clientIp) {
-                        // If not available from SessionService, trigger a verification which will fetch it
-                        try {
-                            // Refresh the session to ensure we have IP information
-                            await this.refreshSessionIpInfo();
-                            this.clientIp = window.SessionService.getSessionIp();
-                        } catch (ipError) {
-                            // Silent error handling
-                        }
-                    }
-                }
-            } else {
-                // Fallback if SessionService is not available
-                this.sessionId = this.generateSessionId();
-
-                if (this.config.enableIpTracking) {
-                    // Try to fetch IP directly if SessionService not available
-                    try {
-                        const clientInfo = await this.fetchClientIp();
-                        if (clientInfo && clientInfo.ip) {
-                            this.clientIp = clientInfo.ip;
-                        }
-                    } catch (ipError) {
-                        // Silent error handling
-                    }
-                }
-            }
-
-            // Update last IP check time
-            this.lastIpCheckTime = Date.now();
-
-            // Also update last activity time
-            this.lastActivityTime = Date.now();
-        } catch (error) {
-            // Fallback to basic session ID for graceful degradation
-            this.sessionId = this.generateSessionId();
-        }
-    }
-
-    /**
-     * Refresh session IP information - called when needed
-     * @returns {Promise<void>}
-     */
-    async refreshSessionIpInfo() {
-        try {
-            // Update last check time
-            this.lastIpCheckTime = Date.now();
-
-            if (window.SessionService) {
-                // Use SessionService to refresh session with IP info
-                await window.SessionService.initialize();
-                this.sessionId = window.SessionService.getSessionId();
-                this.clientIp = window.SessionService.getSessionIp();
-            } else {
-                // Direct fallback if SessionService not available
-                try {
-                    const clientInfo = await this.fetchClientIp();
-                    if (clientInfo && clientInfo.ip) {
-                        this.clientIp = clientInfo.ip;
-                    }
-                } catch (ipError) {
-                    // Silent error handling
-                }
-            }
-        } catch (error) {
-            // Rethrow to signal connection issues
-            console.error("[RECONNECT] Error refreshing session info:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Generate a new session ID (fallback if SessionService unavailable)
-     * @returns {string} New session ID
-     */
-    generateSessionId() {
-        return (
-            "sess_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9)
-        );
-    }
-
-    /**
-     * Fetch client IP directly from client-info API
-     * @returns {Promise<Object>} Client IP information
-     */
-    async fetchClientIp() {
-        try {
-            const response = await fetch("/api/client-info");
-            if (!response.ok) {
-                throw new Error(`Failed to fetch client IP: ${response.status}`);
-            }
-            return await response.json();
-        } catch (error) {
-            // Silent error handling
-            return null;
-        }
-    }
-
-    /**
-     * Mask IP address for logging (privacy)
-     * @param {string} ip - IP address to mask
-     * @returns {string} Masked IP address
-     */
-    maskIp(ip) {
-        if (!ip) return null;
-
-        try {
-            // IPv4 address
-            if (ip.includes(".")) {
-                const parts = ip.split(".");
-                if (parts.length === 4) {
-                    return `${parts[0]}.${parts[1]}.*.*`;
-                }
-            }
-            // IPv6 address
-            else if (ip.includes(":")) {
-                const parts = ip.split(":");
-                if (parts.length > 2) {
-                    return `${parts[0]}:${parts[1]}:****:****`;
-                }
-            }
-
-            // Unknown format, return first 4 chars followed by asterisks
-            return ip.substring(0, 4) + "*".repeat(Math.max(0, ip.length - 4));
-        } catch (error) {
-            return "***.***.***";
-        }
-    }
-
-    /**
-     * Load all enabled modules dynamically
-     */
-    async loadModules() {
-        const modulePromises = this.config.enabledModules.map(
-            async (moduleName) => {
-                try {
-                    // Dynamic import the module
-                    const module = await import(`./${moduleName}-manager.js`);
-                    const ModuleClass = module.default;
-
-                    // Initialize the module
-                    this.modules[moduleName] = new ModuleClass(this);
-                } catch (error) {
-                    // Silent error handling
-                }
-            }
-        );
-
-        // Wait for all modules to load
-        await Promise.all(modulePromises);
-    }
-
-    /**
-     * Extract the original search query from URL or search input
-     */
-    extractOriginalQuery() {
-        // Try to get query from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlQuery = urlParams.get("query");
-
-        if (urlQuery) {
-            this.originalQuery = urlQuery;
-            return;
-        }
-
-        // Try to get query from search input field
-        const searchInput = document.querySelector(this.config.searchInputSelector);
-        if (searchInput && searchInput.value) {
-            this.originalQuery = searchInput.value;
-        }
-    }
-
-    /**
-     * Get session ID - should be called by modules rather than accessing this.sessionId directly
-     * Ensures consistent session ID usage across the application
-     * @returns {string|null} Session ID or null if unavailable
-     */
-    getSessionId() {
-        // If SessionService is available, always use that as source of truth
-        if (window.SessionService) {
-            const sessionId = window.SessionService.getSessionId();
-            // Update our cached value
-            if (sessionId) {
-                this.sessionId = sessionId;
-            }
-            return sessionId;
-        }
-
-        // Fallback to our cached value
-        return this.sessionId;
-    }
-
-    /**
-     * Get client IP - should be called by modules rather than accessing this.clientIp directly
-     * @returns {string|null} Client IP or null if unavailable
-     */
-    getClientIp() {
-        // If not enabled, return null
-        if (!this.config.enableIpTracking) {
-            return null;
-        }
-
-        // If SessionService is available, always use that as source of truth
-        if (window.SessionService) {
-            const clientIp = window.SessionService.getSessionIp();
-            // Update our cached value
-            if (clientIp) {
-                this.clientIp = clientIp;
-            }
-            return clientIp;
-        }
-
-        // Fallback to our cached value
-        return this.clientIp;
-    }
-
-    /**
-     * Initialize the MutationObserver to watch for DOM changes
-     */
-    initializeObserver() {
-        this.observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === "childList") {
-                    // Notify all modules about DOM changes
-                    Object.values(this.modules).forEach((module) => {
-                        if (typeof module.handleDomChanges === "function") {
-                            module.handleDomChanges(mutation.addedNodes);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    /**
-     * Start observing the results container for changes
-     */
-    startObserving() {
-        const resultsContainer = document.querySelector(
-            this.config.resultsContainerSelector
-        );
-        if (resultsContainer) {
-            this.observer.observe(resultsContainer, this.config.observerConfig);
+    
+    try {
+      // Increment counter
+      reconnectionAttempts++;
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, config.reconnection.retryDelay));
+      
+      log(`[RECONNECT] Attempt ${reconnectionAttempts} of ${config.reconnection.maxRetries}...`, LOG_LEVELS.INFO);
+      
+      // Try to use SearchManager if available (preferred method)
+      if (window.SearchManager && typeof window.SearchManager.verifyAndRefreshConnection === 'function') {
+        const result = await window.SearchManager.verifyAndRefreshConnection();
+        
+        if (result) {
+          reconnectionState = "active";
+          reconnectionAttempts = 0;
+          log("[RECONNECT] Successfully reconnected via SearchManager", LOG_LEVELS.INFO);
+          return true;
         } else {
-            this.waitForResultsContainer();
+          throw new Error("SearchManager reconnection failed");
         }
+      } else if (window.SessionService && typeof window.SessionService.initialize === 'function') {
+        // Try to reinitialize SessionService (fallback)
+        const originalSessionId = window.SessionService.getSessionId();
+        await window.SessionService.initialize(originalSessionId);
+        
+        // If we get here, it worked
+        reconnectionState = "active";
+        reconnectionAttempts = 0;
+        log("[RECONNECT] Successfully reconnected via SessionService", LOG_LEVELS.INFO);
+        return true;
+      } else {
+        // Last resort: just try a test request
+        const response = await fetch(`${config.apiBaseUrl}/api/client-info`, {
+          method: "HEAD",
+          cache: "no-store",
+          headers: { "X-Connection-Test": "true" }
+        });
+        
+        if (response.ok) {
+          reconnectionState = "active";
+          reconnectionAttempts = 0;
+          log("[RECONNECT] Test request successful", LOG_LEVELS.INFO);
+          return true;
+        } else {
+          throw new Error(`Test request failed: ${response.status}`);
+        }
+      }
+    } catch (error) {
+      log(`[RECONNECT] Reconnection attempt failed: ${error.message}`, LOG_LEVELS.ERROR);
+      
+      // Retry if attempts remain
+      if (reconnectionAttempts < config.reconnection.maxRetries) {
+        return performReconnection();
+      }
+      
+      // Max retries reached
+      reconnectionState = "failed";
+      return false;
+    }
+  }
+
+  /**
+   * Set up conditional preloading of search-related resources
+   * This function finds the search toggle button and adds an event listener to preload
+   * critical search resources only when the user interacts with the search UI.
+   * Resources are preloaded only once per session to avoid redundant network requests.
+   *
+   * @function
+   * @returns {void}
+   */
+  function setupConditionalPreloading() {
+    // Find the search toggle button
+    const searchToggle =
+      document.getElementById("site-search--button-toggle") ||
+      document.querySelector(".site-search__toggle");
+
+    if (!searchToggle) {
+      log("Search toggle button not found on this page", LOG_LEVELS.INFO);
+      return;
     }
 
-    /**
-     * Wait for the results container to appear in the DOM
-     */
-    waitForResultsContainer() {
-        const bodyObserver = new MutationObserver((mutations, obs) => {
-            const resultsContainer = document.querySelector(
-                this.config.resultsContainerSelector
+    // Check if we've already set up preloading (using sessionStorage)
+    const hasPreloaded = sessionStorage.getItem("searchResourcesPreloaded");
+    if (hasPreloaded === "true") {
+      log(
+        "Resources already preloaded, skipping preload setup",
+        LOG_LEVELS.INFO
+      );
+      return; // Don't set up listeners if we've already preloaded resources
+    }
+
+    log("Setting up preload listener on search toggle button", LOG_LEVELS.INFO);
+
+    // Add click event listener to the search toggle button
+    searchToggle.addEventListener("click", function () {
+      // Check again if we've already preloaded (could have happened between initial check and click)
+      if (sessionStorage.getItem("searchResourcesPreloaded") === "true") {
+        return;
+      }
+
+      // Create and inject preload links
+      preloadSearchResources();
+
+      // Set flag to prevent redundant preloading
+      sessionStorage.setItem("searchResourcesPreloaded", "true");
+    });
+  }
+
+  /**
+   * Creates and injects preload elements for critical search resources
+   * This function dynamically creates and injects resource hints to preload/prefetch
+   * critical assets needed for the search results page. Resources are preloaded in
+   * the following order of priority:
+   * 1. Establish connections to API domains (preconnect)
+   * 2. Load critical JavaScript files (preload)
+   * 3. Prefetch the search results page template (prefetch)
+   *
+   * This approach improves perceived performance when a user initiates a search
+   * by having critical resources already in the browser cache.
+   *
+   * @function
+   * @returns {void}
+   */
+  function preloadSearchResources() {
+    log("Preloading search resources", LOG_LEVELS.INFO);
+
+    // Create a document fragment to hold all the link elements
+    const fragment = document.createDocumentFragment();
+
+    // 1. First, establish connections to API domains
+    const apiPreconnect = document.createElement("link");
+    apiPreconnect.rel = "preconnect";
+    apiPreconnect.href = config.apiBaseUrl;
+    fragment.appendChild(apiPreconnect);
+
+    const proxyPreconnect = document.createElement("link");
+    proxyPreconnect.rel = "preconnect";
+    proxyPreconnect.href = config.proxyBaseUrl;
+    fragment.appendChild(proxyPreconnect);
+
+    // 2. Then preload critical JavaScript files
+    const sessionServicePreload = document.createElement("link");
+    sessionServicePreload.rel = "preload";
+    sessionServicePreload.href = `${config.apiBaseUrl}/js/SessionService.js`;
+    sessionServicePreload.as = "script";
+    fragment.appendChild(sessionServicePreload);
+
+    const searchBundlePreload = document.createElement("link");
+    searchBundlePreload.rel = "preload";
+    searchBundlePreload.href = `${config.apiBaseUrl}/search-bundle.js`;
+    searchBundlePreload.as = "script";
+    fragment.appendChild(searchBundlePreload);
+
+    // 3. Finally, prefetch the search results page template
+    const searchPagePrefetch = document.createElement("link");
+    searchPagePrefetch.rel = "prefetch";
+    searchPagePrefetch.href = "/search-test/";
+    fragment.appendChild(searchPagePrefetch);
+
+    // Append all links to the document head
+    document.head.appendChild(fragment);
+
+    log("Search resources preloaded successfully", LOG_LEVELS.INFO);
+  }
+
+  /**
+   * Find search components on the page
+   * @returns {Object} Object containing references to header and results search components
+   */
+  function findSearchComponents() {
+    const components = {
+      header: null,
+      results: null,
+    };
+
+    // Header search components
+    const headerInput = document.getElementById("search-input");
+    const headerForm = headerInput?.closest("form");
+    const headerButton = headerForm?.querySelector('button[type="submit"]');
+
+    if (headerInput && headerForm) {
+      components.header = {
+        input: headerInput,
+        form: headerForm,
+        button: headerButton,
+        container: document.createElement("div"),
+      };
+
+      // Create suggestions container if not exists
+      if (!document.getElementById("header-suggestions")) {
+        const suggestionsContainer = document.createElement("div");
+        suggestionsContainer.id = "header-suggestions";
+        suggestionsContainer.className = "header-suggestions-container";
+        suggestionsContainer.setAttribute("role", "listbox");
+        suggestionsContainer.hidden = true;
+
+        // Insert after search form
+        headerForm.parentNode.insertBefore(
+          suggestionsContainer,
+          headerForm.nextSibling
+        );
+        components.header.suggestionsContainer = suggestionsContainer;
+      } else {
+        components.header.suggestionsContainer =
+          document.getElementById("header-suggestions");
+      }
+    }
+
+    // Results page components
+    const resultsInput = document.getElementById(
+      "autocomplete-concierge-inputField"
+    );
+    const resultsForm = resultsInput?.closest("form");
+    const resultsButton = resultsForm?.querySelector("#on-page-search-button");
+    const resultsContainer = document.getElementById("results");
+    const suggestionsContainer = document.getElementById(
+      "autocomplete-suggestions"
+    );
+
+    if (resultsInput && resultsContainer) {
+      components.results = {
+        input: resultsInput,
+        form: resultsForm,
+        button: resultsButton,
+        container: resultsContainer,
+        suggestionsContainer: suggestionsContainer,
+      };
+    }
+
+    return components;
+  }
+
+  /**
+   * Set up header search integration
+   * @param {Object} component - Header search component references
+   */
+  function setupHeaderSearch(component) {
+    log("Setting up header search integration", LOG_LEVELS.INFO);
+
+    // Intercept form submission
+    component.form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const query = component.input.value.trim();
+      if (!query) return;
+
+      log(`Header search form submitted with query: ${query}`, LOG_LEVELS.INFO);
+
+      // Normalize the query
+      const normalizedQuery = normalizeQuery(query);
+
+      // Check connection before search if needed
+      if (shouldCheckConnection()) {
+        verifyConnection().catch(error => {
+          log(`Connection check failed before search: ${error.message}`, LOG_LEVELS.WARN);
+          // Continue with search even if verification fails
+        });
+      }
+
+      // Use SessionService to prepare for redirect if available
+      if (
+        window.SessionService &&
+        window.SessionService.prepareForSearchRedirect
+      ) {
+        const prepared =
+          window.SessionService.prepareForSearchRedirect(normalizedQuery);
+        log(
+          `SessionService prepared for redirect: ${prepared ? "success" : "failed"
+          }`,
+          LOG_LEVELS.INFO
+        );
+      } else {
+        log(
+          "SessionService not available for redirect preparation",
+          LOG_LEVELS.WARN
+        );
+      }
+
+      // Navigate to search page with query
+      const redirectUrl = `/search-test/?query=${encodeURIComponent(
+        normalizedQuery
+      )}`;
+      log(`Redirecting to: ${redirectUrl}`, LOG_LEVELS.INFO);
+      window.location.href = redirectUrl;
+    });
+
+    // Set up suggestions
+    if (component.suggestionsContainer) {
+      // Create debounced function for input handling
+      const handleInput = debounce(async function () {
+        const query = component.input.value.trim();
+
+        if (query.length < config.minQueryLength) {
+          component.suggestionsContainer.innerHTML = "";
+          component.suggestionsContainer.hidden = true;
+          return;
+        }
+
+        fetchHeaderSuggestions(query, component.suggestionsContainer);
+      }, config.debounceTime);
+
+      component.input.addEventListener("input", handleInput);
+
+      // Add prefetch functionality
+      const handlePrefetch = debounce(async function () {
+        const query = component.input.value.trim();
+
+        // Only prefetch if query is long enough
+        if (query.length < config.prefetchMinQueryLength) {
+          return;
+        }
+
+        // Normalize the query
+        const normalizedQuery = normalizeQuery(query);
+
+        // Prefetch in background
+        prefetchSearchResults(normalizedQuery);
+      }, config.prefetchDebounceTime);
+
+      // Add the prefetch listener
+      component.input.addEventListener("input", handlePrefetch);
+
+      // Add focus handler to check connection when focusing search
+      component.input.addEventListener("focus", function() {
+        // Update activity timestamp
+        updateActivityTimestamp();
+        
+        // Check connection if needed
+        if (shouldCheckConnection()) {
+          verifyConnection().catch(error => {
+            log(`Connection check on focus failed: ${error.message}`, LOG_LEVELS.WARN);
+            // Continue even if verification fails
+          });
+        }
+      });
+    }
+
+    // Handle clicks outside
+    document.addEventListener("click", function (e) {
+      if (
+        component.suggestionsContainer &&
+        !component.input.contains(e.target) &&
+        !component.suggestionsContainer.contains(e.target)
+      ) {
+        component.suggestionsContainer.innerHTML = "";
+        component.suggestionsContainer.hidden = true;
+      }
+    });
+  }
+
+  /**
+   * Normalizes a query for consistent caching
+   * @param {string} query - Original query
+   * @returns {string} Normalized query
+   */
+  function normalizeQuery(query) {
+    if (!query) return "";
+
+    // Convert to lowercase
+    let normalized = query.toLowerCase();
+
+    // Remove extra whitespace
+    normalized = normalized.trim().replace(/\s+/g, " ");
+
+    // Remove certain special characters
+    normalized = normalized.replace(/['"?!.,]/g, "");
+
+    log(`Normalized query: "${query}" -> "${normalized}"`, LOG_LEVELS.DEBUG);
+
+    return normalized;
+  }
+
+  /**
+   * Prefetch search results for a query to warm up the cache
+   * This sends a low-priority request to the prefetch API endpoint
+   * which will cache the results without blocking the main thread
+   *
+   * @param {string} query - Search query to prefetch
+   */
+  function prefetchSearchResults(query) {
+    try {
+      if (!query || query.length < config.prefetchMinQueryLength) {
+        return;
+      }
+
+      log(`Prefetching results for query: ${query}`, LOG_LEVELS.INFO);
+
+      // Get session ID if available
+      let sessionId = "";
+      if (window.SessionService) {
+        sessionId = window.SessionService.getSessionId() || "";
+        // Use a masked version of the session ID for logging
+        if (window.SessionService._maskString && sessionId) {
+          const maskedId = window.SessionService._maskString(sessionId);
+          log(`Using session ID for prefetch: ${maskedId}`, LOG_LEVELS.DEBUG);
+        }
+      }
+
+      // Create URL with parameters
+      const params = new URLSearchParams({
+        query: query,
+        collection: config.collection,
+        profile: config.profile,
+        prefetch: "true",
+      });
+
+      if (sessionId) {
+        params.append("sessionId", sessionId);
+      }
+
+      const prefetchUrl = `${config.apiBaseUrl}/api/prefetch?${params}`;
+
+      // Use fetch with appropriate flags for background operation
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+      fetch(prefetchUrl, {
+        method: "GET",
+        signal: controller.signal,
+        priority: "low",
+        keepalive: true,
+        headers: {
+          "X-Prefetch-Request": "true",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => {
+          clearTimeout(timeoutId);
+          if (response.ok) {
+            log(`Prefetch request successful for: ${query}`, LOG_LEVELS.INFO);
+            return response.json();
+          } else {
+            log(
+              `Prefetch request failed with status: ${response.status}`,
+              LOG_LEVELS.WARN
             );
-            if (resultsContainer) {
-                obs.disconnect();
-                this.observer.observe(resultsContainer, this.config.observerConfig);
-            }
+            throw new Error(`Prefetch failed: ${response.status}`);
+          }
+        })
+        .then((data) => {
+          log(`Prefetch response data:`, LOG_LEVELS.DEBUG, data);
+        })
+        .catch((error) => {
+          // Silent error handling for prefetch
+          clearTimeout(timeoutId);
+          log(`Prefetch error: ${error.message}`, LOG_LEVELS.ERROR);
         });
+    } catch (error) {
+      // Silent error handling
+      log(`Prefetch exception: ${error.message}`, LOG_LEVELS.ERROR);
+    }
+  }
 
-        bodyObserver.observe(document.body, {
-            childList: true,
-            subtree: true,
+  /**
+   * Fetch suggestions for header search
+   * @param {string} query - Search query
+   * @param {HTMLElement} container - Container for suggestions
+   */
+  async function fetchHeaderSuggestions(query, container) {
+    try {
+      log(`Fetching header suggestions for query: ${query}`, LOG_LEVELS.INFO);
+
+      // Check connection state if needed before making request
+      if (reconnectionState === "failed") {
+        // Try to reconnect before proceeding
+        const reconnected = await verifyConnection().catch(() => false);
+        if (!reconnected) {
+          log("Unable to fetch suggestions due to connection state", LOG_LEVELS.WARN);
+          container.innerHTML = "";
+          container.hidden = true;
+          return;
+        }
+      }
+
+      // Prepare URL with parameters
+      const params = new URLSearchParams({ query });
+
+      // Get session ID directly from SessionService if available
+      if (window.SessionService) {
+        const sessionId = window.SessionService.getSessionId();
+        if (sessionId) {
+          params.append("sessionId", sessionId);
+          // Use a masked version of the session ID for logging
+          if (window.SessionService._maskString) {
+            const maskedId = window.SessionService._maskString(sessionId);
+            log(
+              `Added session ID to suggestions request: ${maskedId}`,
+              LOG_LEVELS.DEBUG
+            );
+          }
+        }
+      }
+
+      // Fetch suggestions from API
+      const url = `${config.apiBaseUrl}/api/suggestions?${params}`;
+      log(`Suggestions API URL: ${url}`, LOG_LEVELS.DEBUG);
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      // Get JSON response
+      const data = await response.json();
+      log(`Received suggestions data:`, LOG_LEVELS.DEBUG, {
+        generalCount: data.general?.length || 0,
+        staffCount: data.staff?.length || 0,
+        programsCount: data.programs?.length || 0,
+      });
+
+      // Render header suggestions (simple list)
+      renderHeaderSuggestions(data, container, query);
+    } catch (error) {
+      log(`Error fetching suggestions: ${error.message}`, LOG_LEVELS.ERROR);
+      
+      // Try to reconnect if this might be a connection issue
+      if (config.reconnection.enabled) {
+        verifyConnection().catch(() => {
+          // Silent error handling
         });
+      }
+      
+      container.innerHTML = "";
+      container.hidden = true;
+      // Continue with normal operation despite fetch failure
+    }
+  }
+
+  /**
+   * Render header suggestions (simple list)
+   * @param {Object} data - Suggestions data
+   * @param {HTMLElement} container - Container for suggestions
+   * @param {string} query - Original query
+   */
+  function renderHeaderSuggestions(data, container, query) {
+    const suggestions = data.general || [];
+
+    if (suggestions.length === 0) {
+      container.innerHTML = "";
+      container.hidden = true;
+      return;
     }
 
-    /**
-     * Sanitize a string value to ensure it contains no line breaks
-     * or special characters that could break the JSON
-     * @param {string} value - The value to sanitize
-     * @returns {string} Sanitized value
-     */
-    sanitizeValue(value) {
-        if (typeof value !== "string") {
-            return value;
+    let html = '<div class="suggestions-list">';
+
+    suggestions.forEach((suggestion, index) => {
+      const display = suggestion.display || suggestion;
+      html += `
+        <div class="suggestion-item" role="option" data-index="${index}">
+          <span class="suggestion-text">${display}</span>
+        </div>
+      `;
+    });
+
+    html += "</div>";
+
+    container.innerHTML = html;
+    container.hidden = false;
+
+    // Add click handlers
+    container.querySelectorAll(".suggestion-item").forEach((item) => {
+      item.addEventListener("click", function () {
+        const text = this.querySelector(".suggestion-text").textContent;
+        log(`Suggestion clicked: ${text}`, LOG_LEVELS.INFO);
+
+        // Set input value
+        const input = document.getElementById("search-input");
+        if (input) {
+          input.value = text;
         }
 
-        // Replace line breaks, tabs, and control characters with spaces
-        let sanitized = value
-            .replace(/[\r\n\t\f\v]+/g, " ")
-            .replace(/\s+/g, " ") // Normalize spaces
-            .trim(); // Remove leading/trailing whitespace
+        // Normalize the query
+        const normalizedQuery = normalizeQuery(text);
 
-        // Remove common counter patterns that might be in the text
-        sanitized = sanitized.replace(/\s*\(\d+\)$/g, ""); // Remove " (26)" at the end
-        sanitized = sanitized.replace(/\s*\[\d+\]$/g, ""); // Remove " [26]" at the end
-        sanitized = sanitized.replace(/\s*\(\d+\)/g, ""); // Remove "(26)" anywhere
-
-        return sanitized;
-    }
-
-    /**
-     * Fetch data from Funnelback API via proxy
-     * @param {string} url - The original Funnelback URL
-     * @param {string} type - The type of request (search, tools, spelling)
-     * @returns {Promise<string>} The HTML response
-     */
-    async fetchFromProxy(url, type = "search") {
-        const endpoint = `${this.config.proxyBaseUrl}/funnelback/${type}`;
-
-        try {
-            let queryString;
-            let fullUrl;
-
-            // Ensure we have the latest session ID and client IP
-            await this.checkAndRefreshIdentifiers();
-
-            // Process based on request type
-            switch (type) {
-                case "search":
-                    // Extract query string
-                    queryString = url.includes("?") ? url.split("?")[1] : "";
-
-                    // Parse and sanitize query parameters
-                    const searchParams = new URLSearchParams(queryString);
-
-                    // Remove any existing sessionId and clientIp parameters
-                    searchParams.delete("sessionId");
-                    searchParams.delete("clientIp");
-
-                    // Add our canonical sessionId
-                    const sessionId = this.getSessionId();
-                    if (sessionId) {
-                        searchParams.append("sessionId", sessionId);
-                    }
-
-                    // Add client IP if available and enabled
-                    const clientIp = this.getClientIp();
-                    if (this.config.enableIpTracking && clientIp) {
-                        searchParams.append("clientIp", clientIp);
-                    }
-
-                    // Construct the full URL
-                    fullUrl = `${endpoint}?${searchParams.toString()}`;
-                    break;
-
-                case "tools":
-                    // Get path from URL
-                    const path = url.split("/s/")[1];
-
-                    // Create parameters object
-                    const toolsParams = new URLSearchParams({
-                        path,
-                    });
-
-                    // Add session ID if available
-                    const toolsSessionId = this.getSessionId();
-                    if (toolsSessionId) {
-                        toolsParams.append("sessionId", toolsSessionId);
-                    }
-
-                    // Add client IP if available and enabled
-                    const toolsClientIp = this.getClientIp();
-                    if (this.config.enableIpTracking && toolsClientIp) {
-                        toolsParams.append("clientIp", toolsClientIp);
-                    }
-
-                    // Construct the full URL
-                    fullUrl = `${endpoint}?${toolsParams.toString()}`;
-                    break;
-
-                case "spelling":
-                    // Extract query string
-                    queryString = url.includes("?") ? url.split("?")[1] : "";
-
-                    // Parse parameters
-                    const spellingParams = new URLSearchParams(queryString);
-
-                    // Remove any existing sessionId and clientIp parameters
-                    spellingParams.delete("sessionId");
-                    spellingParams.delete("clientIp");
-
-                    // Add our canonical sessionId
-                    const spellingSessionId = this.getSessionId();
-                    if (spellingSessionId) {
-                        spellingParams.append("sessionId", spellingSessionId);
-                    }
-
-                    // Add client IP if available and enabled
-                    const spellingClientIp = this.getClientIp();
-                    if (this.config.enableIpTracking && spellingClientIp) {
-                        spellingParams.append("clientIp", spellingClientIp);
-                    }
-
-                    // Construct the full URL
-                    fullUrl = `${endpoint}?${spellingParams.toString()}`;
-                    break;
-
-                default:
-                    throw new Error(`Unknown request type: ${type}`);
-            }
-
-            const response = await fetch(fullUrl);
-
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status}`);
-            }
-
-            return await response.text();
-        } catch (error) {
-            // Check if this is a connection issue that might benefit from reconnection
-            if (this.config.reconnection.enabled) {
-                console.warn(`[RECONNECT] Error during fetch (${type}): ${error.message}`);
-
-                // Try to reconnect if this might be a session timeout issue
-                const reconnected = await this.verifyAndRefreshConnection();
-
-                if (reconnected) {
-                    // Retry the fetch after reconnection
-                    try {
-                        console.log(`[RECONNECT] Retrying ${type} fetch after reconnection`);
-                        // Recursively call this method again now that we've reconnected
-                        return await this.fetchFromProxy(url, type);
-                    } catch (retryError) {
-                        console.error(`[RECONNECT] Retry failed: ${retryError.message}`);
-                    }
-                }
-            }
-
-            // If reconnection disabled, failed, or retry failed, return error message
-            return `<p>Error fetching ${type} request. Please try again later.</p>`;
-        }
-    }
-
-    /**
-     * Check and refresh session ID and client IP if necessary
-     * @returns {Promise<void>}
-     */
-    async checkAndRefreshIdentifiers() {
-        // Always update activity timestamp when checking identifiers
-        this.updateActivityTimestamp();
-
-        // If reconnection is enabled, check connection state based on inactivity
-        if (this.config.reconnection.enabled) {
-            const now = Date.now();
-            const inactivityPeriod = now - this.lastActivityTime;
-            const checkThreshold = this.config.reconnection.inactivityThreshold;
-
-            // Check if we need to verify connection due to inactivity
-            if (inactivityPeriod > checkThreshold) {
-                console.log(
-                    `[RECONNECT] Detected ${Math.round(inactivityPeriod / 1000)}s inactivity period, verifying connection`
-                );
-
-                try {
-                    // Try to verify and refresh the connection
-                    await this.verifyAndRefreshConnection();
-                } catch (error) {
-                    // Connection refresh failed, but we'll continue anyway
-                    console.error("[RECONNECT] Failed to refresh connection:", error);
-                }
-
-                // Update activity time even if verification failed
-                this.updateActivityTimestamp();
-                return;
-            }
+        // Use SessionService to prepare for redirect if available
+        if (
+          window.SessionService &&
+          window.SessionService.prepareForSearchRedirect
+        ) {
+          window.SessionService.prepareForSearchRedirect(normalizedQuery);
+          log(
+            `SessionService prepared for redirect with suggestion: ${normalizedQuery}`,
+            LOG_LEVELS.INFO
+          );
         }
 
-        // Check if we need to refresh IP information (once per hour)
-        // This is the original behavior, maintained for compatibility
-        const now = Date.now();
-        const timeSinceLastCheck = now - this.lastIpCheckTime;
+        // Track suggestion click
+        trackSuggestionClick(text, "general", "", text);
 
-        if (this.config.enableIpTracking && timeSinceLastCheck > 60 * 60 * 1000) {
-            await this.refreshSessionIpInfo();
-        }
+        // Redirect to search page
+        window.location.href = `/search-test/?query=${encodeURIComponent(
+          normalizedQuery
+        )}`;
+      });
+    });
+  }
+
+  /**
+   * Set up results page search integration
+   * @param {Object} component - Results search component references
+   */
+  function setupResultsSearch(component) {
+    log("Setting up results page search integration", LOG_LEVELS.INFO);
+
+    // Make sure search button is visible
+    if (component.button) {
+      component.button.classList.remove("empty-query");
     }
 
-    /**
-     * Get the connection state
-     * @returns {string} Current connection state
-     */
-    getConnectionState() {
-        return this.connectionState;
-    }
+    // Intercept form submission
+    if (component.form) {
+      component.form.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    /**
-     * Reset reconnection attempts counter
-     */
-    resetReconnectionAttempts() {
-        this.reconnectionAttempts = 0;
-        this.connectionState = "active";
-    }
+        const query = component.input.value.trim();
+        if (!query) return;
 
-    /**
-     * Mask a string for logging (for privacy)
-     * @param {string} str - String to mask
-     * @returns {string} Masked string
-     */
-    maskString(str) {
-        if (!str) return "null";
-        if (str.length <= 8) return str;
-
-        return (
-            str.substring(0, 4) +
-            "*".repeat(str.length - 8) +
-            str.substring(str.length - 4)
+        log(
+          `Results page search form submitted with query: ${query}`,
+          LOG_LEVELS.INFO
         );
+
+        // Normalize the query
+        const normalizedQuery = normalizeQuery(query);
+
+        // Check connection before search if needed
+        if (shouldCheckConnection()) {
+          verifyConnection().catch(error => {
+            log(`Connection check before search failed: ${error.message}`, LOG_LEVELS.WARN);
+            // Continue with search even if verification fails
+          });
+        }
+
+        // KEY ADDITION: Update core.originalQuery to ensure analytics work properly
+        // Only set if SearchManager exists and originalQuery is accessible
+        if (window.SearchManager && typeof window.SearchManager === "object") {
+          // First try to use setter method if it exists
+          if (typeof window.SearchManager.setOriginalQuery === "function") {
+            window.SearchManager.setOriginalQuery(normalizedQuery);
+            log(
+              "Updated SearchManager.originalQuery via setter",
+              LOG_LEVELS.DEBUG
+            );
+          }
+          // Otherwise set directly if property exists or can be created
+          else {
+            window.SearchManager.originalQuery = normalizedQuery;
+            log(
+              "Updated SearchManager.originalQuery directly",
+              LOG_LEVELS.DEBUG
+            );
+          }
+        }
+
+        // Perform search
+        performSearch(normalizedQuery, component.container);
+
+        // Update URL without reload
+        updateUrl(normalizedQuery);
+      });
     }
 
-    /**
-     * Update the results container with new content
-     * @param {string} html - The HTML content to display
-     */
-    updateResults(html) {
-        const resultsContainer = document.querySelector(
-            this.config.resultsContainerSelector
+    // Add prefetch functionality to search page input
+    if (component.input) {
+      const handlePrefetch = debounce(async function () {
+        const query = component.input.value.trim();
+
+        // Only prefetch if query is long enough
+        if (query.length < config.prefetchMinQueryLength) {
+          return;
+        }
+
+        // Normalize the query
+        const normalizedQuery = normalizeQuery(query);
+
+        // Prefetch in background
+        prefetchSearchResults(normalizedQuery);
+      }, config.prefetchDebounceTime);
+
+      // Add the prefetch listener
+      component.input.addEventListener("input", handlePrefetch);
+      
+      // Add focus handler to verify connection
+      component.input.addEventListener("focus", function() {
+        // Update activity timestamp
+        updateActivityTimestamp();
+        
+        // Always check connection on search input focus
+        if (reconnectionState !== "active") {
+          verifyConnection().catch(error => {
+            log(`Connection check on focus failed: ${error.message}`, LOG_LEVELS.WARN);
+            // Continue even if verification fails
+          });
+        }
+      });
+    }
+
+    // Set up click tracking on results
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get("query") || "";
+    attachResultClickHandlers(component.container, queryParam);
+
+    // Check if this is a redirect from a prefetched query
+    if (window.SessionService) {
+      const lastQuery =
+        window.SessionService.getLastSearchQuery &&
+        window.SessionService.getLastSearchQuery();
+
+      if (lastQuery) {
+        log(
+          `Found last search query from SessionService: ${lastQuery}`,
+          LOG_LEVELS.INFO
         );
-        if (resultsContainer) {
-            resultsContainer.innerHTML = `
+
+        // Clear after using to avoid stale data
+        if (window.SessionService.clearLastSearchQuery) {
+          window.SessionService.clearLastSearchQuery();
+          log("Cleared last search query from SessionService", LOG_LEVELS.INFO);
+        }
+      }
+    }
+  }
+
+  /**
+   * Process URL parameters for initial search
+   * @param {Object} component - Results search component references
+   * @param {boolean} cacheFirst - Whether to attempt cache-first approach
+   */
+  function processUrlParameters(component, cacheFirst = false) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get("query");
+
+    if (!query) {
+      log("No query parameter found in URL", LOG_LEVELS.INFO);
+      return;
+    }
+
+    log(
+      `Processing URL parameters with query: ${query}, cacheFirst: ${cacheFirst}`,
+      LOG_LEVELS.INFO
+    );
+
+    // Set input value
+    if (component.input) {
+      component.input.value = query;
+    }
+
+    // Normalize the query
+    const normalizedQuery = normalizeQuery(query);
+
+    // Check connection before initial search if needed
+    if (shouldCheckConnection()) {
+      verifyConnection().catch(error => {
+        log(`Connection check before initial search failed: ${error.message}`, LOG_LEVELS.WARN);
+        // Continue with search even if verification fails
+      });
+    }
+
+    // If cache-first is enabled and we have cached results, try to use them
+    if (
+      cacheFirst &&
+      window.SessionService &&
+      window.SessionService.getLastSearchQuery
+    ) {
+      const lastQuery = window.SessionService.getLastSearchQuery();
+
+      if (lastQuery === normalizedQuery) {
+        log(
+          `Cache-first approach possible for query: ${normalizedQuery}`,
+          LOG_LEVELS.INFO
+        );
+        // TODO: In Phase 4, implement cache check here
+      } else {
+        log(
+          `Cache-first approach not possible, query mismatch. URL: ${normalizedQuery}, Cached: ${lastQuery}`,
+          LOG_LEVELS.INFO
+        );
+      }
+    }
+
+    // Perform search
+    performSearch(normalizedQuery, component.container);
+  }
+
+  /**
+   * Perform search via API
+   * @param {string} query - Search query
+   * @param {HTMLElement} container - Container for results
+   */
+  async function performSearch(query, container) {
+    try {
+      log(`Performing search for query: ${query}`, LOG_LEVELS.INFO);
+
+      // Check connection state if needed
+      if (reconnectionState === "failed") {
+        // Try to reconnect before proceeding with search
+        const reconnected = await verifyConnection().catch(() => false);
+        if (!reconnected) {
+          log("Proceeding with search despite connection state", LOG_LEVELS.WARN);
+          // Continue anyway to provide best effort
+        }
+      }
+
+      // Prepare URL with parameters
+      const params = new URLSearchParams({
+        query,
+        form: 'partial',
+        collection: config.collection,
+        profile: config.profile,
+      });
+
+      log(`Performing search with params: ${params}`, LOG_LEVELS.INFO);
+
+      // Get session ID directly from SessionService if available
+      if (window.SessionService) {
+        const sessionId = window.SessionService.getSessionId();
+        if (sessionId) {
+          params.append("sessionId", sessionId);
+          // Use a masked version of the session ID for logging
+          if (window.SessionService._maskString) {
+            const maskedId = window.SessionService._maskString(sessionId);
+            log(
+              `Added session ID to search request: ${maskedId}`,
+              LOG_LEVELS.DEBUG
+            );
+          }
+        }
+      }
+
+      // Fetch results from API
+      const url = `${config.apiBaseUrl}/api/search?${params}`;
+      log(`Search API URL: ${url}`, LOG_LEVELS.DEBUG);
+
+      const startTime = Date.now();
+      const response = await fetch(url);
+      const responseTime = Date.now() - startTime;
+
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      // Check if response was from cache
+      const cacheStatus = response.headers.get("X-Cache-Status");
+      if (cacheStatus) {
+        log(
+          `Search response cache status: ${cacheStatus}, response time: ${responseTime}ms`,
+          LOG_LEVELS.INFO
+        );
+      } else {
+        log(`Search response received in ${responseTime}ms`, LOG_LEVELS.INFO);
+      }
+
+      // Get HTML response
+      const html = await response.text();
+
+      // Update results container
+      container.innerHTML = `
         <div id="funnelback-search-container-response" class="funnelback-search-container">
-          ${html || "No results found."}
+          ${html}
         </div>
       `;
 
-            // Scroll to results if not in viewport and page is not already at the top
-            if (!this.isElementInViewport(resultsContainer) && window.scrollY > 0) {
-                resultsContainer.scrollInView({
-                    behavior: "smooth",
-                    block: "start",
-                });
-            }
-        }
-    }
+      console.log('Search response received, length:', html.length, 'starts with:', html.substring(0, 100), LOG_LEVELS.DEBUG)
 
-    /**
-     * Check if an element is visible in the viewport
-     * @param {Element} el - The element to check
-     * @returns {boolean} True if element is in viewport
-     */
-    isElementInViewport(el) {
-        const rect = el.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <=
-            (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+      // Attach click handlers for tracking
+      attachResultClickHandlers(container, query);
+
+      // Scroll to results if not in viewport and page is not already at the top
+      if (!isElementInViewport(container) && window.scrollY > 0) {
+        container.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } catch (error) {
+      log(`Error performing search: ${error.message}`, LOG_LEVELS.ERROR);
+      
+      // Try to reconnect if this might be due to connection issues
+      if (config.reconnection.enabled) {
+        const reconnected = await verifyConnection().catch(() => false);
+        
+        if (reconnected) {
+          // Retry the search
+          try {
+            log("Retrying search after reconnection", LOG_LEVELS.INFO);
+            
+            // Recursive call with same parameters after reconnection
+            return await performSearch(query, container);
+          } catch (retryError) {
+            log(`Retry failed: ${retryError.message}`, LOG_LEVELS.ERROR);
+            // Fall through to error display
+          }
+        }
+      }
+      
+      // Display error message to user
+      container.innerHTML = `
+        <div class="search-error">
+          <h3>Error Loading Results</h3>
+          <p>${error.message}</p>
+        </div>
+      `;
+    }
+  }
+
+  /**
+   * Attach click handlers to search results for tracking
+   * @param {HTMLElement} container - Results container
+   * @param {string} query - Search query
+   */
+  function attachResultClickHandlers(container, query) {
+    // Find all result links
+    const resultLinks = container.querySelectorAll(
+      ".fb-result h3 a, .search-result-item h3 a, .listing-item__title a"
+    );
+
+    log(
+      `Attaching click handlers to ${resultLinks.length} result links`,
+      LOG_LEVELS.INFO
+    );
+
+    resultLinks.forEach((link, index) => {
+      link.addEventListener("click", function (e) {
+        // Don't prevent default navigation
+
+        // Get link details
+        const url =
+          link.getAttribute("data-live-url") || link.getAttribute("href") || "";
+        const title = link.textContent.trim() || "";
+
+        log(
+          `Result clicked: ${title}, position: ${index + 1}`,
+          LOG_LEVELS.INFO
         );
-    }
 
-    /**
-     * Send analytics data to the appropriate endpoint
-     * @param {Object} data - The analytics data to send
-     */
-    sendAnalyticsData(data) {
-        try {
-            // Ensure we have the latest session ID and client IP
-            // No await here as we don't want to block analytics
-            this.checkAndRefreshIdentifiers().catch(() => {
-                // Silent error handling
-            });
+        // Track click
+        trackResultClick(query, url, title, index + 1);
+      });
+    });
+  }
 
-            // Create a deep copy of the data to modify
-            const analyticsData = JSON.parse(JSON.stringify(data));
+  /**
+   * Track result click via API
+   * @param {string} query - Original query
+   * @param {string} url - Clicked URL
+   * @param {string} title - Result title
+   * @param {number} position - Result position (1-based)
+   */
+  function trackResultClick(query, url, title, position) {
+    try {
+      log(
+        `Tracking result click - Query: ${query}, Title: ${title}, Position: ${position}`,
+        LOG_LEVELS.INFO
+      );
 
-            // Only include sessionId if available
-            const sessionId = this.getSessionId();
-            if (sessionId) {
-                analyticsData.sessionId = sessionId;
-            }
+      // Prepare data
+      const data = {
+        originalQuery: query,
+        clickedUrl: url,
+        clickedTitle: title,
+        clickPosition: position,
+        clickType: "search",
+        timestamp: new Date().toISOString(),
+      };
 
-            // Add client IP if available and enabled
-            const clientIp = this.getClientIp();
-            if (this.config.enableIpTracking && clientIp) {
-                analyticsData.clientIp = clientIp;
-            }
-
-            // Add timestamp if missing
-            if (!analyticsData.timestamp) {
-                analyticsData.timestamp = new Date().toISOString();
-            }
-
-            // Determine endpoint and prepare data format based on data type
-            let endpoint;
-            let formattedData;
-
-            // Extract the type from analyticsData and store it
-            const dataType = analyticsData.type;
-
-            // IMPORTANT: Remove the type field from analyticsData as this is only used
-            // for routing and is not expected by the backend endpoints
-            delete analyticsData.type;
-
-            // Format data according to endpoint requirements
-            if (dataType === "click") {
-                // Format data for click endpoint
-                endpoint = `${this.config.proxyBaseUrl}${this.config.analyticsEndpoints.click}`;
-
-                // Convert from originalQuery to query if needed
-                if (analyticsData.originalQuery && !analyticsData.query) {
-                    analyticsData.query = analyticsData.originalQuery;
-                    delete analyticsData.originalQuery;
-                }
-
-                // Ensure required fields for click endpoint in a flat structure
-                formattedData = {
-                    originalQuery:
-                        analyticsData.originalQuery ||
-                        analyticsData.query ||
-                        this.originalQuery ||
-                        "",
-                    clickedUrl: analyticsData.clickedUrl || analyticsData.url || "",
-                    clickedTitle: analyticsData.clickedTitle || analyticsData.title || "",
-                    clickPosition:
-                        analyticsData.clickPosition || analyticsData.position || -1,
-                    sessionId: analyticsData.sessionId || undefined,
-                    timestamp: analyticsData.timestamp,
-                    clickType: analyticsData.clickType || "search",
-                    // Add client IP if available
-                    ...(analyticsData.clientIp
-                        ? { clientIp: analyticsData.clientIp }
-                        : {}),
-                };
-
-                // Sanitize all string values
-                formattedData.originalQuery = this.sanitizeValue(
-                    formattedData.originalQuery
-                );
-                formattedData.clickedUrl = this.sanitizeValue(formattedData.clickedUrl);
-                formattedData.clickedTitle = this.sanitizeValue(
-                    formattedData.clickedTitle
-                );
-                formattedData.clickType = this.sanitizeValue(formattedData.clickType);
-            } else if (dataType === "batch") {
-                // Format data for batch clicks endpoint
-                endpoint = `${this.config.proxyBaseUrl}${this.config.analyticsEndpoints.batch}`;
-
-                // Format batch data for clicks-batch endpoint
-                formattedData = {
-                    clicks: (analyticsData.clicks || []).map((click) => {
-                        const formattedClick = {
-                            originalQuery:
-                                click.originalQuery || click.query || this.originalQuery || "",
-                            clickedUrl: click.clickedUrl || click.url || "",
-                            clickedTitle: click.clickedTitle || click.title || "",
-                            clickPosition: click.clickPosition || click.position || -1,
-                            sessionId: sessionId || undefined,
-                            timestamp: click.timestamp || analyticsData.timestamp,
-                            clickType: click.clickType || "search",
-                            // Add client IP if available
-                            ...(clientIp ? { clientIp: clientIp } : {}),
-                        };
-
-                        // Sanitize all string values
-                        formattedClick.originalQuery = this.sanitizeValue(
-                            formattedClick.originalQuery
-                        );
-                        formattedClick.clickedUrl = this.sanitizeValue(
-                            formattedClick.clickedUrl
-                        );
-                        formattedClick.clickedTitle = this.sanitizeValue(
-                            formattedClick.clickedTitle
-                        );
-                        formattedClick.clickType = this.sanitizeValue(
-                            formattedClick.clickType
-                        );
-
-                        return formattedClick;
-                    }),
-                };
-            } else {
-                // For all other types (facet, pagination, tab, spelling), use supplement endpoint
-                endpoint = `${this.config.proxyBaseUrl}${this.config.analyticsEndpoints.supplement}`;
-
-                // For supplement endpoint, make sure we're using query (not originalQuery)
-                // and include enrichmentData as expected by the backend
-                if (analyticsData.originalQuery && !analyticsData.query) {
-                    analyticsData.query = analyticsData.originalQuery;
-                    delete analyticsData.originalQuery;
-                }
-
-                // Ensure we have a valid query
-                if (!analyticsData.query) {
-                    analyticsData.query = this.originalQuery || "";
-                }
-
-                // Sanitize query
-                analyticsData.query = this.sanitizeValue(analyticsData.query);
-
-                // Create a properly formatted object for supplement endpoint
-                formattedData = {
-                    query: analyticsData.query,
-                    sessionId: analyticsData.sessionId,
-                    // Add client IP if available
-                    ...(analyticsData.clientIp
-                        ? { clientIp: analyticsData.clientIp }
-                        : {}),
-                };
-
-                // Add resultCount if provided
-                if (analyticsData.resultCount !== undefined) {
-                    formattedData.resultCount = analyticsData.resultCount;
-                }
-
-                // Process enrichmentData if provided
-                if (analyticsData.enrichmentData) {
-                    // Create a clean enrichmentData object
-                    const cleanEnrichmentData = {};
-
-                    // Copy actionType
-                    if (analyticsData.enrichmentData.actionType) {
-                        cleanEnrichmentData.actionType = this.sanitizeValue(
-                            analyticsData.enrichmentData.actionType
-                        );
-                    }
-
-                    // For tab changes, only include tabName (not tabId)
-                    if (
-                        cleanEnrichmentData.actionType === "tab" &&
-                        analyticsData.enrichmentData.tabName
-                    ) {
-                        cleanEnrichmentData.tabName = this.sanitizeValue(
-                            analyticsData.enrichmentData.tabName
-                        );
-                    }
-
-                    // For facet selections
-                    if (cleanEnrichmentData.actionType === "facet") {
-                        if (analyticsData.enrichmentData.facetName) {
-                            cleanEnrichmentData.facetName = this.sanitizeValue(
-                                analyticsData.enrichmentData.facetName
-                            );
-                        }
-                        if (analyticsData.enrichmentData.facetValue) {
-                            cleanEnrichmentData.facetValue = this.sanitizeValue(
-                                analyticsData.enrichmentData.facetValue
-                            );
-                        }
-                        if (analyticsData.enrichmentData.action) {
-                            cleanEnrichmentData.action = this.sanitizeValue(
-                                analyticsData.enrichmentData.action
-                            );
-                        }
-                    }
-
-                    // For pagination
-                    if (
-                        cleanEnrichmentData.actionType === "pagination" &&
-                        analyticsData.enrichmentData.pageNumber !== undefined
-                    ) {
-                        cleanEnrichmentData.pageNumber =
-                            analyticsData.enrichmentData.pageNumber;
-                    }
-
-                    // For spelling suggestions
-                    if (
-                        cleanEnrichmentData.actionType === "spelling" &&
-                        analyticsData.enrichmentData.suggestedQuery
-                    ) {
-                        cleanEnrichmentData.suggestedQuery = this.sanitizeValue(
-                            analyticsData.enrichmentData.suggestedQuery
-                        );
-                    }
-
-                    // Include timestamp if provided
-                    if (analyticsData.enrichmentData.timestamp) {
-                        cleanEnrichmentData.timestamp =
-                            analyticsData.enrichmentData.timestamp;
-                    }
-
-                    // Add the cleaned enrichmentData to formattedData
-                    formattedData.enrichmentData = cleanEnrichmentData;
-                }
-            }
-
-            // Send the data using sendBeacon if available (works during page unload)
-            if (navigator.sendBeacon) {
-                const blob = new Blob([JSON.stringify(formattedData)], {
-                    type: "application/json",
-                });
-
-                const success = navigator.sendBeacon(endpoint, blob);
-                if (!success) {
-                    this.sendAnalyticsWithFetch(endpoint, formattedData);
-                }
-                return;
-            }
-
-            // Fallback to fetch with keepalive
-            this.sendAnalyticsWithFetch(endpoint, formattedData);
-        } catch (error) {
-            // Silent error handling
+      // Get session ID directly from SessionService if available
+      if (window.SessionService) {
+        const sessionId = window.SessionService.getSessionId();
+        if (sessionId) {
+          data.sessionId = sessionId;
         }
-    }
+      }
 
-    /**
-     * Send analytics data using fetch API (fallback) with detailed error handling
-     * @param {string} endpoint - The API endpoint
-     * @param {Object} data - The formatted data to send
-     */
-    sendAnalyticsWithFetch(endpoint, data) {
+      // Use sendBeacon if available for non-blocking operation
+      const endpoint = `${config.proxyBaseUrl}/analytics/click`;
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        });
+        const sent = navigator.sendBeacon(endpoint, blob);
+        log(
+          `Click tracking sent via sendBeacon: ${sent ? "success" : "failed"}`,
+          LOG_LEVELS.DEBUG
+        );
+      } else {
+        // Fallback to fetch with keepalive
+        log(
+          "SendBeacon not available, using fetch with keepalive",
+          LOG_LEVELS.DEBUG
+        );
         fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Origin: window.location.origin,
-            },
-            body: JSON.stringify(data),
-            credentials: "include",
-            keepalive: true,
-        }).catch(() => {
-            // Silent error handling
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          keepalive: true,
+        }).catch((error) => {
+          log(`Error tracking click: ${error.message}`, LOG_LEVELS.ERROR);
         });
+      }
+    } catch (error) {
+      // Error handling with logging
+      log(`Error tracking result click: ${error.message}`, LOG_LEVELS.ERROR);
+    }
+  }
+
+  /**
+   * Track suggestion click for analytics
+   * Exposed globally for use by other components
+   * @param {string} text - Suggestion text
+   * @param {string} type - Suggestion type (general, staff, program)
+   * @param {string} url - Clicked URL (for staff and programs)
+   * @param {string} title - Display title (with additional context)
+   */
+  window.trackSuggestionClick = function (text, type, url, title) {
+    try {
+      log(
+        `Tracking suggestion click - Text: ${text}, Type: ${type}`,
+        LOG_LEVELS.INFO
+      );
+
+      // Prepare data for the API call
+      const data = {
+        originalQuery: text,
+        clickedUrl: url || "",
+        clickedTitle: title || text,
+        clickType: type || "suggestion",
+        clickPosition: -1, // -1 for suggestions
+        timestamp: new Date().toISOString(),
+      };
+
+      // Get session ID directly from SessionService if available
+      if (window.SessionService) {
+        const sessionId = window.SessionService.getSessionId();
+        if (sessionId) {
+          data.sessionId = sessionId;
+        }
+      }
+
+      // Use sendBeacon if available for non-blocking operation
+      const endpoint = `${config.proxyBaseUrl}/analytics/click`;
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        });
+        const sent = navigator.sendBeacon(endpoint, blob);
+        log(
+          `Suggestion click tracking sent via sendBeacon: ${sent ? "success" : "failed"
+          }`,
+          LOG_LEVELS.DEBUG
+        );
+      } else {
+        // Fallback to fetch with keepalive
+        log(
+          "SendBeacon not available, using fetch with keepalive",
+          LOG_LEVELS.DEBUG
+        );
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          keepalive: true,
+        }).catch((error) => {
+          log(
+            `Error tracking suggestion click: ${error.message}`,
+            LOG_LEVELS.ERROR
+          );
+        });
+      }
+    } catch (error) {
+      // Error handling with logging
+      log(
+        `Error tracking suggestion click: ${error.message}`,
+        LOG_LEVELS.ERROR
+      );
+    }
+  };
+
+  /**
+   * Track tab change for analytics
+   * Exposed globally for use by other components
+   * @param {string} query - Original query
+   * @param {string} tabName - Tab name
+   * @param {string} tabId - Tab ID
+   */
+  window.trackTabChange = function (query, tabName, tabId) {
+    try {
+      log(
+        `Tracking tab change - Query: ${query}, Tab: ${tabName}, ID: ${tabId}`,
+        LOG_LEVELS.INFO
+      );
+
+      // Prepare data for the API call
+      const data = {
+        query: query,
+        enrichmentData: {
+          actionType: "tab",
+          tabName: tabName,
+          tabId: tabId,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      // Get session ID directly from SessionService if available
+      if (window.SessionService) {
+        const sessionId = window.SessionService.getSessionId();
+        if (sessionId) {
+          data.sessionId = sessionId;
+        }
+      }
+
+      // Use sendBeacon if available for non-blocking operation
+      const endpoint = `${config.proxyBaseUrl}/analytics/supplement`;
+
+      if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(data)], {
+          type: "application/json",
+        });
+        const sent = navigator.sendBeacon(endpoint, blob);
+        log(
+          `Tab change tracking sent via sendBeacon: ${sent ? "success" : "failed"
+          }`,
+          LOG_LEVELS.DEBUG
+        );
+      } else {
+        // Fallback to fetch with keepalive
+        log(
+          "SendBeacon not available, using fetch with keepalive",
+          LOG_LEVELS.DEBUG
+        );
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          keepalive: true,
+        }).catch((error) => {
+          log(`Error tracking tab change: ${error.message}`, LOG_LEVELS.ERROR);
+        });
+      }
+    } catch (error) {
+      // Error handling with logging
+      log(`Error tracking tab change: ${error.message}`, LOG_LEVELS.ERROR);
+    }
+  };
+
+  /**
+   * Update URL without page reload
+   * @param {string} query - Search query
+   */
+  function updateUrl(query) {
+    if (!window.history?.pushState) return;
+
+    const url = new URL(window.location);
+    url.searchParams.set("query", query);
+    window.history.pushState({}, "", url);
+
+    log(`Updated URL without page reload: ${url.toString()}`, LOG_LEVELS.INFO);
+  }
+
+  /**
+   * Debounce function to limit execution frequency
+   * @param {Function} func - Function to debounce
+   * @param {number} wait - Milliseconds to wait between calls
+   * @returns {Function} Debounced function
+   */
+  function debounce(func, wait) {
+    let timeout;
+    return function () {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
+
+  // Expose debounce function globally for other components
+  window.debounceFunction = debounce;
+
+  /**
+   * Check if element is in viewport
+   * @param {HTMLElement} el - Element to check
+   * @returns {boolean} Whether element is in viewport
+   */
+  function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    const isVisible =
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+    return isVisible;
+  }
+
+  // Expose configuration globally for other components
+  window.searchConfig = config;
+
+  /**
+   * Perform search via API (exposed globally for other components)
+   * @param {string} query - Search query
+   * @param {string|HTMLElement} containerId - Container ID or element for results
+   */
+  window.performSearch = function (query, containerId) {
+    const container =
+      typeof containerId === "string"
+        ? document.getElementById(containerId)
+        : containerId;
+
+    if (!container) {
+      log(`Search container not found: ${containerId}`, LOG_LEVELS.ERROR);
+      return;
     }
 
-    /**
-     * Clean up resources when the manager is destroyed
-     */
-    destroy() {
-        // Disconnect observer
-        if (this.observer) {
-            this.observer.disconnect();
-        }
+    // Normalize the query
+    const normalizedQuery = normalizeQuery(query);
 
-        // Clean up activity tracking
-        if (typeof window !== "undefined" && this.config.reconnection.enabled) {
-            const activityEvents = [
-                "mousedown",
-                "keydown",
-                "scroll",
-                "touchstart",
-                "click",
-                "focus",
-            ];
+    return performSearch(normalizedQuery, container);
+  };
 
-            activityEvents.forEach((eventType) => {
-                document.removeEventListener(eventType, this.handleUserActivity);
-            });
+  /**
+   * Update URL without page reload (exposed globally for other components)
+   */
+  window.updateSearchUrl = updateUrl;
 
-            const searchInputs = document.querySelectorAll(
-                this.config.searchInputSelector + ", #search-input"
-            );
-            searchInputs.forEach((input) => {
-                input.removeEventListener("focus", this.handleSearchInputFocus);
-                input.removeEventListener("input", this.handleUserActivity);
-            });
-        }
+  /**
+   * Expose prefetch function globally
+   */
+  window.prefetchSearchResults = prefetchSearchResults;
 
-        // Destroy all modules
-        Object.values(this.modules).forEach((module) => {
-            if (typeof module.destroy === "function") {
-                module.destroy();
-            }
-        });
-    }
-}
+  /**
+   * Expose normalizeQuery function globally
+   */
+  window.normalizeQuery = normalizeQuery;
 
-// Export as a singleton
-const searchManager = new SearchManager();
-export default searchManager;
+  /**
+   * Expose connection verification globally
+   */
+  window.verifySearchConnection = verifyConnection;
+
+  /**
+   * Toggle debug logging
+   * @param {boolean} enabled - Whether to enable debug logging
+   */
+  window.setSearchDebugLogging = function (enabled) {
+    setLogLevel(enabled ? LOG_LEVELS.DEBUG : LOG_LEVELS.INFO);
+    log(`Debug logging ${enabled ? "enabled" : "disabled"}`, LOG_LEVELS.INFO);
+  };
+})();
