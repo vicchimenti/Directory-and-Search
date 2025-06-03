@@ -55,9 +55,9 @@
  * @license MIT
  * @environment development
  * @status in-progress
- * @devVersion 5.1.6
+ * @devVersion 6.0.0
  * @prodVersion 4.1.0
- * @lastModified 2025-03-21
+ * @lastModified 2025-06003
  */
 
 class AutocompleteSearchManager {
@@ -187,11 +187,7 @@ class AutocompleteSearchManager {
             
             console.log('Sending suggestion click data:', clickData);
             
-            // Determine endpoint based on environment
-            const baseUrl = this.config.endpoints.suggest.includes('dev') 
-                ? 'https://funnelback-proxy-dev.vercel.app/proxy' 
-                : 'https://funnelback-proxy-one.vercel.app/proxy';
-                
+            const baseUrl = 'https://funnelback-proxy-dev.vercel.app/proxy';
             const endpoint = `${baseUrl}/analytics/click`;
             
             // Use sendBeacon for non-blocking operation
