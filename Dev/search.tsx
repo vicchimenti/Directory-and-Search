@@ -84,13 +84,14 @@ export default function SearchPage({
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { query } = context.query;
 
-  // Redirect to homepage if no query provided
+  // Show search page with error if no query provided
   if (!query || typeof query !== 'string' || query.trim() === '') {
     return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
+      props: {
+        query: '',
+        error: 'Please enter a search query to see results.',
+        initialResults: null
+      }
     };
   }
 
