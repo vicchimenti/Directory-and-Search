@@ -97,9 +97,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   try {
     // Generate session ID for server-side request
-    const sessionId = context.req.headers['x-session-id'] || 
-                     context.req.headers['cookie']?.match(/searchSessionId=([^;]+)/)?.[1] || 
-                     `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     // Use existing backend proxy URL
     const backendUrl = process.env.BACKEND_API_URL || 'https://funnelback-proxy-dev.vercel.app/proxy';
