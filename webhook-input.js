@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Form intercept script loaded');
+    console.log('Form intercept + blur script loaded');
     
     function submitKeywords(keywords) {
-        console.log('Submitting keywords via form intercept:', keywords);
+        console.log('Submitting keywords via intercept:', keywords);
         
         try {
             // Create form data for webhook submission
             const formData = new FormData();
-            formData.append('id-name-T4-form-5019', 'Program Search - Form Submit');
+            formData.append('id-name-T4-form-5019', 'Program Search - Intercept');
             formData.append('id-keyword-input-T4-form-5019', keywords);
             
             // Submit to webhook
@@ -16,15 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             })
             .then(response => {
-                console.log('Form intercept webhook status:', response.status);
+                console.log('Intercept webhook status:', response.status);
                 if (response.ok) {
-                    console.log('Form intercept SUCCESS:', keywords);
+                    console.log('Intercept SUCCESS:', keywords);
                 } else {
-                    console.warn('Form intercept FAILED:', response.status);
+                    console.warn('Intercept FAILED:', response.status);
                 }
             })
             .catch(error => {
-                console.error('Form intercept ERROR:', error);
+                console.error('Intercept ERROR:', error);
             });
             
         } catch (err) {
@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Let the original form submission continue normally
-                // (don't preventDefault - we want the search to work)
                 
             }, true); // Use capture phase to fire before other scripts
             
@@ -69,6 +68,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             submitKeywords(keywords);
                         }, 100);
                     }
+                }
+            }, true); // Use capture phase
+            
+            // Also capture when user clicks away from search field
+            searchInput.addEventListener('blur', function() {
+                const keywords = this.value.trim();
+                console.log('BLUR intercepted, keywords:', keywords);
+                
+                if (keywords) {
+                    submitKeywords(keywords);
                 }
             }, true); // Use capture phase
             
