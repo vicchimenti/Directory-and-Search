@@ -29,7 +29,7 @@
             }
             
             // Populate the hidden fields
-            nameField.value = 'Program Search'; // Or whatever identifier you want
+            nameField.value = 'Program Search';
             keywordField.value = keywords;
             
             // Find and submit the form
