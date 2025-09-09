@@ -1,0 +1,22 @@
+<!-- Hidden analytics form - not visible to users or screen readers -->
+<div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true" hidden>
+  <iframe id="t4-form-5019" width="1" height="1" src="https://us.formbank.us/embed/NTAxOS1lbg==" frameborder="0" scrolling="no" tabindex="-1" aria-hidden="true" title="Hidden analytics form"></iframe>
+</div>
+
+<script>
+function uif(e) {
+  var t = document.getElementById("t4-form-5019");
+  t.setAttribute("height", e.height);
+}
+
+var domain = "https://us.formbank.us",
+    iframe = document.getElementById("t4-form-5019").contentWindow;
+
+setInterval(function() {
+  iframe.postMessage("", domain);
+}, 3e3);
+
+window.addEventListener("message", function(e) {
+  "https://us.formbank.us" === e.origin && uif(e.data);
+}, !1);
+</script>
