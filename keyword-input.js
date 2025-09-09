@@ -1,25 +1,22 @@
-// Simple keyword capture script for Seattle University program finder
-(function() {
-    'use strict';
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Keyword capture script loaded');
     
-    // Wait for the page to load
-    function initKeywordCapture() {
+    function getKeywords() {
         const searchInput = document.getElementById('keywords');
+        return searchInput ? searchInput.value.trim() : '';
+    }
+    
+    function autoFillAndSubmit() {
+        const keywords = getKeywords();
+        console.log('Attempting to capture keywords:', keywords);
         
-        if (!searchInput) {
-            console.warn('Search input #keywords not found');
+        if (!keywords) {
+            console.log('No keywords to capture');
             return;
         }
         
-        // Function to capture and submit keywords
-        function captureAndSubmit() {
-            const keywords = searchInput.value.trim();
-            
-            if (!keywords) {
-                return; // Don't submit empty searches
-            }
-            
-            // Find the hidden form fields
+        try {
+            // Populate the hidden form fields
             const nameField = document.getElementById('id-name-T4-form-5019');
             const keywordField = document.getElementById('id-keyword-input-T4-form-5019');
             
@@ -28,44 +25,49 @@
                 return;
             }
             
-            // Populate the hidden fields
             nameField.value = 'Program Search';
             keywordField.value = keywords;
             
+            console.log('Fields populated with:', keywords);
+            
             // Find and submit the form
-            const hiddenForm = nameField.closest('form');
-            if (hiddenForm) {
-                hiddenForm.submit();
-                console.log('Keywords captured and submitted:', keywords);
+            const submitButton = document.querySelector('#t4-form-5019 .pull-right');
+            if (submitButton) {
+                submitButton.click();
+                console.log('Form submitted successfully');
             } else {
-                console.warn('Hidden form not found');
+                console.warn('Submit button not found');
             }
+            
+        } catch (err) {
+            console.error('Error in autoFillAndSubmit:', err);
         }
+    }
+    
+    // Set up event listeners for keyword capture
+    const searchInput = document.getElementById('keywords');
+    
+    if (searchInput) {
+        console.log('Search input found, setting up listeners');
         
-        // Capture keywords when user finishes typing (after they pause)
         let timeout;
+        
+        // Capture after user stops typing for 1 second
         searchInput.addEventListener('input', function() {
             clearTimeout(timeout);
-            timeout = setTimeout(captureAndSubmit, 1000); // Wait 1 second after they stop typing
+            timeout = setTimeout(autoFillAndSubmit, 1000);
         });
         
-        // Also capture on blur (when they click away from search field)
-        searchInput.addEventListener('blur', captureAndSubmit);
+        // Capture when user clicks away from search field
+        searchInput.addEventListener('blur', autoFillAndSubmit);
         
-        // Capture when they submit the main search form
+        // Capture when main search form is submitted
         const mainForm = searchInput.closest('form');
         if (mainForm) {
-            mainForm.addEventListener('submit', function() {
-                captureAndSubmit();
-            });
+            mainForm.addEventListener('submit', autoFillAndSubmit);
         }
-    }
-    
-    // Initialize when page loads
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initKeywordCapture);
+        
     } else {
-        initKeywordCapture();
+        console.warn('Search input #keywords not found');
     }
-    
-})();
+});
