@@ -1,90 +1,82 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Keyword capture script loaded');
+    console.log('Form intercept script loaded');
     
-    function getKeywords() {
-        const searchInput = document.getElementById('keywords');
-        const value = searchInput ? searchInput.value.trim() : '';
-        console.log('getKeywords() returning:', value);
-        return value;
-    }
-    
-    function submitToWebhook() {
-        console.log('submitToWebhook() called');
-        
-        const keywords = getKeywords();
-        console.log('Keywords captured:', keywords);
-        
-        if (!keywords) {
-            console.log('No keywords to submit, exiting');
-            return;
-        }
+    function submitKeywords(keywords) {
+        console.log('Submitting keywords via form intercept:', keywords);
         
         try {
-            console.log('Creating FormData...');
+            // Create form data for webhook submission
             const formData = new FormData();
-            formData.append('id-name-T4-form-5019', 'Program Search');
+            formData.append('id-name-T4-form-5019', 'Program Search - Form Submit');
             formData.append('id-keyword-input-T4-form-5019', keywords);
             
-            console.log('FormData created, sending to webhook...');
-            
+            // Submit to webhook
             fetch('https://www.seattleu.edu/testing123/vic/module-factory/directory/keyword-capture/', {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
-                console.log('Webhook response received, status:', response.status);
+                console.log('Form intercept webhook status:', response.status);
                 if (response.ok) {
-                    console.log('SUCCESS: Keywords submitted:', keywords);
+                    console.log('Form intercept SUCCESS:', keywords);
                 } else {
-                    console.warn('WARNING: Webhook failed with status:', response.status);
+                    console.warn('Form intercept FAILED:', response.status);
                 }
-                return response.text();
-            })
-            .then(data => {
-                console.log('Webhook response data received');
             })
             .catch(error => {
-                console.error('ERROR in fetch:', error);
+                console.error('Form intercept ERROR:', error);
             });
             
         } catch (err) {
-            console.error('ERROR in submitToWebhook:', err);
+            console.error('Error in submitKeywords:', err);
         }
     }
     
+    // Find the search form and intercept submissions
     const searchInput = document.getElementById('keywords');
     
     if (searchInput) {
-        console.log('Search input found, setting up event listeners');
+        const form = searchInput.closest('form');
         
-        let timeout;
-        
-        searchInput.addEventListener('input', function() {
-            console.log('INPUT event triggered, current value:', this.value);
-            clearTimeout(timeout);
-            timeout = setTimeout(function() {
-                console.log('Timeout fired, calling submitToWebhook');
-                submitToWebhook();
-            }, 1000);
-        });
-        
-        searchInput.addEventListener('blur', function() {
-            console.log('BLUR event triggered');
-            submitToWebhook();
-        });
-        
-        const mainForm = searchInput.closest('form');
-        if (mainForm) {
-            console.log('Main form found, adding submit listener');
-            mainForm.addEventListener('submit', function() {
-                console.log('FORM SUBMIT event triggered');
-                submitToWebhook();
-            });
+        if (form) {
+            console.log('Search form found, setting up intercept');
+            
+            // Intercept form submission using capture phase
+            form.addEventListener('submit', function(e) {
+                const keywords = searchInput.value.trim();
+                console.log('FORM SUBMIT intercepted, keywords:', keywords);
+                
+                if (keywords) {
+                    submitKeywords(keywords);
+                } else {
+                    console.log('Empty search, not submitting');
+                }
+                
+                // Let the original form submission continue normally
+                // (don't preventDefault - we want the search to work)
+                
+            }, true); // Use capture phase to fire before other scripts
+            
+            // Also intercept Enter key presses in the search field
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    const keywords = this.value.trim();
+                    console.log('ENTER KEY intercepted, keywords:', keywords);
+                    
+                    if (keywords) {
+                        // Small delay to ensure the form submission happens
+                        setTimeout(function() {
+                            submitKeywords(keywords);
+                        }, 100);
+                    }
+                }
+            }, true); // Use capture phase
+            
         } else {
-            console.log('No main form found around search input');
+            console.warn('No parent form found for search input');
         }
         
     } else {
-        console.error('ERROR: Search input #keywords not found');
+        console.warn('Search input #keywords not found');
     }
 });
