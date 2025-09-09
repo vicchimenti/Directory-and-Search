@@ -3,76 +3,88 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function getKeywords() {
         const searchInput = document.getElementById('keywords');
-        return searchInput ? searchInput.value.trim() : '';
+        const value = searchInput ? searchInput.value.trim() : '';
+        console.log('getKeywords() returning:', value);
+        return value;
     }
     
     function submitToWebhook() {
+        console.log('submitToWebhook() called');
+        
         const keywords = getKeywords();
-        console.log('Attempting to capture keywords:', keywords);
+        console.log('Keywords captured:', keywords);
         
         if (!keywords) {
-            console.log('No keywords to capture');
+            console.log('No keywords to submit, exiting');
             return;
         }
         
         try {
-            // Create form data to match your T4 form fields
+            console.log('Creating FormData...');
             const formData = new FormData();
             formData.append('id-name-T4-form-5019', 'Program Search');
             formData.append('id-keyword-input-T4-form-5019', keywords);
             
-            console.log('Sending to webhook:', keywords);
+            console.log('FormData created, sending to webhook...');
             
-            // Send directly to your webhook
             fetch('https://www.seattleu.edu/testing123/vic/module-factory/directory/keyword-capture/', {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
-                console.log('Webhook response status:', response.status);
+                console.log('Webhook response received, status:', response.status);
                 if (response.ok) {
-                    console.log('Keywords successfully submitted to webhook:', keywords);
+                    console.log('SUCCESS: Keywords submitted:', keywords);
                 } else {
-                    console.warn('Webhook submission failed with status:', response.status);
+                    console.warn('WARNING: Webhook failed with status:', response.status);
                 }
                 return response.text();
             })
             .then(data => {
-                console.log('Webhook response:', data);
+                console.log('Webhook response data received');
             })
             .catch(error => {
-                console.error('Webhook submission error:', error);
+                console.error('ERROR in fetch:', error);
             });
             
         } catch (err) {
-            console.error('Error in submitToWebhook:', err);
+            console.error('ERROR in submitToWebhook:', err);
         }
     }
     
-    // Set up event listeners for keyword capture
     const searchInput = document.getElementById('keywords');
     
     if (searchInput) {
-        console.log('Search input found, setting up listeners');
+        console.log('Search input found, setting up event listeners');
         
         let timeout;
         
-        // Capture after user stops typing for 1 second
         searchInput.addEventListener('input', function() {
+            console.log('INPUT event triggered, current value:', this.value);
             clearTimeout(timeout);
-            timeout = setTimeout(submitToWebhook, 1000);
+            timeout = setTimeout(function() {
+                console.log('Timeout fired, calling submitToWebhook');
+                submitToWebhook();
+            }, 1000);
         });
         
-        // Capture when user clicks away from search field
-        searchInput.addEventListener('blur', submitToWebhook);
+        searchInput.addEventListener('blur', function() {
+            console.log('BLUR event triggered');
+            submitToWebhook();
+        });
         
-        // Capture when main search form is submitted
         const mainForm = searchInput.closest('form');
         if (mainForm) {
-            mainForm.addEventListener('submit', submitToWebhook);
+            console.log('Main form found, adding submit listener');
+            mainForm.addEventListener('submit', function() {
+                console.log('FORM SUBMIT event triggered');
+                submitToWebhook();
+            });
+        } else {
+            console.log('No main form found around search input');
         }
         
     } else {
-        console.warn('Search input #keywords not found');
+        console.error('ERROR: Search input #keywords not found');
     }
 });
