@@ -91,18 +91,21 @@ Different content types use optimized cache durations:
 This application uses an A/B deployment strategy:
 
 ### Development Environment (This Repository)
+
 - **Frontend**: `su-search-dev` → [https://su-search-dev.vercel.app](https://su-search-dev.vercel.app)
 - **Backend Proxy**: `funnelback-proxy-dev`
 - **Purpose**: Feature development, testing, optimization
 - **Vercel Dashboard**: [https://vercel.com/su-web-ops/su-search-dev](https://vercel.com/su-web-ops/su-search-dev)
 
 ### Production Environment
+
 - **Frontend**: `su-search` → [https://su-search.vercel.app](https://su-search.vercel.app) 
 - **Backend Proxy**: `funnelback-proxy`
 - **Purpose**: Live search functionality for Seattle University
 - **Deployment Source**: Validated features from this development repository
 
 ### Emergency Backup Protocol
+
 In case of production system failure, this development environment can serve as an emergency backup while production issues are resolved.
 
 ## Getting Started
@@ -117,12 +120,14 @@ In case of production system failure, this development environment can serve as 
 ### Local Development Setup
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/vicchimenti/su-search-dev.git
    cd su-search-dev
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    # or
@@ -130,9 +135,9 @@ In case of production system failure, this development environment can serve as 
    ```
 
 3. **Configure environment variables**:
-   
+
    Create a `.env.local` file with the following configuration:
-   
+
    ```bash
    # Required - Backend API Configuration
    BACKEND_API_URL=https://funnelback-proxy-dev.vercel.app/proxy
@@ -148,6 +153,7 @@ In case of production system failure, this development environment can serve as 
    ```
 
 4. **Start the development server**:
+
    ```bash
    npm run dev
    # or
@@ -181,6 +187,7 @@ git tag -l "snapshot-dev-*"
    - Test edge cases and error handling
 
 2. **Deploy to production**:
+
    ```bash
    # Deploy current state to production environment
    npm install -g vercel
