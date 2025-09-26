@@ -91,21 +91,18 @@ Different content types use optimized cache durations:
 This application uses an A/B deployment strategy:
 
 ### Development Environment (This Repository)
-
 - **Frontend**: `su-search-dev` → [https://su-search-dev.vercel.app](https://su-search-dev.vercel.app)
 - **Backend Proxy**: `funnelback-proxy-dev`
 - **Purpose**: Feature development, testing, optimization
 - **Vercel Dashboard**: [https://vercel.com/su-web-ops/su-search-dev](https://vercel.com/su-web-ops/su-search-dev)
 
 ### Production Environment
-
 - **Frontend**: `su-search` → [https://su-search.vercel.app](https://su-search.vercel.app) 
 - **Backend Proxy**: `funnelback-proxy`
 - **Purpose**: Live search functionality for Seattle University
 - **Deployment Source**: Validated features from this development repository
 
 ### Emergency Backup Protocol
-
 In case of production system failure, this development environment can serve as an emergency backup while production issues are resolved.
 
 ## Getting Started
@@ -120,14 +117,12 @@ In case of production system failure, this development environment can serve as 
 ### Local Development Setup
 
 1. **Clone the repository**:
-
    ```bash
    git clone https://github.com/vicchimenti/su-search-dev.git
    cd su-search-dev
    ```
 
 2. **Install dependencies**:
-
    ```bash
    npm install
    # or
@@ -135,9 +130,9 @@ In case of production system failure, this development environment can serve as 
    ```
 
 3. **Configure environment variables**:
-
+   
    Create a `.env.local` file with the following configuration:
-
+   
    ```bash
    # Required - Backend API Configuration
    BACKEND_API_URL=https://funnelback-proxy-dev.vercel.app/proxy
@@ -153,7 +148,6 @@ In case of production system failure, this development environment can serve as 
    ```
 
 4. **Start the development server**:
-
    ```bash
    npm run dev
    # or
@@ -187,7 +181,6 @@ git tag -l "snapshot-dev-*"
    - Test edge cases and error handling
 
 2. **Deploy to production**:
-
    ```bash
    # Deploy current state to production environment
    npm install -g vercel
@@ -519,16 +512,150 @@ vercel --prod
    - Test thoroughly in development environment
    - Monitor performance impact
 
-3. **Create Snapshot**:
+3. **Commit Following Conventions** (see Commit Conventions below)
+
+4. **Create Snapshot**:
    ```bash
    git tag snapshot-dev-feature-name-$(date +%Y%m%d)
    git push origin snapshot-dev-feature-name-$(date +%Y%m%d)
    ```
 
-4. **Submit for Review**:
+5. **Submit for Review**:
    - Create detailed pull request with performance metrics
    - Include testing instructions and edge case coverage
    - Document any breaking changes or configuration updates
+
+### Commit Conventions
+
+This repository follows **Conventional Commits** specification for clear, structured commit messages that enable automated changelog generation and semantic versioning.
+
+#### Commit Message Format
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### Commit Types
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| `feat` | New feature | `feat(suggestions): add three-column layout for autocomplete` |
+| `fix` | Bug fix | `fix(searchNowFunction): resolve cache key mismatch in URL parameters` |
+| `perf` | Performance improvement | `perf(cache): reduce pre-render check time from 402ms to 285ms` |
+| `refactor` | Code refactoring | `refactor(sessionService): eliminate redundant initialization calls` |
+| `docs` | Documentation changes | `docs(readme): update API endpoint documentation` |
+| `style` | Code style changes | `style(analytics): fix ESLint warnings in tracking module` |
+| `test` | Test additions/changes | `test(search-api): add integration tests for cache scenarios` |
+| `chore` | Maintenance tasks | `chore(deps): update Next.js to version 14.2.0` |
+| `ci` | CI/CD changes | `ci(vercel): add performance monitoring to deployment` |
+
+#### Scope Guidelines
+
+Use lowercase scope names that represent the affected component:
+
+**API Scopes**:
+- `search-api`, `suggestions-api`, `cache-api`, `client-info`
+
+**Client Module Scopes**:
+- `sessionService`, `analytics`, `tabs`, `facets`, `pagination`, `collapse`
+
+**Integration Scopes**:
+- `integration`, `search-bundle`, `autocomplete`
+
+**Infrastructure Scopes**:
+- `cache`, `redis`, `performance`, `deployment`
+
+#### Commit Message Examples
+
+```bash
+# Feature additions
+feat(pre-render): implement smart background caching for search queries
+feat(analytics): add comprehensive click tracking for suggestion items
+
+# Bug fixes
+fix(tabs-manager): prevent duplicate event handlers on dynamic content
+fix(cache): resolve TTL calculation error for popular queries
+
+# Performance improvements
+perf(search-flow): eliminate redundant cache-first fallback (366ms improvement)
+perf(sessionService): reduce initialization overhead by 50ms
+
+# Refactoring
+refactor(core-search-manager): extract common session ID logic into utility
+refactor(integration): simplify URL parameter processing with helper functions
+
+# Documentation
+docs(api): add comprehensive endpoint documentation with examples
+docs(performance): document optimization results and monitoring guidelines
+
+# Maintenance
+chore(snapshot): create milestone tag for SessionService optimization sprint
+chore(env): update Redis configuration for production deployment
+```
+
+#### Breaking Changes
+
+For breaking changes, add `BREAKING CHANGE:` in the commit footer:
+
+```bash
+feat(search-api): restructure response format for improved performance
+
+BREAKING CHANGE: Search API now returns structured JSON instead of raw HTML.
+Update client-side integration scripts to handle new response format.
+```
+
+#### Commit Best Practices
+
+1. **Keep commits focused**: One logical change per commit
+2. **Use present tense**: "add feature" not "added feature"
+3. **Be specific in scope**: Use the actual component/file affected
+4. **Include performance metrics**: When relevant, mention timing improvements
+5. **Reference issues**: Include issue numbers when applicable
+
+```bash
+# Good examples
+fix(cache): resolve Redis connection timeout in production environment
+perf(search): reduce average response time by 240ms through query optimization
+feat(suggestions): implement keyboard navigation for three-column layout
+
+# Avoid these patterns
+fix: various bug fixes
+update: made some changes
+feat: new stuff
+```
+
+#### Automated Tools
+
+The repository may use automated tools that depend on conventional commits:
+
+- **Changelog Generation**: Automatic release notes from commit messages
+- **Semantic Versioning**: Version bumps based on commit types
+- **Release Automation**: Deployment triggers from tagged commits
+
+#### Commit Validation
+
+Consider using tools like `commitlint` to validate commit message format:
+
+```bash
+# Install commitlint (optional)
+npm install --save-dev @commitlint/cli @commitlint/config-conventional
+
+# Example .commitlintrc.json
+{
+  "extends": ["@commitlint/config-conventional"],
+  "rules": {
+    "scope-enum": [2, "always", [
+      "search-api", "suggestions-api", "cache-api", 
+      "sessionService", "analytics", "tabs", "facets",
+      "integration", "performance", "deployment"
+    ]]
+  }
+}
+```
 
 ### Code Quality Standards
 
