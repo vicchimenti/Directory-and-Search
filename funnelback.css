@@ -1,12 +1,12 @@
 /**
 *   Funnelback Stylesheet
-*   Version: 3.1.1
+*   Version: 3.1.2
 *   Date: 2025-01-05
 *   Author: Funnelback
 *   Description: Funnelback Stylesheet
-*   Last Updated: 2025-05-11
+*   Last Updated: 2026-02-02
 *   Last Updated By: Vic
-*   Added rule for scroll-behavior smooth
+*   Added rule for background color
 *
 * */
 
@@ -18,6 +18,10 @@
     margin-top: 0;
   }
 }
+
+/* .su-listing--form-wrapper.bg--dark {
+  background-color: #004250;
+} */
 
 .site-search .search-block-form input.sq-search {
   border: 0;
