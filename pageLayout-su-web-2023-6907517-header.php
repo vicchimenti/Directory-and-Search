@@ -1,9 +1,7 @@
 <t4 type="navigation" name="v10 Access Control - PHP" id="1021" /><t4 type="navigation" name="Return PHP Head" id="977" /><t4 type="media" id="7506257" formatter="inline/*" />
 <!DOCTYPE html>
 <html lang="en-US">
-
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,34 +21,33 @@
     <meta name="Language" content="en-US">
     <meta name="googlebot" content="all">
     <meta name="robots" content="all">
-    
 
     <!-- Preconnects -->
-
     <link rel="preconnect" href="https://fonts.googleapis.com"  />
 
     <!-- Preloads -->
-
     <link
         rel="preload"
         href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;1,500;1,800&amp;family=Oswald:wght@300;700&amp;family=Roboto+Slab:wght@200;300&amp;display=swap"
         as="style"
         crossorigin
     />
-
     <link
         rel="preload"
         href="/media/seattle-university/site-assets/css/theme.min.css"
         as="style"
     />
+  
+  	<t4 type="navigation" name="JSON-LD Meta Tags" id="1128" />
+    <!-- JSON-LD -->
+    <t4 type="navigation" name="Breadcrumbs Structured Data" id="1130"/>
+    <!-- JSON-LD Breadcrumbs-->
+
 
     <!-- Custom Head Code -->
-
     <t4 type="navigation" name="V10 - Custom Header Code" id="1014" />
-
     
     <!-- Nav Icons -->
-
     <link rel="apple-touch-icon" sizes="180x180" href='<t4 type="media" id="6913741" formatter="path/*" />'>
     <link rel="icon" type="image/png" sizes="32x32" href='<t4 type="media" id="6913745" formatter="path/*" />'>
     <link rel="icon" type="image/png" sizes="16x16" href='<t4 type="media" id="6913749" formatter="path/*" />'>
@@ -59,9 +56,7 @@
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="msapplication-config" content='<t4 type="media" id="6913806" formatter="path/*" />'>
 
-    
     <!-- Stylesheets -->
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,600;0,700;1,500;1,800&amp;family=Oswald:wght@300;700&amp;family=Roboto+Slab:wght@200;300&amp;display=swap" />
     <t4 type="media" id="6907520" formatter="cssver/*" />
     <!-- app.css -->
@@ -71,13 +66,12 @@
     <!-- all.css -->
     <t4 type="media" id="7022512" formatter="cssver/*" />
     <!-- t4-extras.css -->
+    <t4 type="media" id="8953952" formatter="cssver/*" />
+    <!-- funnelback.css -->
 
-    
     <!-- Custom -->
-
     <t4 type="navigation" name="Return Scripts for Head" id="978" />
     <t4 type="navigation" name="V10 - Custom CSS Zone" id="1013" />
-
 
 </head>
 
