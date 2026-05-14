@@ -102,23 +102,6 @@
                     </#if>
                 </div>
             </div>                     
-            <#--  <div class="listing-item__footer">
-                <div class="listing-item__footer-block listing-item__footer-block">
-                    <#if (result.listMetadata["category"])!?has_content && (result.listMetadata["provider"])!?has_content>
-                        <p>
-                            ${(result.listMetadata["category"]?first)!} | ${(result.listMetadata["provider"]?first)!}
-                        </p>
-                    <#elseif (result.listMetadata["category"])!?has_content>
-                        <p>
-                            ${(result.listMetadata["category"]?first)!}
-                        </p>
-                    <#elseif (result.listMetadata["provider"])!?has_content>
-                        <p>
-                            ${(result.listMetadata["provider"]?first)!}
-                        </p>
-                    </#if>
-                </div>
-            </div>                                          -->
         </div>
     </article>    
 </#macro>
