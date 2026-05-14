@@ -39,7 +39,7 @@
                             <div class="listing-item__content">
                                 <div class="listing-item__header">
                                     <span class="listing-item__promoted-tag">promoted</span>
-                                    <h3 class="module-curator__title funderline">
+                                    <h3 class="module-curator__title h4 funderline">
                                         <a 
                                             href="${exhibit.linkUrl!}"
                                             class="listing-item__title-link"
