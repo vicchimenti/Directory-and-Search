@@ -81,8 +81,13 @@
                                 ${(result.title)!} | School of Law
                             </@s.Truncate>
                         </#if>
-                        
-                        </a>    
+                        </a>  
+                        <#-- Show an icon to represented the file type of the current document -->
+                        <#switch result.fileType>
+                            <#case "pdf">
+                                <i class="far fa-file-pdf" aria-hidden="true"></i>
+                                <#break>
+                        </#switch>
                     </h3>  
                 </div>
             </#if>
