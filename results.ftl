@@ -60,13 +60,6 @@
             <#-- Title -->
             <#if (result.title)!?has_content>
                 <div class="listing-item__header">
-                    <#-- Show an icon to represented the file type of the current document -->
-                    <#switch result.fileType>
-                        <#case "pdf">
-                            <i class="far fa-file-pdf" aria-hidden="true"></i>
-                            <#break>
-                    </#switch>
-
                     <h3 class="listing-item__title h4 funderline">
                         <a 
                         href="${result.clickTrackingUrl!}" 
@@ -79,6 +72,12 @@
                                 ${(result.listMetadata["t"]?first)!} 
                             </@s.boldicize></@s.Truncate>
                         </a>    
+                        <#-- Show an icon to represented the file type of the current document -->
+                        <#switch result.fileType>
+                            <#case "pdf">
+                                <i class="far fa-file-pdf" aria-hidden="true"></i>
+                                <#break>
+                        </#switch>
                     </h3>
                 </div>
             </#if>
