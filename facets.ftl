@@ -50,10 +50,24 @@
                         <#if facet.allValues?size gt 0>
                             <#--  Facet  -->
                             <div class="facet-group" data-component="facet-group">
-                                <h2 hidden class="sr-only">Refine by ${facet.name}</h2>
-                                <div class="facet-group__title facet-group__title--open" data-component="facet-group-control">
-                                    <h3>${facet.name}</h3>
-                                 </div>
+                                <#--  
+                                    Show the name of the facet as a heading which allows the 
+                                    user to expland and collapse the associated facet categories.  
+                                -->
+                                <button 
+                                    type="button" 
+                                    class="facet-group__title facet-group__title--open"
+                                    data-component="facet-group-control" 
+                                    >
+                                    ${facet.name}
+                                    <svg class="facet-group__icon facet-group__icon--closed">
+                                        <use href="#add"></use>
+                                    </svg>
+                                    <svg class="facet-group__icon facet-group__icon--open">
+                                        <use href="#subtract"></use>
+                                    </svg>
+                                </button>
+
                                 <#--  Facet categories  -->
                                 <@FacetCategories facet=facet maxCategories=maxCategories />
                                       
@@ -84,11 +98,11 @@
         aria-label="${facet.name}"
         class="
         facet-group__list
-        facet-group__type-${(facet.guessedDisplayType)?replace('_','-')}
+        facet-group__type-${(facet.guessedDisplayType?lower_case)?replace('_','-')}
         facet-group__list--open
         "
         data-component="facet-group-content"
-        data-type="${(facet.guessedDisplayType)?replace('_','-')}"
+        data-type="${(facet.guessedDisplayType?lower_case)?replace('_','-')}"
     >
         <#list facet.allValues as category>
             <a 
@@ -107,7 +121,11 @@
                 <#if facet.guessedDisplayType == "SINGLE_DRILL_DOWN" && category.selected>
                     <i class="fas fa-level-up-alt"></i>
                 </#if> 
-                ${category.label}  
+              <#if category.label?lower_case == "past week" || category.label?lower_case == "past month">
+                  ${category.label?lower_case?split(" ")?map(word -> word?capitalize)?join(" ")}
+                <#else>
+                  ${category.label}
+                </#if>
 
                 <#if category.count?? && !category.selected>
                     <span class="facet-group__results-number">${category.count}</span>
