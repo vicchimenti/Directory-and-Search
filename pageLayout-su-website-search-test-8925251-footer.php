@@ -34,16 +34,18 @@
         <!-- emergency-alert.js -->
         <script src="<t4 type='media' id='7022505' formatter='path/*' />" defer></script>
         <!-- t4-extras.js -->
-        <script src="<t4 type='media' id='9055999' formatter='path/*' />" type="module" defer></script>
-        <!-- results-search-manager.js -->
-        <script src="<t4 type='media' id='9017309' formatter='path/*' />" type="module" defer></script>
-        <!-- dynamic-results-manager.js -->
-        <script src="<t4 type='media' id='9056000' formatter='path/*' />" type="module" defer></script>
-        <!-- header-search-manager.js -->
-        <script src="<t4 type='media' id='9063951' formatter='path/*' />" type="module" defer></script>
-        <!-- global-collapse-manager.js -->
-        <script src="<t4 type='media' id='9155586' formatter='path/*' />" type="module" defer></script>
-        <!-- autocomplete-search-manager.js -->
+        <script src="https://su-search-dev.vercel.app/js/SessionService.js" fetchpriority="high"></script>
+        <!-- Session Service Manager -->
+        <script src="https://su-search-dev.vercel.app/search-page-autocomplete.js"></script>
+        <!-- Frontend Search Autocomplete -->
+        <script src="https://su-search-dev.vercel.app/integration.js" defer></script>
+        <!-- Frontend Search API Integration -->
+        <script type="module" src="https://su-search-dev.vercel.app/js/search-index.js"></script>
+        <!-- Search Module Integration -->
+
+
+
+
         
         <t4 type="navigation" name="Return Gallery JS" id="956" />
         <t4 type="navigation" name="Return Event Promo JS" id="965" />
