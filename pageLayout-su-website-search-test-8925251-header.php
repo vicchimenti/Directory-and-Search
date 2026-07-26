@@ -58,7 +58,10 @@
     <!-- funnelback.css -->
 
     <script type="module" src="https://funnelback-search-bh7xd66kv-su-web-ops.vercel.app/js/search.js" fetchpriority="high"></script>
-    <!-- Funnelback Search — unified client entry point -->
+    <!-- Funnelback Search — unified client entry point testing -->
+     
+    <!-- <script type="module" src="https://funnelback-search.vercel.app/js/search.js" fetchpriority="high"></script> -->
+    <!-- Funnelback Search — unified client entry point production -->
     
     <!-- Custom -->
     <t4 type="navigation" name="Return Scripts for Head - Search Assets" id="1089" />
