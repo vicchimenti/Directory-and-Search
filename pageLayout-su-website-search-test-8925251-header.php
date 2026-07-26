@@ -56,6 +56,9 @@
     <!-- t4-extras.css -->
     <t4 type="media" id="9396006" formatter="cssver/*" />
     <!-- funnelback.css -->
+
+    <script type="module" src="https://funnelback-search-bh7xd66kv-su-web-ops.vercel.app/js/search.js" fetchpriority="high"></script>
+    <!-- Funnelback Search — unified client entry point -->
     
     <!-- Custom -->
     <t4 type="navigation" name="Return Scripts for Head - Search Assets" id="1089" />
