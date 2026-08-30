@@ -9910,3 +9910,6 @@ button#on-page-search-button svg,
   font-size: .95rem;
 }
 
+@media (max-width: 767.98px) {
+  .tabs { overflow-x: hidden; }
+}
