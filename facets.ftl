@@ -35,9 +35,9 @@
             </button>
         </div>
         <div 
-            class="facet-groups"
+            class="facet-groups facet-groups--open"
             data-component="facet-group-content"
-            aria-hidden="true"
+            aria-hidden="false"
         >
             <#list facetNames as facetName>
                 <#list response.facets![] as facet>
