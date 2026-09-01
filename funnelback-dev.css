@@ -4,9 +4,9 @@
 *   Date: 2025-01-05
 *   Author: Funnelback
 *   Description: Funnelback Stylesheet Development Environment
-*   Last Updated: 2026-08-30
+*   Last Updated: 2026-09-01
 *   Last Updated By: Vic
-*   Tab overflow on mobile
+*   Tab overflow on ipad
 *   /search-test/
 *
 **/
@@ -9276,6 +9276,7 @@ html {
   text-decoration: none;
   transition: color, background-color 0.3s ease-in-out;
   white-space: nowrap;
+  position: relative;
 }
 
 .tabs .tab__button:focus,
