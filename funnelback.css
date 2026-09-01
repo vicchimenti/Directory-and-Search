@@ -1,13 +1,15 @@
 /**
 *   Funnelback Stylesheet
-*   Version: 3.1.2
+*   Version: 3.3.0
 *   Date: 2025-01-05
 *   Author: Funnelback
 *   Description: Funnelback Stylesheet
-*   Last Updated: 2026-02-02
+*   Last Updated: 2026-09-01
 *   Last Updated By: Vic
+*   prettier formatter
+*   /search/
 *
-* */
+**/
 
 /* Search bar input rules */
 
@@ -9416,6 +9418,7 @@ html {
     color,
     background-color 0.3s ease-in-out;
   white-space: nowrap;
+  position: relative;
 }
 
 .tabs .tab__button:focus,
@@ -10044,3 +10047,21 @@ button#on-page-search-button svg,
   }
 }
 
+/* su-search-notice — dispatch-failure notice drawn by tabs, refine, spelling
+   and suggestion handlers. Class is emitted by the search app, not by the
+   stencil. Mirrors NOTICE_STYLE in render-results.ts; added 2026-08-25 so the
+   rule survives innerHTML writes on #results. */
+.su-search-notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #a00;
+  background: #f4f4f4;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 767.98px) {
+  .tabs {
+    overflow-x: hidden;
+  }
+}
