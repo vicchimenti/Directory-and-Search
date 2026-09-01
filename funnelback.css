@@ -1,13 +1,15 @@
 /**
 *   Funnelback Stylesheet
-*   Version: 3.1.2
-*   Date: 2025-01-05
+*   Version: 4.0.0
+*   Date: 2026-09-01
 *   Author: Funnelback
-*   Description: Funnelback Stylesheet
-*   Last Updated: 2026-02-02
+*   Description: Funnelback Stylesheet Development Environment
+*   Last Updated: 2026-09-01
 *   Last Updated By: Vic
+*   New search app
+*   /search/
 *
-* */
+**/
 
 /* Search bar input rules */
 
@@ -278,9 +280,7 @@ template {
   content: "";
   display: none;
   position: absolute;
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1171,14 +1171,9 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -1449,11 +1444,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -1571,9 +1563,7 @@ html {
 .custom-form.search-tools .search-tools__button {
   color: #262626;
   margin-right: 0.625rem;
-  transition:
-    color 0.3s ease-in-out,
-    color 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .custom-form.search-tools .search-tools__button--inactive {
@@ -1644,11 +1634,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -2033,11 +2020,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -2116,11 +2100,8 @@ html {
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -2288,11 +2269,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -2884,8 +2862,7 @@ html {
   height: 100%;
   position: fixed;
   top: 0;
-  transition:
-    background-color var(--drawer-transition-speed),
+  transition: background-color var(--drawer-transition-speed),
     visibility 0s var(--drawer-transition-speed);
   visibility: hidden;
   width: 100%;
@@ -3135,11 +3112,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3433,11 +3407,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3549,11 +3520,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3619,11 +3587,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3687,11 +3652,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3757,11 +3719,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3827,11 +3786,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3897,11 +3853,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -3967,11 +3920,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4037,11 +3987,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4107,11 +4054,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4194,11 +4138,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4258,11 +4199,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4320,11 +4258,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4384,11 +4319,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4448,11 +4380,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4512,11 +4441,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4576,11 +4502,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4640,11 +4563,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4704,11 +4624,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4868,11 +4785,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -4933,11 +4847,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -6043,9 +5954,7 @@ html {
 .modal[hidden] {
   display: block;
   transform: translate3d(0, -0.0625rem, 0) scale(0);
-  transition:
-    visibility 0s linear 0.2s,
-    transform 0s linear 0.2s;
+  transition: visibility 0s linear 0.2s, transform 0s linear 0.2s;
   visibility: hidden;
 }
 
@@ -6060,9 +5969,7 @@ html {
 .modal[hidden]:before {
   display: block;
   transform: translate3d(0, -0.0625rem, 0) scale(0);
-  transition:
-    visibility 0s linear 0.2s,
-    transform 0s linear 0.2s;
+  transition: visibility 0s linear 0.2s, transform 0s linear 0.2s;
   visibility: hidden;
 }
 
@@ -6076,9 +5983,7 @@ html {
 
 .modal[hidden]:before {
   opacity: 0;
-  transition:
-    opacity 0.2s ease-in-out,
-    visibility 0s linear 0.2s,
+  transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s,
     transform 0s linear 0.2s;
 }
 
@@ -6106,9 +6011,7 @@ html {
 
 .modal[hidden] .modal__content {
   transform: translate3d(0, -0.0625rem, 0) scale(0);
-  transition:
-    transform 0s ease-in-out,
-    visibility 0s linear;
+  transition: transform 0s ease-in-out, visibility 0s linear;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6305,9 +6208,7 @@ html {
   overflow: visible;
   padding: 0.75rem 1rem;
   text-align: inherit;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6355,11 +6256,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -6459,9 +6357,7 @@ html {
   padding: 1rem 1.5rem;
   position: relative;
   text-decoration: none;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6483,9 +6379,7 @@ html {
   opacity: 0;
   position: absolute;
   transform: translate(-50%);
-  transition:
-    background-color,
-    transform 0.25s ease;
+  transition: background-color, transform 0.25s ease;
   width: 0;
 }
 
@@ -6558,9 +6452,7 @@ html {
 .primary-nav__landmark .overflow-menu__button:hover {
   background: #f4f4f4;
   outline-offset: -0.125rem;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6644,14 +6536,9 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -7138,9 +7025,7 @@ html {
   left: -1.625rem;
   position: absolute;
   top: 0.125rem;
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   width: 1.125rem;
 }
 .funnelback-facet
@@ -7167,9 +7052,7 @@ html {
   position: absolute;
   top: 0.25rem;
   transform: rotate(45deg);
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   width: 0.3125rem;
 }
 
@@ -7197,9 +7080,7 @@ html {
   margin-right: 0.5rem;
   position: absolute;
   top: 0.125rem;
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   width: 1.125rem;
 }
 
@@ -7222,9 +7103,7 @@ html {
   left: -1.375rem;
   position: absolute;
   top: 0.375rem;
-  transition:
-    border-color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   width: 0.625rem;
 }
 
@@ -7611,11 +7490,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -7925,11 +7801,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -8043,11 +7916,8 @@ html {
   padding: 0.5rem 1rem;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -8199,9 +8069,7 @@ html {
   margin: 0 0.125rem;
   min-height: 2.25rem;
   min-width: 2.25rem;
-  transition:
-    background-color 0.2s ease-in,
-    color 0.2s ease-in;
+  transition: background-color 0.2s ease-in, color 0.2s ease-in;
   padding-left: 0;
 }
 
@@ -8594,11 +8462,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -9348,11 +9213,8 @@ html {
   text-align: inherit;
   text-align: center;
   text-decoration: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0.15s ease-in-out,
-    box-shadow 0.15s ease-in-out;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   -webkit-user-select: none;
   -moz-user-select: none;
   user-select: none;
@@ -9412,10 +9274,9 @@ html {
   margin: 0;
   padding: 1rem;
   text-decoration: none;
-  transition:
-    color,
-    background-color 0.3s ease-in-out;
+  transition: color, background-color 0.3s ease-in-out;
   white-space: nowrap;
+  position: relative;
 }
 
 .tabs .tab__button:focus,
@@ -9646,15 +9507,9 @@ html {
 .overflow-menu .tab__button {
   color: #262626;
   margin: 0;
-  transition:
-    color 0.3s ease-in-out,
-    -webkit-text-decoration 0.3s ease-in-out;
-  transition:
-    color 0.3s ease-in-out,
-    text-decoration 0.3s ease-in-out;
-  transition:
-    color 0.3s ease-in-out,
-    text-decoration 0.3s ease-in-out,
+  transition: color 0.3s ease-in-out, -webkit-text-decoration 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out,
     -webkit-text-decoration 0.3s ease-in-out;
 }
 
@@ -9758,8 +9613,7 @@ html {
   border: 1px solid #e2e8f0;
   border-top: none;
   border-radius: 0 0 4px 4px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   z-index: 1000;
   max-height: 80vh;
@@ -10042,4 +9896,21 @@ button#on-page-search-button svg,
   #on-page-search-button {
     flex-shrink: 0; /* Prevent button from shrinking */
   }
+}
+  
+  /* su-search-notice — dispatch-failure notice drawn by tabs, refine, spelling
+   and suggestion handlers. Class is emitted by the search app, not by the
+   stencil. Mirrors NOTICE_STYLE in render-results.ts; added 2026-08-25 so the
+   rule survives innerHTML writes on #results. */
+.su-search-notice {
+  margin: 0 0 1rem;
+  padding: .75rem 1rem;
+  border-left: 4px solid #a00;
+  background: #f4f4f4;
+  color: #333;
+  font-size: .95rem;
+}
+
+@media (max-width: 767.98px) {
+  .tabs { overflow-x: hidden; }
 }
