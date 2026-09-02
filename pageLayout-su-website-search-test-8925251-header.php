@@ -57,7 +57,7 @@
     <t4 type="media" id="9396006" formatter="cssver/*" />
     <!-- funnelback.css -->
 
-    <script type="module" src="https://funnelback-search-bh7xd66kv-su-web-ops.vercel.app/js/search.js" fetchpriority="high"></script>
+    <script type="module" src="https://funnelback-search-git-cutover-su-web-ops.vercel.app/js/search.js" fetchpriority="high"></script>
     <!-- Funnelback Search — unified client entry point testing -->
      
     <!-- <script type="module" src="https://funnelback-search.vercel.app/js/search.js" fetchpriority="high"></script> -->
