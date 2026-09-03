@@ -9367,6 +9367,15 @@ html {
     background-color 0.3s ease-in-out;
   white-space: nowrap;
   position: relative;
+  cursor: pointer;
+}
+
+/* Navigation affordance — these controls lose their href to the
+   renderer and the navigation sweep, so the pointer cursor can no
+   longer come from the UA default for a[href]. */
+.facet-group__list-item,
+.pagination__link {
+  cursor: pointer;
 }
 
 .tabs .tab__button:focus,
